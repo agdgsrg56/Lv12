@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>الصفحة الرئيسية</title>
+  <title>لوحة التحكم</title>
   <link rel="stylesheet" href="style.css" />
   <style>
     body {
@@ -25,6 +25,7 @@
     a {
       text-decoration: none;
       color: #0070f3;
+      cursor: pointer;
     }
     a:hover {
       text-decoration: underline;
@@ -32,23 +33,34 @@
   </style>
 </head>
 <body>
-  <h1>مرحباً بك في موقع المستوى 12</h1>
-  <p>اختر الصفحة التي تريد زيارتها:</p>
+  <h1>لوحة التحكم</h1>
+  <p>اختر ما تريد الوصول إليه:</p>
   <ul>
-    <li><a href="login.html">تسجيل الدخول</a></li>
-    <li><a href="register.html">تسجيل حساب جديد</a></li>
-    <li><a href="dashboard.html">لوحة التحكم</a></li>
-    <li><a href="team.html">فريق العمل</a></li>
-    <li><a href="subscriptions.html">الاشتراكات</a></li>
-    <li><a href="subscribe.html">الاشتراك</a></li>
-    <li><a href="sessions-attendance.html">حضور الجلسات</a></li>
-    <li><a href="privacy.html">سياسة الخصوصية</a></li>
-    <li><a href="contact.html">اتصل بنا</a></li>
-    <li><a href="about.html">من نحن</a></li>
-    <li><a href="coach-cv.html">السيرة الذاتية للمدرب</a></li>
-    <li><a href="vip-requests.html">طلبات VIP</a></li>
-    <li><a href="pool-management.html">إدارة المسبح</a></li>
-    <li><a href="register-player.html">تسجيل لاعب</a></li>
+    <li><a onclick="goToPage('dashboard.html')">لوحة التحكم</a></li>
+    <li><a onclick="goToPage('team.html')">فريق العمل</a></li>
+    <li><a onclick="goToPage('subscriptions.html')">الاشتراكات</a></li>
+    <li><a onclick="goToPage('subscribe.html')">الاشتراك</a></li>
+    <li><a onclick="goToPage('sessions-attendance.html')">حضور الجلسات</a></li>
+    <li><a onclick="goToPage('privacy.html')">سياسة الخصوصية</a></li>
+    <li><a onclick="goToPage('contact.html')">اتصل بنا</a></li>
+    <li><a onclick="goToPage('about.html')">من نحن</a></li>
+    <li><a onclick="goToPage('coach-cv.html')">السيرة الذاتية للمدرب</a></li>
+    <li><a onclick="goToPage('vip-requests.html')">طلبات VIP</a></li>
+    <li><a onclick="goToPage('pool-management.html')">إدارة المسبح</a></li>
+    <li><a onclick="goToPage('register-player.html')">تسجيل لاعب</a></li>
   </ul>
+
+  <script>
+    function goToPage(page) {
+      const isLoggedIn = localStorage.getItem("loggedIn");
+      if (isLoggedIn === "true") {
+        window.location.href = page;
+      } else {
+        // نحفظ اسم الصفحة اللي المستخدم حاول يفتحها
+        localStorage.setItem("redirectAfterLogin", page);
+        window.location.href = "login.html";
+      }
+    }
+  </script>
 </body>
 </html>
