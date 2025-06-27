@@ -1,0 +1,102 @@
+body {
+  font-family: 'Tajawal', sans-serif;
+  margin: 0;
+  padding: 0;
+  direction: rtl;
+  background: linear-gradient(to right, #00c6ff, #0072ff);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-page {
+  background: linear-gradient(to right, #0072ff, #00c6ff);
+}
+
+.auth-container {
+  background: #fff;
+  padding: 40px 30px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+h2 {
+  color: #0072ff;
+  margin-bottom: 25px;
+  font-size: 24px;
+}
+
+input, select, button {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+input:focus {
+  border-color: #00c6ff;
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 198, 255, 0.5);
+}
+
+button {
+  background-color: #0072ff;
+  color: white;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #0059c1;
+}
+
+.error-msg {
+  color: red;
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+.redirect-msg {
+  margin-top: 15px;
+  font-size: 15px;
+}
+
+a {
+  color: #0072ff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+  .auth-container {
+    padding: 30px 20px;
+  }
+
+  h2 {
+    font-size: 20px;
+  }
+  .phone-wrapper {
+  display: flex;
+  gap: 8px;
+}
+
+.phone-wrapper select,
+.phone-wrapper input {
+  flex: 1;
+}
+
+}

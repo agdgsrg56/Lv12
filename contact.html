@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>اتصل بنا</title>
+</head>
+<body style="font-family: 'Tajawal', sans-serif; padding: 20px;">
+  <h2>📞 اتصل بنا</h2>
+  <p>يسعدنا تواصلك معنا لأي استفسار أو دعم:</p>
+  <ul>
+    <li>📧 البريد الإلكتروني: <a href="mailto:lv12dev@gmail.com">lv12dev@gmail.com</a></li>
+    <li>📱 واتساب: <a href="https://wa.me/201112223344" target="_blank">اضغط هنا للدردشة</a></li>
+  </ul>
+  <script>
+  const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
+
+  if (currentUser.status === "banned" || currentUser.status === "suspended") {
+    const msg = currentUser.status === "banned"
+      ? `<div class="message banned"><h2>🚫 لقد تم حظرك من استخدام النظام</h2><p>برجاء التواصل مع الإدارة</p></div>`
+      : `<div class="message suspended"><h2>⏸️ حسابك موقوف مؤقتًا</h2><p>يرجى المحاولة لاحقًا أو التواصل مع الإدارة</p></div>`;
+    document.write(`<html><head><title>الحالة</title></head><body>${msg}</body></html>`);
+  }
+</script>
+
+</body>
+</html>

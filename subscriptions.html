@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>إدارة الاشتراكات</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Tajawal', sans-serif;
+      direction: rtl;
+      background-color: var(--bg-color, #f4f4f4);
+      padding: 20px;
+    }
+    .container {
+      max-width: 1000px;
+      margin: auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      color: var(--main-color, #0072ff);
+      text-align: center;
+    }
+    .search-box input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    .player-strip {
+      background-color: #e6f0ff;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+    .player-strip:hover {
+      background-color: #cce0ff;
+    }
+    .player-details {
+      display: none;
+      margin: 10px 0;
+      padding: 15px;
+      background-color: #f9f9f9;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+    .player-details p {
+      margin: 6px 0;
+    }
+    .player-details input, .player-details select {
+      width: 100%;
+      padding: 8px;
+      margin: 6px 0;
+      border-radius: 6px;
+      border: 1px solid #aaa;
+    }
+    .btn {
+      padding: 10px;
+      margin: 5px 0;
+      background-color: var(--main-color, #0072ff);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .day-btn {
+      margin: 4px;
+      padding: 8px 12px;
+      border: 1px solid #0072ff;
+      background-color: white;
+      color: #0072ff;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .day-btn.active {
+      background-color: #0072ff;
+      color: white;
+    }
+    .summary {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    .expiring-btn {
+      background: orange;
+    }
+    .ended-btn {
+      background: red;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>📄 إدارة الاشتراكات</h2>
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="🔍 ابحث عن اسم اللاعب...">
+    </div>
+    <button class="btn expiring-btn" onclick="showExpiring()">⏳ الاشتراكات القريبة من الانتهاء</button>
+    <button class="btn ended-btn" onclick="showEnded()">📕 الاشتراكات المنتهية</button>
+    <div id="playersList"></div>
+  </div>
+  <script>
+    const user = JSON.parse(localStorage.getItem("currentUser"));
+    if (user && user.plan === "vip") {
+      const vipColor = localStorage.getItem("vipColor");
+      if (vipColor) document.documentElement.style.setProperty('--main-color', vipColor);
+    }
+    const players = JSON.parse(localStorage.getItem("players")) || [];
+    const coaches = JSON.parse(localStorage.getItem("coaches")) || [];
+    const listContainer = document.getElementById("playersList");
+    const searchInput = document.getElementById("searchInput");
+
+    function renderPlayers(filter = "", onlyExpiring = false, onlyEnded = false) {
+      listContainer.innerHTML = "";
+      const now = new Date();
+      players.filter(p => p.name.includes(filter)).forEach((player, index) => {
+        const endDate = player.endDate ? new Date(player.endDate) : null;
+        const daysLeft = endDate ? Math.ceil((endDate - now) / (1000 * 60 * 60 * 24)) : null;
+        if (onlyExpiring && (daysLeft === null || daysLeft > 5)) return;
+        if (onlyEnded && (daysLeft === null || daysLeft > 0)) return;
+        const strip = document.createElement("div");
+        strip.className = "player-strip";
+        strip.textContent = `👤 ${player.name}`;
+        const details = document.createElement("div");
+        details.className = "player-details";
+        details.innerHTML = `
+          <p><strong>📛 الاسم:</strong> ${player.name}</p>
+          <p><strong>📍 العنوان:</strong> ${player.address}</p>
+          <p><strong>🎂 السن:</strong> ${player.age}</p>
+          <p><strong>📞 الهاتف:</strong> ${player.phone}</p>
+          <p><strong>🎯 المستوى:</strong> ${player.level || '-'}</p>
+          <p><strong>🔁 عدد مرات التجديد:</strong> ${player.renewCount || 0}</p>
+          <form onsubmit="return saveData(event, ${index})">
+            <input type="number" name="price" placeholder="💰 المبلغ الأساسي" value="${player.price || ''}" required>
+            <input type="number" name="paid" placeholder="💵 المبلغ المدفوع" value="${player.paid || ''}" required>
+            <input type="number" name="sessions" placeholder="📆 عدد الحصص في الشهر" value="${player.sessions || ''}" required>
+            <label>📅 أيام الحضور:</label>
+            <div id="days-buttons" class="day-selector">
+              ${["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة"].map(day => `
+                <button type="button" class="day-btn" data-value="${day}">${day}</button>
+              `).join('')}
+            </div>
+            <input type="hidden" name="days" value="${player.days || ''}">
+            <label>👨‍🏫 اختر المدرب:</label>
+            <select name="coach" required>
+              ${coaches.map(c => `<option value="${c.name}" ${player.coach === c.name ? 'selected' : ''}>${c.name}</option>`).join('')}
+            </select>
+            <div class="summary" id="summary-${index}"></div>
+            <button class="btn" type="submit">💾 حفظ</button>
+            <button class="btn" type="button" onclick="printInvoice(${index})">🧾 طباعة فاتورة</button>
+            <button class="btn" type="button" onclick="renew(${index})">♻️ تجديد</button>
+            <button class="btn" type="button" onclick="deletePlayer(${index})">🗑️ حذف</button>
+            <button class="btn" type="button" onclick="migrateToAttendance(${index})">📋 ترحيل للغياب والحضور</button>
+          </form>
+        `;
+        strip.onclick = () => {
+          details.style.display = details.style.display === "block" ? "none" : "block";
+        };
+        listContainer.appendChild(strip);
+        listContainer.appendChild(details);
+        setupDayButtons(details.querySelector('form'));
+      });
+    }
+
+    function setupDayButtons(form) {
+      const buttons = form.querySelectorAll('.day-btn');
+      const hiddenInput = form.querySelector('input[name="days"]');
+      const existingDays = hiddenInput.value.split(' - ');
+      buttons.forEach(btn => {
+        if (existingDays.includes(btn.dataset.value)) {
+          btn.classList.add('active');
+        }
+        btn.addEventListener('click', () => {
+          btn.classList.toggle('active');
+          const selected = Array.from(buttons)
+            .filter(b => b.classList.contains('active'))
+            .map(b => b.dataset.value);
+          hiddenInput.value = selected.join(" - ");
+        });
+      });
+    }
+
+    function saveData(e, index) {
+      e.preventDefault();
+      const form = e.target;
+      const price = parseFloat(form.price.value);
+      const paid = parseFloat(form.paid.value);
+      const sessions = parseInt(form.sessions.value);
+      const days = form.days.value;
+      const coach = form.coach.value;
+      const daysCount = days.split("-").length;
+      const today = new Date();
+      const weeks = Math.ceil(sessions / daysCount);
+      const endDate = new Date();
+      endDate.setDate(today.getDate() + weeks * 7);
+      players[index].price = price;
+      players[index].paid = paid;
+      players[index].sessions = sessions;
+      players[index].days = days;
+      players[index].coach = coach;
+      players[index].startDate = today.toLocaleDateString();
+      players[index].endDate = endDate.toLocaleDateString();
+      localStorage.setItem("players", JSON.stringify(players));
+      const perSession = (price / sessions).toFixed(2);
+      const summary = document.getElementById(`summary-${index}`);
+      summary.innerHTML = `
+        ✅ تم الحفظ<br>
+        💰 المتبقي: ${price - paid} جنيه<br>
+        💸 سعر الحصة: ${perSession} جنيه<br>
+        🗓️ من ${players[index].startDate} إلى ${players[index].endDate}
+      `;
+    }
+
+    function renew(index) {
+      const player = players[index];
+      const start = new Date();
+      const daysCount = player.days?.split("-").length || 3;
+      const weeks = Math.ceil((player.sessions || 12) / daysCount);
+      const end = new Date(start);
+      end.setDate(start.getDate() + (weeks * 7));
+      player.startDate = start.toLocaleDateString();
+      player.endDate = end.toLocaleDateString();
+      player.renewCount = (player.renewCount || 0) + 1;
+      localStorage.setItem("players", JSON.stringify(players));
+      alert("✅ تم تجديد الاشتراك.");
+      renderPlayers(searchInput.value.trim());
+    }
+
+    function deletePlayer(index) {
+      if (confirm("❌ هل تريد حذف هذا اللاعب؟")) {
+        players.splice(index, 1);
+        localStorage.setItem("players", JSON.stringify(players));
+        renderPlayers(searchInput.value.trim());
+      }
+    }
+
+    function printInvoice(index) {
+      const p = players[index];
+      const win = window.open('', '', 'width=600,height=400');
+      win.document.write(`<h3>إيصال اشتراك</h3>
+        <p>الاسم: ${p.name}</p>
+        <p>المدرب: ${p.coach}</p>
+        <p>المدفوع: ${p.paid} / ${p.price} جنيه</p>
+        <p>تاريخ البداية: ${p.startDate}</p>
+        <p>تاريخ النهاية: ${p.endDate}</p>`);
+      win.print();
+    }
+
+    function migrateToAttendance(index) {
+      const player = players[index];
+      const attendance = JSON.parse(localStorage.getItem("attendanceList")) || [];
+      attendance.push(player);
+      localStorage.setItem("attendanceList", JSON.stringify(attendance));
+      alert("📋 تم ترحيل اللاعب إلى الغياب والحضور.");
+      window.location.href = "sessions-attendance.html";
+    }
+
+    function showExpiring() {
+      renderPlayers("", true);
+    }
+
+    function showEnded() {
+      renderPlayers("", false, true);
+    }
+
+    searchInput.addEventListener("input", () => {
+      renderPlayers(searchInput.value.trim());
+    });
+
+    renderPlayers();
+  </script>
+  
+</body>
+<body>
+  <div class="container">
+  
+
+    <button class="summary-btn" onclick="calculateTotals()">📊 إجمالي الأرباح (شهري -يومي - أسبوعي - سنوي)</button>
+    <div id="summaryResults"></div>
+
+
+    <script>
+function calculateTotals() {
+  const players = JSON.parse(localStorage.getItem("players")) || [];
+  let daily = 0, weekly = 0, monthly = 0, yearly = 0;
+
+  players.forEach(p => {
+    const paid = parseFloat(p.paid || 0);
+    const sessions = parseInt(p.sessions || 0);
+    const days = p.days ? p.days.split(" - ") : [];
+    const daysPerWeek = days.length || 1;
+
+    const weeks = sessions > 0 && daysPerWeek > 0
+      ? Math.ceil(sessions / daysPerWeek)
+      : 4;
+
+    const perWeek = paid / weeks;
+    const perDay = perWeek / daysPerWeek;
+
+    weekly += perWeek;
+    daily += perDay;
+    monthly += paid;
+  });
+
+  yearly = monthly * 12;
+
+        document.getElementById("summaryResults").innerHTML = `
+          📍 <strong>الإجمالي اليومي (تقديري):</strong> ${daily.toFixed(2)} جنيه
+          💵 <strong>إجمالي المدفوع شهريًا:</strong> ${monthly.toFixed(2)} جنيه<br>
+          📅 <strong>إجمالي تقديري أسبوعي:</strong> ${weekly.toFixed(2)} جنيه<br>
+          📆 <strong>إجمالي تقديري سنوي:</strong> ${yearly.toFixed(2)} جنيه
+        `;
+      }
+    </script>
+    <script>
+  const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
+
+  if (currentUser.status === "banned" || currentUser.status === "suspended") {
+    const msg = currentUser.status === "banned"
+      ? `<div class="message banned"><h2>🚫 لقد تم حظرك من استخدام النظام</h2><p>برجاء التواصل مع الإدارة</p></div>`
+      : `<div class="message suspended"><h2>⏸️ حسابك موقوف مؤقتًا</h2><p>يرجى المحاولة لاحقًا أو التواصل مع الإدارة</p></div>`;
+    document.write(`<html><head><title>الحالة</title></head><body>${msg}</body></html>`);
+  }
+</script>
+
+  </div>
+ 
+    <button class="btn" style="margin-top: 30px; width: 100%;" onclick="location.href='pool-management.html'">⬅️ الرجوع إلى الصفحة الرئيسية</button>
+ 
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>مراجعة طلبات VIP</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Tajawal', sans-serif;
+      direction: rtl;
+      padding: 30px;
+      background: #f5f5f5;
+    }
+    .request-box {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    .request-box p {
+      margin: 6px 0;
+    }
+    .request-box img {
+      max-width: 100%;
+      margin-top: 10px;
+      border-radius: 8px;
+    }
+    button {
+      padding: 8px 16px;
+      margin-top: 10px;
+      margin-left: 10px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .approve-btn {
+      background-color: #28a745;
+      color: white;
+    }
+    .reject-btn {
+      background-color: #dc3545;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h2>📋 مراجعة طلبات VIP</h2>
+  <div id="requestsContainer"></div>
+
+  <script>
+    const container = document.getElementById("requestsContainer");
+    let requests = JSON.parse(localStorage.getItem("vipRequests")) || [];
+    const users = JSON.parse(localStorage.getItem("users")) || [];
+
+    if (requests.length === 0) {
+      container.innerHTML = "<p style='color:red; text-align:center;'>لا توجد طلبات حالياً.</p>";
+    } else {
+      requests.forEach((req, index) => {
+        const user = users.find(u => u.email === req.userEmail);
+        const box = document.createElement("div");
+        box.className = "request-box";
+
+        box.innerHTML = `
+          <p><strong>📧 المستخدم:</strong> ${req.userEmail}</p>
+          <p><strong>📆 الخطة:</strong> ${req.plan}</p>
+          <p><strong>📱 رقم التحويل:</strong> ${req.payerNumber}</p>
+          <p><strong>💳 المحفظة:</strong> ${req.targetWallet}</p>
+          <p><strong>📝 ملاحظات:</strong> ${req.note || 'لا يوجد'}</p>
+          <p><strong>📅 التاريخ:</strong> ${req.date}</p>
+          <p><strong>📷 صورة التحويل:</strong></p>
+          <img src="${req.screenshot}" alt="Screenshot" />
+        `;
+
+        // زر الموافقة
+        const approveBtn = document.createElement("button");
+        approveBtn.className = "approve-btn";
+        approveBtn.textContent = "✅ موافقة";
+        approveBtn.onclick = () => {
+          const now = new Date();
+          let endDate = new Date(now);
+          if (req.plan === "شهر") endDate.setMonth(now.getMonth() + 1);
+          else if (req.plan === "3 شهور") endDate.setMonth(now.getMonth() + 3);
+          else if (req.plan === "سنة") endDate.setFullYear(now.getFullYear() + 1);
+
+          user.plan = "vip";
+          user.planStartDate = now.toISOString();
+          user.planEndDate = endDate.toISOString();
+          user.notification = "✅ تم قبول اشتراكك في VIP! مرحبًا بك عميل مميز 🎉";
+
+          const userIndex = users.findIndex(u => u.email === user.email);
+          users[userIndex] = user;
+          localStorage.setItem("users", JSON.stringify(users));
+          localStorage.setItem("currentUser", JSON.stringify(user)); // في حاله الأدمن هو نفسه
+
+          requests.splice(index, 1);
+          localStorage.setItem("vipRequests", JSON.stringify(requests));
+
+          alert("تمت الموافقة وتم ترقية المستخدم إلى VIP ✅");
+          location.reload();
+        };
+
+        // زر الرفض
+        const rejectBtn = document.createElement("button");
+        rejectBtn.className = "reject-btn";
+        rejectBtn.textContent = "❌ رفض";
+        rejectBtn.onclick = () => {
+          if (user) {
+            user.notification = "❌ تم رفض طلب الاشتراك في VIP. حاول مرة أخرى أو تواصل مع الدعم.";
+            const userIndex = users.findIndex(u => u.email === user.email);
+            users[userIndex] = user;
+            localStorage.setItem("users", JSON.stringify(users));
+          }
+
+          requests.splice(index, 1);
+          localStorage.setItem("vipRequests", JSON.stringify(requests));
+          alert("تم رفض الطلب ❌");
+          location.reload();
+        };
+
+        box.appendChild(approveBtn);
+        box.appendChild(rejectBtn);
+        container.appendChild(box);
+      });
+    }
+  </script>
+</body>
+</html>

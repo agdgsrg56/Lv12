@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تسجيل لاعب</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Tajawal', sans-serif;
+      background-color: var(--bg-color, #f4f4f4);
+      padding: 20px;
+      direction: rtl;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      color: var(--main-color, #0072ff);
+    }
+    label {
+      font-weight: bold;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: var(--main-color, #0072ff);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .player-list {
+      margin-top: 30px;
+    }
+    .player-card {
+      border: 1px solid #ccc;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      background-color: #fafafa;
+      position: relative;
+    }
+    .player-card img {
+      max-width: 100px;
+      border-radius: 8px;
+      margin-left: 10px;
+    }
+    .search-box {
+      margin: 20px 0;
+    }
+    .card-actions {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+    }
+    .card-actions button {
+      margin-left: 5px;
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>👤 تسجيل لاعب جديد</h2>
+
+    <form id="playerForm">
+      <label>📛 الاسم:</label>
+      <input type="text" id="name" required>
+
+      <label>📍 العنوان:</label>
+      <input type="text" id="address" required>
+
+      <label>🎂 السن:</label>
+      <input type="number" id="age" required>
+
+      <label>📞 رقم الهاتف:</label>
+      <input type="tel" id="phone" required>
+
+      <label>💰 سعر الاشتراك:</label>
+      <input type="number" id="price" required>
+
+      <label>🏊‍♂️ اسم الكابتن:</label>
+      <select id="coachName" required></select>
+
+      <label>🩺 الحالة الصحية:</label>
+      <input type="text" id="healthStatus" required>
+
+      <label>📊 المستوى:</label>
+      <input type="text" id="level" required>
+
+      <label>📅 أيام الحضور:</label>
+      <input type="text" id="attendanceDays" placeholder="مثال: السبت - الإثنين - الأربعاء" required>
+
+      <label>🖼️ صورة اللاعب:</label>
+      <input type="file" id="playerImage" accept="image/*" required>
+
+      <button type="submit">➕ تسجيل اللاعب</button>
+    </form>
+
+    <button onclick="location.href='subscriptions.html'" style="margin-top: 15px; width: 100%;">📄 ترحيل إلى قائمة الاشتراكات</button>
+
+    <div class="search-box">
+      <label>🔍 البحث عن لاعب:</label>
+      <input type="text" id="searchBox" placeholder="اكتب اسم اللاعب...">
+    </div>
+
+    <div class="player-list" id="playerList"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById("playerForm");
+    const coachSelect = document.getElementById("coachName");
+    const playerList = document.getElementById("playerList");
+    const searchBox = document.getElementById("searchBox");
+    const user = JSON.parse(localStorage.getItem("currentUser"));
+
+    if (user && user.plan === "vip") {
+      const vipColor = localStorage.getItem("vipColor");
+      if (vipColor) {
+        document.documentElement.style.setProperty('--main-color', vipColor);
+      }
+    }
+
+    const coaches = JSON.parse(localStorage.getItem("coaches")) || [];
+    coaches.forEach(coach => {
+      const option = document.createElement("option");
+      option.value = coach.name;
+      option.textContent = coach.name;
+      coachSelect.appendChild(option);
+    });
+
+    function renderPlayers(filter = "") {
+      const players = JSON.parse(localStorage.getItem("players")) || [];
+      playerList.innerHTML = "";
+
+      players.filter(p => p.name.includes(filter)).forEach((player, index) => {
+        const card = document.createElement("div");
+        card.className = "player-card";
+        card.innerHTML = `
+          <div class="card-actions">
+            <button onclick="editPlayer(${index})">✏️ تعديل</button>
+            <button onclick="deletePlayer(${index})">🗑️ حذف</button>
+          </div>
+          <div style="display: flex; align-items: center;">
+            <img src="${player.image}" alt="صورة اللاعب">
+            <div>
+              <p><strong>الاسم:</strong> ${player.name}</p>
+              <p><strong>العنوان:</strong> ${player.address}</p>
+              <p><strong>السن:</strong> ${player.age}</p>
+              <p><strong>رقم الهاتف:</strong> ${player.phone}</p>
+              <p><strong>سعر الاشتراك:</strong> ${player.price} جنيه</p>
+              <p><strong>الكابتن:</strong> ${player.coach}</p>
+              <p><strong>الحالة الصحية:</strong> ${player.health}</p>
+              <p><strong>المستوى:</strong> ${player.level}</p>
+              <p><strong>أيام الحضور:</strong> ${player.days}</p>
+              <p><strong>تاريخ التسجيل:</strong> ${player.date}</p>
+            </div>
+          </div>
+        `;
+        playerList.appendChild(card);
+      });
+    }
+
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value;
+      const address = document.getElementById("address").value;
+      const age = document.getElementById("age").value;
+      const phone = document.getElementById("phone").value;
+      const price = document.getElementById("price").value;
+      const coach = coachSelect.value;
+      const health = document.getElementById("healthStatus").value;
+      const level = document.getElementById("level").value;
+      const days = document.getElementById("attendanceDays").value;
+      const imageFile = document.getElementById("playerImage").files[0];
+
+      if (!imageFile) return;
+
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const player = {
+          name,
+          address,
+          age,
+          phone,
+          price,
+          coach,
+          health,
+          level,
+          days,
+          image: event.target.result,
+          date: new Date().toLocaleDateString()
+        };
+
+        const players = JSON.parse(localStorage.getItem("players")) || [];
+        players.push(player);
+        localStorage.setItem("players", JSON.stringify(players));
+        form.reset();
+        renderPlayers();
+      };
+
+      reader.readAsDataURL(imageFile);
+    });
+
+    function deletePlayer(index) {
+      const players = JSON.parse(localStorage.getItem("players")) || [];
+      if (confirm("❌ هل تريد حذف هذا اللاعب؟")) {
+        players.splice(index, 1);
+        localStorage.setItem("players", JSON.stringify(players));
+        renderPlayers();
+      }
+    }
+
+    function editPlayer(index) {
+      const players = JSON.parse(localStorage.getItem("players")) || [];
+      const player = players[index];
+      document.getElementById("name").value = player.name;
+      document.getElementById("address").value = player.address;
+      document.getElementById("age").value = player.age;
+      document.getElementById("phone").value = player.phone;
+      document.getElementById("price").value = player.price;
+      document.getElementById("coachName").value = player.coach;
+      document.getElementById("healthStatus").value = player.health;
+      document.getElementById("level").value = player.level;
+      document.getElementById("attendanceDays").value = player.days;
+
+      // حذف اللاعب القديم ثم إعادة إضافته بعد التعديل
+      players.splice(index, 1);
+      localStorage.setItem("players", JSON.stringify(players));
+      renderPlayers();
+    }
+
+    searchBox.addEventListener("input", function() {
+      renderPlayers(this.value.trim());
+    });
+
+    renderPlayers();
+  </script>
+  <script>
+  const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
+
+  if (currentUser.status === "banned" || currentUser.status === "suspended") {
+    const msg = currentUser.status === "banned"
+      ? `<div class="message banned"><h2>🚫 لقد تم حظرك من استخدام النظام</h2><p>برجاء التواصل مع الإدارة</p></div>`
+      : `<div class="message suspended"><h2>⏸️ حسابك موقوف مؤقتًا</h2><p>يرجى المحاولة لاحقًا أو التواصل مع الإدارة</p></div>`;
+    document.write(`<html><head><title>الحالة</title></head><body>${msg}</body></html>`);
+  }
+</script>
+
+  <button class="btn" style="margin-top: 30px; width: 100%;" onclick="location.href='pool-management.html'">⬅️ الرجوع إلى الصفحة الرئيسية</button>
+</body>
+</html>

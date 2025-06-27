@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>من نحن</title>
+  <style>
+    body {
+      font-family: 'Tajawal', sans-serif;
+      background: #f4f6f8;
+      padding: 30px;
+      line-height: 1.8;
+      color: #333;
+    }
+    .about-container {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    }
+    h2 {
+      color: #0072ff;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    h3 {
+      color: #444;
+      margin-top: 30px;
+    }
+    p {
+      font-size: 16px;
+    }
+    ul {
+      padding-right: 20px;
+    }
+    li {
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="about-container">
+    <h2>👨‍💻 من نحن</h2>
+    <p>مرحباً، أنا <strong>LV 12</strong>، مبرمج مستقل أعمل في مجال تطوير المواقع والأنظمة الذكية.</p>
+
+    <h3>📌 خبرتي ومجالي</h3>
+    <p>كنت أحد أعضاء مجموعة خاصة اسمها <strong>KMSMIO1</strong> تضم أكثر من <strong>122 شخصاً</strong> من:</p>
+    <ul>
+      <li>مبرمجين</li>
+      <li>محللي بيانات</li>
+      <li>مهندسي برمجيات</li>
+      <li>متخصصي الأمن السيبراني</li>
+      <li>متدربين جدد في المجالات التقنية</li>
+    </ul>
+    <p>تعمل هذه المجموعة على:</p>
+    <ul>
+      <li>اكتشاف الثغرات في المواقع والأنظمة</li>
+      <li>تأمين المواقع والمنصات العملاقة</li>
+      <li>تطوير الأدوات البرمجية المتقدمة</li>
+    </ul>
+
+    <h3>🛠️ إنجازاتي</h3>
+    <ul>
+      <li>✅ قمت بتطوير <strong>13 أداة تقنية</strong></li>
+      <li>✅ أنشأت <strong>6 برامج</strong> احترافية</li>
+      <li>✅ أمتلك <strong>9 مواقع ويب صغيرة</strong> على الإنترنت</li>
+    </ul>
+<script>
+  const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
+
+  if (currentUser.status === "banned" || currentUser.status === "suspended") {
+    const msg = currentUser.status === "banned"
+      ? `<div class="message banned"><h2>🚫 لقد تم حظرك من استخدام النظام</h2><p>برجاء التواصل مع الإدارة</p></div>`
+      : `<div class="message suspended"><h2>⏸️ حسابك موقوف مؤقتًا</h2><p>يرجى المحاولة لاحقًا أو التواصل مع الإدارة</p></div>`;
+    document.write(`<html><head><title>الحالة</title></head><body>${msg}</body></html>`);
+  }
+</script>
+
+    <h3>🎯 رؤيتي</h3>
+    <p>أسعى دائماً لتقديم حلول ذكية وآمنة للمستخدمين، وتحسين تجربة التصفح والإدارة من خلال واجهات بسيطة وأداء عالي.</p>
+  </div>
+</body>
+</html>

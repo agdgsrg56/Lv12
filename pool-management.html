@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>إدارة حمام السباحة</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Tajawal', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: var(--bg-color, #f2f4f8);
+      direction: rtl;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 30px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: var(--main-color, #0072ff);
+      margin-bottom: 30px;
+    }
+
+    .vip-box {
+      background: linear-gradient(to left, #ffd700, #fff8b3);
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      text-align: center;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .ad-box {
+      background: #e2e3e5;
+      padding: 10px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .buttons-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+    }
+
+    .btn {
+      background-color: var(--main-color, #0072ff);
+      color: white;
+      padding: 15px;
+      border: none;
+      border-radius: 10px;
+      text-align: center;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .btn:hover {
+      background-color: #0059c1;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🏊‍♂️ لوحة إدارة حمام السباحة</h2>
+
+    <div id="vipSection" class="vip-box" style="display: none;">
+      🌟 مرحبًا بك عميل VIP – استمتع بتجربة بدون إعلانات وتحكم في الألوان والترتيب
+      <br>
+      <label>🎨 اختر لون الواجهة:</label>
+      <input type="color" id="colorPicker" style="margin-top: 10px;">
+    </div>
+
+    <div id="adSection" class="ad-box">
+      📢 إعلان: احصل على خصم 10% على أدوات السباحة من متجرنا!
+    </div>
+
+    <div class="buttons-grid" id="buttonGrid">
+      <button class="btn" onclick="location.href='register-player.html'">👤 تسجيل لاعب</button>
+      <button class="btn" onclick="location.href='coach-cv.html'">📄 CV مدرب</button>
+      <button class="btn" onclick="location.href='sessions-attendance.html'">🗓️ الحصص والحضور</button>
+ 
+      <button class="btn" onclick="location.href='payments-expenses.html'">💰 الرواتب والمدفوعات</button>
+      <button class="btn" onclick="location.href='data-analysis.html'">📊 تحليل البيانات</button>
+      <button class="btn" onclick="location.href='store.html'">🛒 متجر المنتجات الرياضية</button>
+      <button class="btn" onclick="location.href='subscriptions.html'">💎 إدارة الاشتراكات</button>
+      <button class="btn" onclick="location.href='free-swimming.html'">🏊‍♀️ السباحة الحرة</button>
+    </div>
+  </div>
+
+  <script>
+    const user = JSON.parse(localStorage.getItem("currentUser"));
+    const vipSection = document.getElementById("vipSection");
+    const adSection = document.getElementById("adSection");
+    const colorPicker = document.getElementById("colorPicker");
+
+    if (user && user.plan === "vip") {
+      vipSection.style.display = "block";
+      adSection.style.display = "none";
+
+      const savedColor = localStorage.getItem("vipColor");
+      if (savedColor) {
+        document.documentElement.style.setProperty('--main-color', savedColor);
+        colorPicker.value = savedColor;
+      }
+
+      colorPicker.addEventListener("input", function() {
+        document.documentElement.style.setProperty('--main-color', this.value);
+        localStorage.setItem("vipColor", this.value);
+      });
+    }
+  </script>
+  <script>
+  const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
+
+  if (currentUser.status === "banned" || currentUser.status === "suspended") {
+    const msg = currentUser.status === "banned"
+      ? `<div class="message banned"><h2>🚫 لقد تم حظرك من استخدام النظام</h2><p>برجاء التواصل مع الإدارة</p></div>`
+      : `<div class="message suspended"><h2>⏸️ حسابك موقوف مؤقتًا</h2><p>يرجى المحاولة لاحقًا أو التواصل مع الإدارة</p></div>`;
+    document.write(`<html><head><title>الحالة</title></head><body>${msg}</body></html>`);
+  }
+</script>
+
+</body>
+    <button class="btn" style="margin-top: 30px; width: 100%;" onclick="location.href='dashboard.html'">⬅️ الرجوع إلى الصفحة الرئيسية</button>
+  </div>
+</body>
+</html>
+
+</html>

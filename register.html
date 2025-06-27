@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>تسجيل حساب جديد</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="auth-page">
+  <div class="auth-container">
+    <h2>🏊‍♂️ إنشاء حساب جديد</h2>
+    <form id="registerForm">
+      <input type="text" id="name" placeholder="الاسم الكامل" required />
+
+      <div class="phone-wrapper">
+        <select id="phoneCode" required>
+          <option value="">📱 مفتاح الدولة</option>
+          <option value="+20">🇪🇬 مصر (+20)</option>
+          <option value="+966">🇸🇦 السعودية (+966)</option>
+          <option value="+971">🇦🇪 الإمارات (+971)</option>
+          <option value="+974">🇶🇦 قطر (+974)</option>
+          <option value="+963">🇸🇾 سوريا (+963)</option>
+          <option value="+962">🇯🇴 الأردن (+962)</option>
+          <option value="+965">🇰🇼 الكويت (+965)</option>
+          <option value="+218">🇱🇾 ليبيا (+218)</option>
+          <option value="+249">🇸🇩 السودان (+249)</option>
+          <option value="+212">🇲🇦 المغرب (+212)</option>
+        </select>
+        <input type="tel" id="phone" placeholder="رقم الهاتف" required />
+      </div>
+
+      <select id="country" required>
+        <option value="">🌍 اختر الدولة</option>
+        <option value="مصر">مصر</option>
+        <option value="السعودية">السعودية</option>
+        <option value="الإمارات">الإمارات</option>
+        <option value="قطر">قطر</option>
+        <option value="أخرى">أخرى</option>
+      </select>
+
+      <input type="text" id="address" placeholder="العنوان" required />
+      <input type="email" id="email" placeholder="البريد الإلكتروني (Gmail فقط)" required />
+      <input type="number" id="age" placeholder="السن" required />
+      <input type="password" id="password" placeholder="كلمة المرور (6 أحرف على الأقل)" required />
+      <button type="submit">تسجيل</button>
+      <p id="errorMsg" class="error-msg"></p>
+    </form>
+    <p class="redirect-msg">هل لديك حساب؟ <a href="login.html">تسجيل الدخول</a></p>
+  </div>
+  <script src="register.js"></script>
+</body>
+<script>
+  const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
+
+  if (currentUser.status === "banned" || currentUser.status === "suspended") {
+    const msg = currentUser.status === "banned"
+      ? `<div class="message banned"><h2>🚫 لقد تم حظرك من استخدام النظام</h2><p>برجاء التواصل مع الإدارة</p></div>`
+      : `<div class="message suspended"><h2>⏸️ حسابك موقوف مؤقتًا</h2><p>يرجى المحاولة لاحقًا أو التواصل مع الإدارة</p></div>`;
+    document.write(`<html><head><title>الحالة</title></head><body>${msg}</body></html>`);
+  }
+</script>
+
+<footer style="text-align: center; padding: 20px; background: #0935ad; border-top: 10px solid #8a8383; margin-top: 700px;">
+  <a href="privacy.html" style="margin: 0 10px;">سياسة الخصوصية</a> |
+  <a href="contact.html" style="margin: 0 10px;">اتصل بنا</a> |
+  <a href="about.html" style="margin: 0 10px;">من نحن</a>
+</footer>
+</html>
