@@ -71,16 +71,37 @@
     <p class="redirect-msg">ليس لديك حساب؟ <a href="register.html">إنشاء حساب</a></p>
   </div>
 
-  <script>
+  <!-- Firebase SDK -->
+  <script type="module">
+    // استيراد مكتبات Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+
+    // إعداد Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDIHlQs6gw--sTbzhTXw7mF1by8yOTdNXo",
+      authDomain: "lv-12-dd2da.firebaseapp.com",
+      projectId: "lv-12-dd2da",
+      storageBucket: "lv-12-dd2da.appspot.com",
+      messagingSenderId: "852908073266",
+      appId: "1:852908073266:web:42df4810cf6448fca5372b",
+      measurementId: "G-WZ0QFC0WL0"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
     const loginForm = document.getElementById("loginForm");
     const loginError = document.getElementById("loginError");
 
-    loginForm.addEventListener("submit", function (e) {
+    loginForm.addEventListener("submit", async function (e) {
       e.preventDefault();
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value;
 
-      // حساب خاص للمدير أو VIP
+      // حساب المدير
       if (email === "lv12" && password === "kms.mo.111") {
         const vipUser = {
           name: "المشرف",
@@ -88,7 +109,7 @@
           country: "VIP",
           plan: "vip",
           planStartDate: new Date().toISOString(),
-          planEndDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 يوم
+          planEndDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
           status: "active"
         };
         localStorage.setItem("currentUser", JSON.stringify(vipUser));
@@ -96,14 +117,24 @@
         return;
       }
 
-      // تحقق من المستخدمين العاديين
-      const users = JSON.parse(localStorage.getItem("users") || "[]");
-      const user = users.find(u => u.email === email && u.password === password);
+      try {
+        // تسجيل الدخول عبر Firebase Auth
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
 
-      if (user) {
-        localStorage.setItem("currentUser", JSON.stringify(user));
-        window.location.href = "index.html";
-      } else {
+        // جلب بيانات المستخدم من Firestore
+        const userDocRef = doc(db, "users", user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (userDocSnap.exists()) {
+          const userData = userDocSnap.data();
+          localStorage.setItem("currentUser", JSON.stringify(userData));
+          window.location.href = "index.html";
+        } else {
+          loginError.textContent = "❌ لم يتم العثور على بيانات المستخدم.";
+        }
+      } catch (error) {
+        console.error(error);
         loginError.textContent = "❌ البريد الإلكتروني أو كلمة المرور غير صحيحة.";
       }
     });
@@ -116,4 +147,5 @@
   </footer>
 </body>
 </html>
+
 
