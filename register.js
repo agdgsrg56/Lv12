@@ -1,9 +1,26 @@
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyDIHlQs6gw--sTbzhTXw7mF1by8yOTdNXo", // ← ضع مفتاحك هنا من Firebase
+  authDomain: "lv-12-dd2da.firebaseapp.com",
+  projectId: "lv-12-dd2da",
+  storageBucket: "lv-12-dd2da.appspot.com",
+  messagingSenderId: "********",
+  appId: "***************"
+};
+
+// Firebase init
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// DOM Elements
 const form = document.getElementById("registerForm");
 const errorMsg = document.getElementById("errorMsg");
 
-form.addEventListener("submit", function (e) {
+form.addEventListener("submit", async function (e) {
   e.preventDefault();
 
+  // Get form values
   const name = document.getElementById("name").value.trim();
   const phoneCode = document.getElementById("phoneCode").value;
   const phone = document.getElementById("phone").value.trim();
@@ -15,6 +32,7 @@ form.addEventListener("submit", function (e) {
 
   const fullPhone = phoneCode + phone;
 
+  // Basic Validation
   if (!name || !phone || !phoneCode || !country || !address || !email || !age || !password) {
     errorMsg.textContent = "كل الحقول مطلوبة!";
     return;
@@ -36,27 +54,34 @@ form.addEventListener("submit", function (e) {
     return;
   }
 
-  const users = JSON.parse(localStorage.getItem("users")) || [];
-  const exists = users.find(u => u.email === email || u.name === name);
-  if (exists) {
-    errorMsg.textContent = "هذا الاسم أو البريد مستخدم بالفعل.";
-    return;
+  try {
+    // إنشاء حساب المستخدم في Firebase Auth
+    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+    const user = userCredential.user;
+
+    // حفظ بيانات إضافية في Firestore
+    await db.collection("users").doc(user.uid).set({
+      uid: user.uid,
+      name,
+      phone: fullPhone,
+      country,
+      address,
+      email,
+      age,
+      plan: "free",
+      members: [],
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    // توجيه المستخدم إلى صفحة تسجيل الدخول
+    window.location.href = "login.html";
+
+  } catch (error) {
+    if (error.code === "auth/email-already-in-use") {
+      errorMsg.textContent = "البريد مستخدم بالفعل.";
+    } else {
+      errorMsg.textContent = "حدث خطأ: " + error.message;
+    }
   }
-
- const newUser = {
-  name,
-  phone: fullPhone,
-  country,
-  address,
-  email,
-  age,
-  password,
-  plan: "free", 
-  members: []
-};
-
-
-  users.push(newUser);
-  localStorage.setItem("users", JSON.stringify(users));
-  window.location.href = "login.html";
 });
+
