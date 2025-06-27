@@ -6,6 +6,11 @@
   <title>تسجيل حساب جديد</title>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
+  <style>
+    .error-msg { color: red; margin-top: 10px; }
+    .message { text-align: center; padding: 50px; font-family: 'Tajawal', sans-serif; }
+    .banned h2, .suspended h2 { color: red; }
+  </style>
 </head>
 <body class="auth-page">
   <div class="auth-container">
@@ -48,22 +53,83 @@
     </form>
     <p class="redirect-msg">هل لديك حساب؟ <a href="login.html">تسجيل الدخول</a></p>
   </div>
-  <script src="register.js"></script>
+
+  <script>
+    const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
+
+    if (currentUser.status === "banned" || currentUser.status === "suspended") {
+      const msg = currentUser.status === "banned"
+        ? `<div class="message banned"><h2>🚫 لقد تم حظرك من استخدام النظام</h2><p>برجاء التواصل مع الإدارة</p></div>`
+        : `<div class="message suspended"><h2>⏸️ حسابك موقوف مؤقتًا</h2><p>يرجى المحاولة لاحقًا أو التواصل مع الإدارة</p></div>`;
+      document.write(`<html><head><title>الحالة</title></head><body>${msg}</body></html>`);
+    }
+
+    const form = document.getElementById("registerForm");
+    const errorMsg = document.getElementById("errorMsg");
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value.trim();
+      const phoneCode = document.getElementById("phoneCode").value;
+      const phone = document.getElementById("phone").value.trim();
+      const country = document.getElementById("country").value;
+      const address = document.getElementById("address").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const age = document.getElementById("age").value;
+      const password = document.getElementById("password").value;
+
+      // التحقق من البريد Gmail فقط
+      if (!email.endsWith("@gmail.com")) {
+        errorMsg.textContent = "❌ يجب استخدام بريد إلكتروني من Gmail فقط.";
+        return;
+      }
+
+      // تحقق من الطول الأدنى لكلمة المرور
+      if (password.length < 6) {
+        errorMsg.textContent = "❌ كلمة المرور يجب أن تكون 6 أحرف على الأقل.";
+        return;
+      }
+
+      const users = JSON.parse(localStorage.getItem("users") || "[]");
+
+      // تحقق من أن البريد غير مسجل من قبل
+      if (users.some(user => user.email === email)) {
+        errorMsg.textContent = "❌ البريد الإلكتروني مسجل مسبقًا.";
+        return;
+      }
+
+      const now = new Date();
+      const end = new Date(now);
+      end.setDate(end.getDate() + 30); // اشتراك لمدة 30 يوم
+
+      const newUser = {
+        name,
+        phone: phoneCode + phone,
+        country,
+        address,
+        email,
+        age,
+        password,
+        status: "active",
+        planStartDate: now.toISOString(),
+        planEndDate: end.toISOString()
+      };
+
+      users.push(newUser);
+      localStorage.setItem("users", JSON.stringify(users));
+      localStorage.setItem("currentUser", JSON.stringify(newUser));
+
+      // التوجيه للصفحة الرئيسية
+      window.location.href = "index.html";
+    });
+  </script>
+
+  <footer style="text-align: center; padding: 20px; background: #0935ad; border-top: 10px solid #8a8383; margin-top: 700px;">
+    <a href="privacy.html" style="margin: 0 10px;">سياسة الخصوصية</a> |
+    <a href="contact.html" style="margin: 0 10px;">اتصل بنا</a> |
+    <a href="about.html" style="margin: 0 10px;">من نحن</a>
+  </footer>
 </body>
-<script>
-  const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
-
-  if (currentUser.status === "banned" || currentUser.status === "suspended") {
-    const msg = currentUser.status === "banned"
-      ? `<div class="message banned"><h2>🚫 لقد تم حظرك من استخدام النظام</h2><p>برجاء التواصل مع الإدارة</p></div>`
-      : `<div class="message suspended"><h2>⏸️ حسابك موقوف مؤقتًا</h2><p>يرجى المحاولة لاحقًا أو التواصل مع الإدارة</p></div>`;
-    document.write(`<html><head><title>الحالة</title></head><body>${msg}</body></html>`);
-  }
-</script>
-
-<footer style="text-align: center; padding: 20px; background: #0935ad; border-top: 10px solid #8a8383; margin-top: 700px;">
-  <a href="privacy.html" style="margin: 0 10px;">سياسة الخصوصية</a> |
-  <a href="contact.html" style="margin: 0 10px;">اتصل بنا</a> |
-  <a href="about.html" style="margin: 0 10px;">من نحن</a>
-</footer>
 </html>
+
