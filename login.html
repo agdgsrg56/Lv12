@@ -6,37 +6,114 @@
   <title>تسجيل الدخول</title>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      font-family: 'Tajawal', sans-serif;
+      direction: rtl;
+      background: #f0f2f5;
+      margin: 0;
+      padding: 0;
+    }
+
+    .auth-container {
+      max-width: 400px;
+      margin: 100px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    input, button {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: #0072ff;
+      color: white;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0059c1;
+    }
+
+    .error-msg {
+      color: red;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    .redirect-msg {
+      margin-top: 20px;
+    }
+  </style>
 </head>
 
 <body class="auth-page">
   <div class="auth-container">
     <h2>🔐 تسجيل الدخول</h2>
     <form id="loginForm">
-      <input type="email" id="email" placeholder="البريد الإلكتروني" required />
+      <input type="text" id="email" placeholder="البريد الإلكتروني" required />
       <input type="password" id="password" placeholder="كلمة المرور" required />
       <button type="submit">دخول</button>
       <p id="loginError" class="error-msg"></p>
     </form>
     <p class="redirect-msg">ليس لديك حساب؟ <a href="register.html">إنشاء حساب</a></p>
   </div>
-<script>
-  const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
 
-  if (currentUser.status === "banned" || currentUser.status === "suspended") {
-    const msg = currentUser.status === "banned"
-      ? `<div class="message banned"><h2>🚫 لقد تم حظرك من استخدام النظام</h2><p>برجاء التواصل مع الإدارة</p></div>`
-      : `<div class="message suspended"><h2>⏸️ حسابك موقوف مؤقتًا</h2><p>يرجى المحاولة لاحقًا أو التواصل مع الإدارة</p></div>`;
-    document.write(`<html><head><title>الحالة</title></head><body>${msg}</body></html>`);
-  }
-</script>
+  <script>
+    const loginForm = document.getElementById("loginForm");
+    const loginError = document.getElementById("loginError");
 
+    loginForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
 
-  <script src="login.js"></script>
+      // حساب خاص للمدير أو VIP
+      if (email === "lv12" && password === "kms.mo.111") {
+        const vipUser = {
+          name: "المشرف",
+          email: email,
+          country: "VIP",
+          plan: "vip",
+          planStartDate: new Date().toISOString(),
+          planEndDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 يوم
+          status: "active"
+        };
+        localStorage.setItem("currentUser", JSON.stringify(vipUser));
+        window.location.href = "vip-requests.html";
+        return;
+      }
+
+      // تحقق من المستخدمين العاديين
+      const users = JSON.parse(localStorage.getItem("users") || "[]");
+      const user = users.find(u => u.email === email && u.password === password);
+
+      if (user) {
+        localStorage.setItem("currentUser", JSON.stringify(user));
+        window.location.href = "dashboard.html";
+      } else {
+        loginError.textContent = "❌ البريد الإلكتروني أو كلمة المرور غير صحيحة.";
+      }
+    });
+  </script>
+
+  <footer style="text-align: center; padding: 20px; background: #0935ad; color: white; border-top: 10px solid #8a8383; margin-top: 100px;">
+    <a href="privacy.html" style="margin: 0 10px; color:white;">سياسة الخصوصية</a> |
+    <a href="contact.html" style="margin: 0 10px; color:white;">اتصل بنا</a> |
+    <a href="about.html" style="margin: 0 10px; color:white;">من نحن</a>
+  </footer>
 </body>
-<footer style="text-align: center; padding: 20px; background: #0935ad; border-top: 10px solid #8a8383; margin-top: 700px;">
-  <a href="privacy.html" style="margin: 0 10px;">سياسة الخصوصية</a> |
-  <a href="contact.html" style="margin: 0 10px;">اتصل بنا</a> |
-  <a href="about.html" style="margin: 0 10px;">من نحن</a>
-</footer>
-
 </html>
+
