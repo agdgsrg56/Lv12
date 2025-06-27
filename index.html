@@ -39,30 +39,17 @@
       margin-bottom: 10px;
     }
 
-    .info-box {
+    .info-box, .alert, .ad-box, .vip-upgrade {
       background: #f9f9f9;
       padding: 15px;
       border-radius: 10px;
     }
 
-    .info-box p {
-      margin: 6px 0;
-    }
-
     .alert {
       background: #fff3cd;
-      padding: 10px;
-      border-radius: 8px;
       color: #856404;
-      margin-bottom: 20px;
       border: 1px solid #ffeeba;
-    }
-
-    .ad-box {
-      background: #e9ecef;
-      padding: 15px;
-      border-radius: 10px;
-      text-align: center;
+      margin-bottom: 20px;
     }
 
     .ad-box img {
@@ -92,7 +79,8 @@
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      margin-top: 20px;
+      margin-top: 10px;
+      display: inline-block;
     }
 
     button:hover {
@@ -123,6 +111,20 @@
       background: rgba(0,0,0,0.5);
       z-index: 999;
     }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      background: #f9f9f9;
+      border-top: 1px solid #ccc;
+      margin-top: 50px;
+    }
+
+    footer a {
+      margin: 0 10px;
+      text-decoration: none;
+      color: #333;
+    }
   </style>
 </head>
 <body>
@@ -149,28 +151,33 @@
     <button onclick="logout()">🚪 تسجيل الخروج</button>
   </div>
 
+  <!-- نافذة تفاصيل الاشتراك -->
   <div id="subscriptionModal">
     <h3>📋 حالة الاشتراك</h3>
     <div id="modalContent"></div>
     <button onclick="closeDetails()">إغلاق</button>
   </div>
   <div id="overlay" onclick="closeDetails()"></div>
-<footer style="text-align: center; padding: 20px; background: #f9f9f9; border-top: 1px solid #ccc; margin-top: 50px;">
-  <a href="privacy.html" style="margin: 0 10px;">سياسة الخصوصية</a> |
-  <a href="contact.html" style="margin: 0 10px;">اتصل بنا</a> |
-  <a href="about.html" style="margin: 0 10px;">من نحن</a>
-</footer>
-<script>
-  const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
 
-  if (currentUser.status === "banned" || currentUser.status === "suspended") {
-    const msg = currentUser.status === "banned"
-      ? `<div class="message banned"><h2>🚫 لقد تم حظرك من استخدام النظام</h2><p>برجاء التواصل مع الإدارة</p></div>`
-      : `<div class="message suspended"><h2>⏸️ حسابك موقوف مؤقتًا</h2><p>يرجى المحاولة لاحقًا أو التواصل مع الإدارة</p></div>`;
-    document.write(`<html><head><title>الحالة</title></head><body>${msg}</body></html>`);
-  }
-</script>
+  <footer>
+    <a href="privacy.html">سياسة الخصوصية</a> |
+    <a href="contact.html">اتصل بنا</a> |
+    <a href="about.html">من نحن</a>
+  </footer>
 
+  <!-- سكربت التحقق من المستخدم -->
+  <script>
+    const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
+
+    if (currentUser.status === "banned" || currentUser.status === "suspended") {
+      const msg = currentUser.status === "banned"
+        ? `<div class="message banned"><h2>🚫 لقد تم حظرك من استخدام النظام</h2><p>برجاء التواصل مع الإدارة</p></div>`
+        : `<div class="message suspended"><h2>⏸️ حسابك موقوف مؤقتًا</h2><p>يرجى المحاولة لاحقًا أو التواصل مع الإدارة</p></div>`;
+      document.write(`<html><head><title>الحالة</title></head><body style="font-family: 'Tajawal', sans-serif; text-align:center; padding:50px;">${msg}</body></html>`);
+    }
+  </script>
+
+  <!-- سكربت إدارة الحساب -->
   <script>
     const user = JSON.parse(localStorage.getItem("currentUser"));
     const welcome = document.getElementById("welcomeMsg");
@@ -191,7 +198,6 @@
 
       const now = new Date();
       const planEnd = user.planEndDate ? new Date(user.planEndDate) : null;
-      const planStart = user.planStartDate ? new Date(user.planStartDate) : null;
 
       if (user.plan === "vip" && planEnd && planEnd > now) {
         adSection.style.display = "none";
@@ -210,9 +216,7 @@
       }
 
       if (user.plan === "free") {
-        document.body.addEventListener("click", function () {
-          showAdPopup();
-        }, { once: true });
+        document.body.addEventListener("click", showAdPopup, { once: true });
       }
     }
 
@@ -221,19 +225,12 @@
       const overlay = document.getElementById("overlay");
       const content = document.getElementById("modalContent");
 
-      let plan = user.plan || "free";
-      let start = user.planStartDate ? new Date(user.planStartDate) : null;
-      let end = user.planEndDate ? new Date(user.planEndDate) : null;
-      let now = new Date();
-      let diffDays = 0;
-      let status = "❌ غير مشترك";
-
-      if (plan === "vip" && end && end > now) {
-        diffDays = Math.ceil((end - now) / (1000 * 60 * 60 * 24));
-        status = "✅ نشط";
-      } else {
-        plan = "free";
-      }
+      const plan = user.plan || "free";
+      const start = user.planStartDate ? new Date(user.planStartDate) : null;
+      const end = user.planEndDate ? new Date(user.planEndDate) : null;
+      const now = new Date();
+      const diffDays = end && end > now ? Math.ceil((end - now) / (1000 * 60 * 60 * 24)) : 0;
+      const status = (plan === "vip" && end && end > now) ? "✅ نشط" : "❌ غير مشترك";
 
       content.innerHTML = `
         <p><strong>الخطة:</strong> ${plan.toUpperCase()}</p>
