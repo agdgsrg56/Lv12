@@ -74,7 +74,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
     import { getFirestore, collection, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
-
+ import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     const firebaseConfig = {
       apiKey: "AIzaSyDIHlQs6gw--sTbzhTXw7mF1by8yOTdNXo",
       authDomain: "lv-12-dd2da.firebaseapp.com",
@@ -87,9 +87,20 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+  const auth = getAuth(app);
 
     const usersContainer = document.getElementById("usersContainer");
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      console.log("🔐 Logged in as:", user.uid);
 
+      const querySnapshot = await getDocs(collection(db, "users"));
+      querySnapshot.forEach((doc) => {
+        console.log("👤 User:", doc.id, doc.data());
+      });
+    } else {
+      console.log("🚫 Not logged in");
+    }
     // التحقق من أن المستخدم مسجل كـ admin
     const currentUser = JSON.parse(localStorage.getItem("currentUser"));
     if (!currentUser || currentUser.role !== "admin") {
