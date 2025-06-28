@@ -75,7 +75,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDIHlQs6gw--sTbzhTXw7mF1by8yOTdNXo",
@@ -96,33 +96,39 @@
 
     loginForm.addEventListener("submit", async function (e) {
       e.preventDefault();
-      loginError.textContent = ""; // تفريغ الرسالة السابقة
-
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value;
 
-      // تحقق من حساب المشرف
+      // حساب المدير
       if (email === "lv12" && password === "kms.mo.111") {
-        const vipUser = {
-          name: "المشرف",
-          email: email,
-          country: "VIP",
-          plan: "vip",
-          planStartDate: new Date().toISOString(),
-          planEndDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-          status: "active"
-        };
-        localStorage.setItem("currentUser", JSON.stringify(vipUser));
-        window.location.href = "vip-requests.html";
+        try {
+          const querySnapshot = await getDocs(collection(db, "users"));
+          const allUsers = [];
+          querySnapshot.forEach((doc) => {
+            allUsers.push({ id: doc.id, ...doc.data() });
+          });
+
+          const vipUser = {
+            name: "المشرف",
+            email: email,
+            role: "admin",
+            status: "active"
+          };
+
+          localStorage.setItem("currentUser", JSON.stringify(vipUser));
+          localStorage.setItem("allUsers", JSON.stringify(allUsers));
+          window.location.href = "vip-requests.html";
+        } catch (err) {
+          console.error(err);
+          loginError.textContent = "حدث خطأ أثناء تحميل بيانات المستخدمين.";
+        }
         return;
       }
 
       try {
-        // تسجيل الدخول باستخدام Firebase Auth
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        // جلب بيانات المستخدم من Firestore
         const userDocRef = doc(db, "users", user.uid);
         const userDocSnap = await getDoc(userDocRef);
 
@@ -131,10 +137,10 @@
           localStorage.setItem("currentUser", JSON.stringify(userData));
           window.location.href = "index.html";
         } else {
-          loginError.textContent = "❌ لم يتم العثور على بيانات المستخدم في قاعدة البيانات.";
+          loginError.textContent = "❌ لم يتم العثور على بيانات المستخدم.";
         }
       } catch (error) {
-        console.error("Login Error:", error);
+        console.error(error);
         loginError.textContent = "❌ البريد الإلكتروني أو كلمة المرور غير صحيحة.";
       }
     });
