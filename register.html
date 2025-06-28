@@ -1,32 +1,125 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>LV12 - Register</title>
-  <link rel="stylesheet" href="css/register.css" />
+  <title>LV12 - انشاء حساب</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Cairo', sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(120deg, #4facfe, #00f2fe);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      max-width: 420px;
+      width: 100%;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: #333;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 0.6rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+
+    .phone-group {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .phone-group select {
+      width: 35%;
+    }
+
+    .phone-group input {
+      width: 65%;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.8rem;
+      background-color: #4facfe;
+      border: none;
+      color: white;
+      font-size: 1.1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #3a9bdc;
+    }
+
+    .error {
+      color: red;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .login-link {
+      text-align: center;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
-    <h2>انشاء حساب</h2>
+    <h2>انشاء حساب جديد</h2>
     <form id="registerForm">
       <div class="form-group">
-        <label for="name">الاسم الكامل:</label>
-        <input type="text" id="name" required />
+        <label for="name">الاسم الكامل</label>
+        <input type="text" id="name" placeholder="ادخل اسمك الكامل" required />
       </div>
+
       <div class="form-group">
-        <label for="phone">رقم الهاتف:</label>
+        <label for="phone">رقم الهاتف</label>
         <div class="phone-group">
           <select id="phoneCode">
             <option value="+966">+966</option>
             <option value="+20">+20</option>
             <option value="+971">+971</option>
           </select>
-          <input type="tel" id="phone" required />
+          <input type="tel" id="phone" placeholder="5xxxxxxxx" required />
         </div>
       </div>
+
       <div class="form-group">
-        <label for="country">الدولة:</label>
+        <label for="country">الدولة</label>
         <select id="country" required>
           <option value="">اختر الدولة</option>
           <option value="السعودية">السعودية</option>
@@ -34,29 +127,33 @@
           <option value="الامارات">الامارات</option>
         </select>
       </div>
+
       <div class="form-group">
-        <label for="address">العنوان:</label>
-        <input type="text" id="address" required />
+        <label for="address">العنوان</label>
+        <input type="text" id="address" placeholder="ادخل العنوان" required />
       </div>
+
       <div class="form-group">
-        <label for="email">البريد الإلكتروني:</label>
-        <input type="email" id="email" required />
+        <label for="email">البريد الإلكتروني</label>
+        <input type="email" id="email" placeholder="example@gmail.com" required />
       </div>
+
       <div class="form-group">
-        <label for="age">العمر:</label>
-        <input type="number" id="age" required />
+        <label for="age">العمر</label>
+        <input type="number" id="age" min="5" max="99" required />
       </div>
+
       <div class="form-group">
-        <label for="password">كلمة المرور:</label>
-        <input type="password" id="password" required />
+        <label for="password">كلمة المرور</label>
+        <input type="password" id="password" placeholder="********" required />
       </div>
-      <p id="errorMsg" style="color: red; font-weight: bold;"></p>
+
+      <p id="errorMsg" class="error"></p>
       <button type="submit">تسجيل</button>
     </form>
-    <p>لديك حساب؟ <a href="login.html">سجل الدخول</a></p>
+    <p class="login-link">هل لديك حساب؟ <a href="login.html">سجل الدخول</a></p>
   </div>
 
-  <!-- Firebase + تسجيل المستخدم -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
@@ -136,5 +233,4 @@
   </script>
 </body>
 </html>
-
 
