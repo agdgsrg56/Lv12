@@ -73,12 +73,10 @@
 
   <!-- Firebase SDK -->
   <script type="module">
-    // استيراد مكتبات Firebase
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
     import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
 
-    // إعداد Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyDIHlQs6gw--sTbzhTXw7mF1by8yOTdNXo",
       authDomain: "lv-12-dd2da.firebaseapp.com",
@@ -98,10 +96,12 @@
 
     loginForm.addEventListener("submit", async function (e) {
       e.preventDefault();
+      loginError.textContent = ""; // تفريغ الرسالة السابقة
+
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value;
 
-      // حساب المدير
+      // تحقق من حساب المشرف
       if (email === "lv12" && password === "kms.mo.111") {
         const vipUser = {
           name: "المشرف",
@@ -118,7 +118,7 @@
       }
 
       try {
-        // تسجيل الدخول عبر Firebase Auth
+        // تسجيل الدخول باستخدام Firebase Auth
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
@@ -131,10 +131,10 @@
           localStorage.setItem("currentUser", JSON.stringify(userData));
           window.location.href = "index.html";
         } else {
-          loginError.textContent = "❌ لم يتم العثور على بيانات المستخدم.";
+          loginError.textContent = "❌ لم يتم العثور على بيانات المستخدم في قاعدة البيانات.";
         }
       } catch (error) {
-        console.error(error);
+        console.error("Login Error:", error);
         loginError.textContent = "❌ البريد الإلكتروني أو كلمة المرور غير صحيحة.";
       }
     });
