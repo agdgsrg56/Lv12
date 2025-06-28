@@ -1,73 +1,85 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>تسجيل حساب جديد</title>
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css" />
-  <style>
-    .error-msg { color: red; margin-top: 10px; }
-    .message { text-align: center; padding: 50px; font-family: 'Tajawal', sans-serif; }
-    .banned h2, .suspended h2 { color: red; }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LV12 - Register</title>
+  <link rel="stylesheet" href="css/register.css" />
 </head>
-<body class="auth-page">
-  <div class="auth-container">
-    <h2>🏊‍♂️ إنشاء حساب جديد</h2>
+<body>
+  <div class="container">
+    <h2>انشاء حساب</h2>
     <form id="registerForm">
-      <input type="text" id="name" placeholder="الاسم الكامل" required />
-
-      <div class="phone-wrapper">
-        <select id="phoneCode" required>
-          <option value="">📱 مفتاح الدولة</option>
-          <option value="+20">🇪🇬 مصر (+20)</option>
-          <option value="+966">🇸🇦 السعودية (+966)</option>
-          <option value="+971">🇦🇪 الإمارات (+971)</option>
-          <option value="+974">🇶🇦 قطر (+974)</option>
-          <option value="+963">🇸🇾 سوريا (+963)</option>
-          <option value="+962">🇯🇴 الأردن (+962)</option>
-          <option value="+965">🇰🇼 الكويت (+965)</option>
-          <option value="+218">🇱🇾 ليبيا (+218)</option>
-          <option value="+249">🇸🇩 السودان (+249)</option>
-          <option value="+212">🇲🇦 المغرب (+212)</option>
-        </select>
-        <input type="tel" id="phone" placeholder="رقم الهاتف" required />
+      <div class="form-group">
+        <label for="name">الاسم الكامل:</label>
+        <input type="text" id="name" required />
       </div>
-
-      <select id="country" required>
-        <option value="">🌍 اختر الدولة</option>
-        <option value="مصر">مصر</option>
-        <option value="السعودية">السعودية</option>
-        <option value="الإمارات">الإمارات</option>
-        <option value="قطر">قطر</option>
-        <option value="أخرى">أخرى</option>
-      </select>
-
-      <input type="text" id="address" placeholder="العنوان" required />
-      <input type="email" id="email" placeholder="البريد الإلكتروني (Gmail فقط)" required />
-      <input type="number" id="age" placeholder="السن" required />
-      <input type="password" id="password" placeholder="كلمة المرور (6 أحرف على الأقل)" required />
+      <div class="form-group">
+        <label for="phone">رقم الهاتف:</label>
+        <div class="phone-group">
+          <select id="phoneCode">
+            <option value="+966">+966</option>
+            <option value="+20">+20</option>
+            <option value="+971">+971</option>
+          </select>
+          <input type="tel" id="phone" required />
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="country">الدولة:</label>
+        <select id="country" required>
+          <option value="">اختر الدولة</option>
+          <option value="السعودية">السعودية</option>
+          <option value="مصر">مصر</option>
+          <option value="الامارات">الامارات</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="address">العنوان:</label>
+        <input type="text" id="address" required />
+      </div>
+      <div class="form-group">
+        <label for="email">البريد الإلكتروني:</label>
+        <input type="email" id="email" required />
+      </div>
+      <div class="form-group">
+        <label for="age">العمر:</label>
+        <input type="number" id="age" required />
+      </div>
+      <div class="form-group">
+        <label for="password">كلمة المرور:</label>
+        <input type="password" id="password" required />
+      </div>
+      <p id="errorMsg" style="color: red; font-weight: bold;"></p>
       <button type="submit">تسجيل</button>
-      <p id="errorMsg" class="error-msg"></p>
     </form>
-    <p class="redirect-msg">هل لديك حساب؟ <a href="login.html">تسجيل الدخول</a></p>
+    <p>لديك حساب؟ <a href="login.html">سجل الدخول</a></p>
   </div>
 
-  <script>
-    const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
+  <!-- Firebase + تسجيل المستخدم -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    if (currentUser.status === "banned" || currentUser.status === "suspended") {
-      const msg = currentUser.status === "banned"
-        ? `<div class="message banned"><h2>🚫 لقد تم حظرك من استخدام النظام</h2><p>برجاء التواصل مع الإدارة</p></div>`
-        : `<div class="message suspended"><h2>⏸️ حسابك موقوف مؤقتًا</h2><p>يرجى المحاولة لاحقًا أو التواصل مع الإدارة</p></div>`;
-      document.write(`<html><head><title>الحالة</title></head><body>${msg}</body></html>`);
-    }
+    const firebaseConfig = {
+      apiKey: "AIzaSyDIHlQs6gw--sTbzhTXw7mF1by8yOTdNXo",
+      authDomain: "lv-12-dd2da.firebaseapp.com",
+      projectId: "lv-12-dd2da",
+      storageBucket: "lv-12-dd2da.appspot.com",
+      messagingSenderId: "852908073266",
+      appId: "1:852908073266:web:42df4810cf6448fca5372b",
+      measurementId: "G-WZ0QFC0WL0"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
     const form = document.getElementById("registerForm");
     const errorMsg = document.getElementById("errorMsg");
 
-    form.addEventListener("submit", function (e) {
+    form.addEventListener("submit", async function (e) {
       e.preventDefault();
 
       const name = document.getElementById("name").value.trim();
@@ -79,57 +91,50 @@
       const age = document.getElementById("age").value;
       const password = document.getElementById("password").value;
 
-      // التحقق من البريد Gmail فقط
+      errorMsg.textContent = "";
+
       if (!email.endsWith("@gmail.com")) {
         errorMsg.textContent = "❌ يجب استخدام بريد إلكتروني من Gmail فقط.";
         return;
       }
 
-      // تحقق من الطول الأدنى لكلمة المرور
       if (password.length < 6) {
         errorMsg.textContent = "❌ كلمة المرور يجب أن تكون 6 أحرف على الأقل.";
         return;
       }
 
-      const users = JSON.parse(localStorage.getItem("users") || "[]");
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
 
-      // تحقق من أن البريد غير مسجل من قبل
-      if (users.some(user => user.email === email)) {
-        errorMsg.textContent = "❌ البريد الإلكتروني مسجل مسبقًا.";
-        return;
+        const now = new Date();
+        const end = new Date(now);
+        end.setDate(now.getDate() + 30);
+
+        const userData = {
+          name,
+          phone: phoneCode + phone,
+          country,
+          address,
+          email,
+          age,
+          status: "active",
+          planStartDate: now.toISOString(),
+          planEndDate: end.toISOString()
+        };
+
+        await setDoc(doc(db, "users", user.uid), userData);
+
+        localStorage.setItem("currentUser", JSON.stringify({ ...userData, uid: user.uid }));
+
+        window.location.href = "index.html";
+      } catch (error) {
+        console.error(error);
+        errorMsg.textContent = "❌ حدث خطأ أثناء إنشاء الحساب: " + error.message;
       }
-
-      const now = new Date();
-      const end = new Date(now);
-      end.setDate(end.getDate() + 30); // اشتراك لمدة 30 يوم
-
-      const newUser = {
-        name,
-        phone: phoneCode + phone,
-        country,
-        address,
-        email,
-        age,
-        password,
-        status: "active",
-        planStartDate: now.toISOString(),
-        planEndDate: end.toISOString()
-      };
-
-      users.push(newUser);
-      localStorage.setItem("users", JSON.stringify(users));
-      localStorage.setItem("currentUser", JSON.stringify(newUser));
-
-      // التوجيه للصفحة الرئيسية
-      window.location.href = "index.html";
     });
   </script>
-
-  <footer style="text-align: center; padding: 20px; background: #0935ad; border-top: 10px solid #8a8383; margin-top: 700px;">
-    <a href="privacy.html" style="margin: 0 10px;">سياسة الخصوصية</a> |
-    <a href="contact.html" style="margin: 0 10px;">اتصل بنا</a> |
-    <a href="about.html" style="margin: 0 10px;">من نحن</a>
-  </footer>
 </body>
 </html>
+
 
