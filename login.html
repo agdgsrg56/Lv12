@@ -120,17 +120,19 @@
         const userDocRef = doc(db, "users", user.uid);
         const userDocSnap = await getDoc(userDocRef);
 
-        if (userDocSnap.exists()) {
-          const userData = userDocSnap.data();
-          localStorage.setItem("currentUser", JSON.stringify(userData));
-          window.location.href = "manage-users.html";
-        } else {
-          loginError.textContent = "❌ لم يتم العثور على بيانات المستخدم.";
-        }
-      } catch (error) {
-        console.error(error);
-        loginError.textContent = "❌ البريد الإلكتروني أو كلمة المرور غير صحيحة.";
-      }
+       if (userDocSnap.exists()) {
+  const userData = userDocSnap.data();
+
+  if (userData.role === "admin") {
+    localStorage.setItem("currentUser", JSON.stringify(userData));
+    window.location.href = "manage-users.html"; // فقط للمشرفين
+  } else {
+    loginError.textContent = "❌ ليس لديك صلاحيات الدخول كمدير.";
+  }
+} else {
+  loginError.textContent = "❌ لم يتم العثور على بيانات المستخدم.";
+}
+
     });
   </script>
 
