@@ -1,114 +1,160 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>إدارة المستخدمين</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: sans-serif;
-      background-color: #f5f5f5;
-      padding: 20px;
+      font-family: 'Tajawal', sans-serif;
+      direction: rtl;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 0;
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
+
+    .container {
+      max-width: 900px;
+      margin: 50px auto;
       background: white;
+      padding: 20px;
+      border-radius: 16px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    th, td {
-      padding: 12px;
-      border-bottom: 1px solid #ddd;
+
+    h2 {
       text-align: center;
+      margin-bottom: 30px;
     }
-    th {
-      background-color: #333;
-      color: white;
+
+    .user-card {
+      border: 1px solid #ccc;
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      background-color: #f1f1f1;
     }
-    button {
-      padding: 6px 12px;
-      margin: 2px;
+
+    .user-card p {
+      margin: 5px 0;
+    }
+
+    .actions button {
+      margin: 5px;
+      padding: 8px 12px;
       border: none;
-      border-radius: 4px;
+      border-radius: 8px;
       cursor: pointer;
+      font-size: 14px;
     }
-    .btn-active { background-color: #4CAF50; color: white; }
-    .btn-blocked { background-color: #f44336; color: white; }
-    .btn-vip { background-color: #ff9800; color: white; }
+
+    .actions .activate { background-color: #28a745; color: white; }
+    .actions .suspend { background-color: #ffc107; color: black; }
+    .actions .ban { background-color: #dc3545; color: white; }
+    .actions .vip { background-color: #6f42c1; color: white; }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      background: #0935ad;
+      color: white;
+      margin-top: 50px;
+    }
   </style>
 </head>
 <body>
 
-  <h2>قائمة المستخدمين</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>الاسم</th>
-        <th>البريد</th>
-        <th>الحالة</th>
-        <th>إجراءات</th>
-      </tr>
-    </thead>
-    <tbody id="usersTableBody"></tbody>
-  </table>
+  <div class="container">
+    <h2>👤 إدارة المستخدمين</h2>
+    <div id="usersContainer">جاري تحميل البيانات...</div>
+  </div>
 
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+    import { getFirestore, collection, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
 
-  <script>
-    // إعداد Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyDIHlQs6gw--sTbzhTXw7mF1by8yOTdNXo",
       authDomain: "lv-12-dd2da.firebaseapp.com",
       projectId: "lv-12-dd2da",
       storageBucket: "lv-12-dd2da.appspot.com",
-      messagingSenderId: "1:852908073266:web:42df4810cf6448fca5372b",
-      appId: "G-WZ0QFC0WL0"
+      messagingSenderId: "852908073266",
+      appId: "1:852908073266:web:42df4810cf6448fca5372b",
+      measurementId: "G-WZ0QFC0WL0"
     };
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-    // استهداف الجدول
-    const usersTableBody = document.getElementById('usersTableBody');
+    const usersContainer = document.getElementById("usersContainer");
 
-    // عرض المستخدمين
-    db.collection("users").get().then((querySnapshot) => {
-      querySnapshot.forEach((doc) => {
-        const user = doc.data();
-        const row = `
-          <tr>
-            <td>${doc.id}</td>
-            <td>${user.name || '—'}</td>
-            <td>${user.email || '—'}</td>
-            <td>${user.status || 'غير محدد'}</td>
-            <td>
-              <button class="btn-active" onclick="changeStatus('${doc.id}', 'active')">تفعيل</button>
-              <button class="btn-blocked" onclick="changeStatus('${doc.id}', 'blocked')">حظر</button>
-              <button class="btn-vip" onclick="changeStatus('${doc.id}', 'vip')">VIP</button>
-            </td>
-          </tr>
+    // التحقق من أن المستخدم مسجل كـ admin
+    const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+    if (!currentUser || currentUser.role !== "admin") {
+      window.location.href = "login.html";
+    }
+
+    async function loadUsers() {
+      usersContainer.innerHTML = "";
+
+      const usersSnapshot = await getDocs(collection(db, "users"));
+      usersSnapshot.forEach((docSnap) => {
+        const user = docSnap.data();
+        const userId = docSnap.id;
+
+        const userCard = document.createElement("div");
+        userCard.className = "user-card";
+        userCard.innerHTML = `
+          <p><strong>الاسم:</strong> ${user.name || "غير محدد"}</p>
+          <p><strong>البريد:</strong> ${user.email}</p>
+          <p><strong>الدور:</strong> ${user.role || "user"}</p>
+          <p><strong>الحالة:</strong> ${user.status || "unknown"}</p>
+          <p><strong>VIP:</strong> ${user.vip ? "نعم" : "لا"}</p>
+          <p><strong>UID:</strong> ${userId}</p>
+          <div class="actions">
+            <button class="activate">تفعيل</button>
+            <button class="suspend">تعليق</button>
+            <button class="ban">حظر</button>
+            <button class="vip">تحويل إلى VIP</button>
+          </div>
         `;
-        usersTableBody.innerHTML += row;
-      });
-    }).catch((error) => {
-      console.error("خطأ في جلب المستخدمين:", error);
-    });
 
-    // تغيير الحالة
-    function changeStatus(userId, newStatus) {
-      db.collection("users").doc(userId).update({
-        status: newStatus
-      }).then(() => {
-        alert("تم تحديث حالة المستخدم إلى: " + newStatus);
-        location.reload(); // تحديث الجدول بعد التعديل
-      }).catch((error) => {
-        console.error("فشل في تحديث الحالة:", error);
+        const activateBtn = userCard.querySelector(".activate");
+        const suspendBtn = userCard.querySelector(".suspend");
+        const banBtn = userCard.querySelector(".ban");
+        const vipBtn = userCard.querySelector(".vip");
+
+        activateBtn.addEventListener("click", () => updateUserStatus(userId, "active"));
+        suspendBtn.addEventListener("click", () => updateUserStatus(userId, "suspended"));
+        banBtn.addEventListener("click", () => updateUserStatus(userId, "banned"));
+        vipBtn.addEventListener("click", () => updateUserVIP(userId, true));
+
+        usersContainer.appendChild(userCard);
       });
     }
+
+    async function updateUserStatus(uid, status) {
+      const userRef = doc(db, "users", uid);
+      await updateDoc(userRef, { status });
+      alert(`✅ تم تحديث حالة المستخدم إلى "${status}"`);
+      loadUsers();
+    }
+
+    async function updateUserVIP(uid, isVIP) {
+      const userRef = doc(db, "users", uid);
+      await updateDoc(userRef, { vip: isVIP });
+      alert("🌟 تم تحويل المستخدم إلى VIP");
+      loadUsers();
+    }
+
+    loadUsers();
   </script>
 
+  <footer>
+    <a href="index.html" style="color: white;">العودة إلى الرئيسية</a>
+  </footer>
 </body>
 </html>
+
