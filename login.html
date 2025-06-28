@@ -133,12 +133,14 @@
         if (userDocSnap.exists()) {
           const userData = userDocSnap.data();
 
-          if (userData.role === "admin") {
-            localStorage.setItem("currentUser", JSON.stringify(userData));
-            window.location.href = "manage-users.html";
-          } else {
-            loginError.textContent = "❌ ليس لديك صلاحيات الدخول كمدير.";
-          }
+          localStorage.setItem("currentUser", JSON.stringify(userData));
+
+if (userData.role === "admin") {
+  window.location.href = "manage-users.html";
+} else {
+  window.location.href = "index.html"; // أو أي صفحة رئيسية تريد توجيه المستخدم العادي لها
+}
+
         } else {
           loginError.textContent = "❌ لم يتم العثور على بيانات المستخدم.";
         }
