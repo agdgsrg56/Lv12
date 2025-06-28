@@ -75,7 +75,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDIHlQs6gw--sTbzhTXw7mF1by8yOTdNXo",
@@ -98,17 +98,6 @@
       e.preventDefault();
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value;
-
-     
-          localStorage.setItem("currentUser", JSON.stringify(vipUser));
-          localStorage.setItem("allUsers", JSON.stringify(allUsers));
-          window.location.href = "manage-users.html";
-        } catch (err) {
-          console.error(err);
-          loginError.textContent = "حدث خطأ أثناء تحميل بيانات المستخدمين.";
-        }
-        return;
-      }
 
       try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -138,5 +127,4 @@
   </footer>
 </body>
 </html>
-
 
