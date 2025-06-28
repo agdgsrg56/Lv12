@@ -1,198 +1,114 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>إدارة المستخدمين</title>
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: 'Tajawal', sans-serif;
-      direction: rtl;
-      padding: 30px;
-      background: #f0f0f0;
-    }
-    h2 {
-      text-align: center;
-    }
-    .controls {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .controls input, .controls select {
-      padding: 8px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      margin: 5px;
-      width: 200px;
-    }
-    .user-box {
-      background: #fff;
+      font-family: sans-serif;
+      background-color: #f5f5f5;
       padding: 20px;
-      border-radius: 12px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
-    .user-box p {
-      margin: 6px 0;
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #ddd;
+      text-align: center;
+    }
+    th {
+      background-color: #333;
+      color: white;
     }
     button {
-      padding: 8px 14px;
-      margin: 5px 4px 0 0;
+      padding: 6px 12px;
+      margin: 2px;
       border: none;
-      border-radius: 8px;
+      border-radius: 4px;
       cursor: pointer;
-      font-weight: bold;
     }
-    .vip-btn       { background: #ffc107; color: black; }
-    .ban-btn       { background: #dc3545; color: white; }
-    .suspend-btn   { background: #fd7e14; color: white; }
-    .activate-btn  { background: #28a745; color: white; }
-    .info-badge {
-      padding: 4px 10px;
-      border-radius: 6px;
-      background: #e0e0e0;
-      font-size: 13px;
-      margin-right: 5px;
-      display: inline-block;
-    }
+    .btn-active { background-color: #4CAF50; color: white; }
+    .btn-blocked { background-color: #f44336; color: white; }
+    .btn-vip { background-color: #ff9800; color: white; }
   </style>
 </head>
 <body>
 
-  <h2>👥 إدارة جميع الحسابات</h2>
+  <h2>قائمة المستخدمين</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>الاسم</th>
+        <th>البريد</th>
+        <th>الحالة</th>
+        <th>إجراءات</th>
+      </tr>
+    </thead>
+    <tbody id="usersTableBody"></tbody>
+  </table>
 
-  <div class="controls">
-    <input type="text" id="searchInput" placeholder="ابحث بالبريد أو الاسم">
-    <select id="filterSelect">
-      <option value="all">عرض الكل</option>
-      <option value="نشط">نشط</option>
-      <option value="معلق">معلق</option>
-      <option value="محظور">محظور</option>
-      <option value="vip">VIP</option>
-    </select>
-  </div>
-
-  <div id="usersContainer"></div>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
 
   <script>
-    const container = document.getElementById("usersContainer");
-    const searchInput = document.getElementById("searchInput");
-    const filterSelect = document.getElementById("filterSelect");
+    // إعداد Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDIHlQs6gw--sTbzhTXw7mF1by8yOTdNXo",
+      authDomain: "lv-12-dd2da.firebaseapp.com",
+      projectId: "lv-12-dd2da",
+      storageBucket: "lv-12-dd2da.appspot.com",
+      messagingSenderId: "1:852908073266:web:42df4810cf6448fca5372b",
+      appId: "G-WZ0QFC0WL0"
+    };
 
-    let users = JSON.parse(localStorage.getItem("users")) || [];
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-    function displayUsers(filterText = "", filterStatus = "all") {
-      container.innerHTML = "";
+    // استهداف الجدول
+    const usersTableBody = document.getElementById('usersTableBody');
 
-      let filtered = users.filter(user => {
-        const nameMatch = user.name && user.name.toLowerCase().includes(filterText.toLowerCase());
-        const emailMatch = user.email && user.email.toLowerCase().includes(filterText.toLowerCase());
-        const matchText = nameMatch || emailMatch;
-
-        let statusMatch = true;
-        if (filterStatus !== "all") {
-          if (filterStatus === "vip") {
-            statusMatch = user.plan === "vip";
-          } else {
-            statusMatch = user.status === filterStatus;
-          }
-        }
-
-        return matchText && statusMatch;
-      });
-
-      if (filtered.length === 0) {
-        container.innerHTML = "<p style='text-align:center; color:red;'>لا يوجد نتائج.</p>";
-        return;
-      }
-
-      filtered.forEach((user, index) => {
-        const box = document.createElement("div");
-        box.className = "user-box";
-
-        box.innerHTML = `
-          <p><strong>🆔 ID:</strong> ${user.id || index + 1}</p>
-          <p><strong>📧 البريد:</strong> ${user.email}</p>
-          <p><strong>👤 الاسم:</strong> ${user.name || "غير محدد"}</p>
-          <p><strong>📦 الحالة:</strong> <span class="info-badge">${user.status || "نشط"}</span></p>
-          <p><strong>⭐️ الخطة:</strong> ${user.plan || "عادي"}</p>
-          <p><strong>🔔 إشعار:</strong> ${user.notification || "لا يوجد"}</p>
+    // عرض المستخدمين
+    db.collection("users").get().then((querySnapshot) => {
+      querySnapshot.forEach((doc) => {
+        const user = doc.data();
+        const row = `
+          <tr>
+            <td>${doc.id}</td>
+            <td>${user.name || '—'}</td>
+            <td>${user.email || '—'}</td>
+            <td>${user.status || 'غير محدد'}</td>
+            <td>
+              <button class="btn-active" onclick="changeStatus('${doc.id}', 'active')">تفعيل</button>
+              <button class="btn-blocked" onclick="changeStatus('${doc.id}', 'blocked')">حظر</button>
+              <button class="btn-vip" onclick="changeStatus('${doc.id}', 'vip')">VIP</button>
+            </td>
+          </tr>
         `;
+        usersTableBody.innerHTML += row;
+      });
+    }).catch((error) => {
+      console.error("خطأ في جلب المستخدمين:", error);
+    });
 
-        const activateBtn = document.createElement("button");
-        activateBtn.className = "activate-btn";
-        activateBtn.textContent = "✅ تفعيل";
-        activateBtn.onclick = () => {
-          user.status = "نشط";
-          user.notification = "✅ تم تفعيل حسابك.";
-          updateUser(user);
-        };
-
-        const suspendBtn = document.createElement("button");
-        suspendBtn.className = "suspend-btn";
-        suspendBtn.textContent = "🛑 تعليق";
-        suspendBtn.onclick = () => {
-          user.status = "معلق";
-          user.notification = "⚠️ حسابك معلق مؤقتاً.";
-          updateUser(user);
-        };
-
-        const banBtn = document.createElement("button");
-        banBtn.className = "ban-btn";
-        banBtn.textContent = "🚫 حظر";
-        banBtn.onclick = () => {
-          user.status = "محظور";
-          user.notification = "🚫 تم حظر حسابك.";
-          updateUser(user);
-        };
-
-        const vipBtn = document.createElement("button");
-        vipBtn.className = "vip-btn";
-        vipBtn.textContent = "⭐️ VIP";
-        vipBtn.onclick = () => {
-          const now = new Date();
-          const endDate = new Date(now);
-          endDate.setFullYear(endDate.getFullYear() + 1);
-
-          user.plan = "vip";
-          user.planStartDate = now.toISOString();
-          user.planEndDate = endDate.toISOString();
-          user.notification = "🎉 تم ترقيتك إلى VIP!";
-          updateUser(user);
-        };
-
-        box.appendChild(activateBtn);
-        box.appendChild(suspendBtn);
-        box.appendChild(banBtn);
-        box.appendChild(vipBtn);
-
-        container.appendChild(box);
+    // تغيير الحالة
+    function changeStatus(userId, newStatus) {
+      db.collection("users").doc(userId).update({
+        status: newStatus
+      }).then(() => {
+        alert("تم تحديث حالة المستخدم إلى: " + newStatus);
+        location.reload(); // تحديث الجدول بعد التعديل
+      }).catch((error) => {
+        console.error("فشل في تحديث الحالة:", error);
       });
     }
-
-    function updateUser(user) {
-      const index = users.findIndex(u => u.email === user.email);
-      if (index !== -1) {
-        users[index] = user;
-        localStorage.setItem("users", JSON.stringify(users));
-        displayUsers(searchInput.value, filterSelect.value);
-      }
-    }
-
-    searchInput.addEventListener("input", () => {
-      displayUsers(searchInput.value, filterSelect.value);
-    });
-
-    filterSelect.addEventListener("change", () => {
-      displayUsers(searchInput.value, filterSelect.value);
-    });
-
-    displayUsers();
   </script>
 
 </body>
 </html>
-
-
