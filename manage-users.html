@@ -181,20 +181,18 @@
       }
     }
 
-    // حدث البحث
     searchInput.addEventListener("input", () => {
       displayUsers(searchInput.value, filterSelect.value);
     });
 
-    // حدث الفلترة
     filterSelect.addEventListener("change", () => {
       displayUsers(searchInput.value, filterSelect.value);
     });
 
-    // عرض أولي
     displayUsers();
   </script>
 
 </body>
 </html>
+
 
