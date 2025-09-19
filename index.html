@@ -5,22 +5,26 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>LV12 WarerWeb - إدارة شركتك بسهولة</title>
 
-  <!-- ✅ Meta SEO -->
-  <meta name="description" content="LV12 WarerWeb - منصة متكاملة لإدارة العملاء، المبيعات، المخزن، الرواتب والإحصائيات بسهولة.">
-  <meta name="keywords" content="إدارة أعمال, إدارة العملاء, برنامج مبيعات, برنامج مخازن, رواتب, إحصائيات">
-  <meta property="og:title" content="LV12 WarerWeb - إدارة شركتك بسهولة">
-  <meta property="og:description" content="كل ما تحتاجه من إدارة عملاء، مخزن، مبيعات، رواتب وإحصائيات في منصة واحدة.">
-  <meta property="og:image" content="https://lv-12.vercel.app/preview.png">
-  <meta property="og:url" content="https://lv-12.vercel.app/">
-  <meta name="twitter:card" content="summary_large_image">
+  <!-- ✅ تحسين SEO -->
+  <meta name="description" content="LV12 WarerWeb - نظام متكامل لإدارة العملاء، المبيعات، الرواتب، المخزن والإحصائيات بسهولة في منصة واحدة." />
+  <meta name="keywords" content="LV12, إدارة شركة, ERP, مبيعات, عملاء, رواتب, مخزن, صيانة, إحصائيات" />
+  <meta name="author" content="LV12 Team" />
+
+  <!-- ✅ Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png" />
+
+  <!-- ✅ Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- ✅ Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- ✅ FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
   <!-- ✅ AdSense -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7770714931220768"
      crossorigin="anonymous"></script>
-
-  <!-- ✅ Tailwind & Icons -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
   <style>
     body { font-family: "Tajawal", sans-serif; background: linear-gradient(135deg,#f3f4f6,#eef2ff); }
@@ -32,11 +36,10 @@
 </head>
 <body class="text-gray-800">
 
-  <!-- ✅ Header -->
+  <!-- ✅ الهيدر -->
   <header class="glass fixed w-full z-20">
     <div class="container mx-auto flex justify-between items-center py-4 px-6">
       <h1 class="text-xl font-extrabold text-blue-700">🚀 LV12 WarerWeb</h1>
-
       <div class="flex items-center gap-4">
         <div id="user-area" class="hidden items-center gap-3">
           <span id="user-name" class="text-sm text-gray-700"></span>
@@ -47,113 +50,81 @@
     </div>
   </header>
 
-  <!-- ✅ Hero -->
+  <!-- ✅ الهيرو -->
   <section class="pt-28 pb-20 text-center bg-gradient-to-r from-indigo-100 to-blue-100">
     <div class="container mx-auto px-6">
-      <h2 class="text-3xl md:text-5xl font-bold mb-6 text-blue-700 drop-shadow animate-pulse">
-        إدارة شركتك لم تكن أسهل من قبل
-      </h2>
+      <h2 class="text-3xl md:text-5xl font-bold mb-6 text-blue-700 drop-shadow animate-pulse">إدارة شركتك لم تكن أسهل من قبل</h2>
       <p class="text-gray-700 max-w-2xl mx-auto mb-6">كل ما تحتاجه من إدارة عملاء، مخزن، مبيعات، رواتب وإحصائيات في منصة واحدة منظمة وسهلة الاستخدام.</p>
-
-      <a id="try-btn" href="#" class="inline-block bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-full shadow-lg font-semibold hover:scale-105 transition">
-        ✨ جرّب مجانًا
-      </a>
+      <a id="try-btn" href="#" class="inline-block bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-full shadow-lg font-semibold hover:scale-105 transition">✨ جرّب مجانًا</a>
     </div>
   </section>
 
-  <!-- ✅ AdSpace -->
+  <!-- ✅ إعلان جاهز -->
   <div class="container mx-auto px-6">
     <div class="ad-box">
       <ins class="adsbygoogle"
-           style="display:block"
-           data-ad-client="ca-pub-7770714931220768"
-           data-ad-slot="1234567890" <!-- 🔄 استبدلها بالـ Ad Slot ID -->
-           data-ad-format="auto"
-           data-full-width-responsive="true"></ins>
+          style="display:block"
+          data-ad-client="ca-pub-7770714931220768"
+          data-ad-slot="1234567890"
+          data-ad-format="auto"
+          data-full-width-responsive="true"></ins>
       <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
     </div>
   </div>
 
-  <!-- ✅ Features -->
+  <!-- ✅ المميزات -->
   <section id="features" class="py-16 container mx-auto px-6">
     <h3 class="text-3xl font-bold text-center mb-10 text-blue-700">🔥 مميزات البرنامج</h3>
     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div class="glass p-6 rounded-2xl hover:-translate-y-1 hover:shadow-xl transition">
-        <div class="text-blue-600 text-4xl mb-3">👥</div>
-        <h4 class="font-bold text-lg mb-2">إدارة العملاء</h4>
-        <p class="text-gray-600 text-sm">تسجيل عملاء جدد وقدامى مع متابعة الأقساط والصيانة.</p>
-      </div>
-      <div class="glass p-6 rounded-2xl hover:-translate-y-1 hover:shadow-xl transition">
-        <div class="text-blue-600 text-4xl mb-3">📦</div>
-        <h4 class="font-bold text-lg mb-2">إدارة المخزن</h4>
-        <p class="text-gray-600 text-sm">تسجيل المنتجات بالكمية والأسعار وصور الموردين.</p>
-      </div>
-      <div class="glass p-6 rounded-2xl hover:-translate-y-1 hover:shadow-xl transition">
-        <div class="text-blue-600 text-4xl mb-3">💳</div>
-        <h4 class="font-bold text-lg mb-2">المبيعات</h4>
-        <p class="text-gray-600 text-sm">تسجيل عمليات البيع والربح مع تقارير وطباعة.</p>
-      </div>
-      <div class="glass p-6 rounded-2xl hover:-translate-y-1 hover:shadow-xl transition">
-        <div class="text-blue-600 text-4xl mb-3">💰</div>
-        <h4 class="font-bold text-lg mb-2">الرواتب</h4>
-        <p class="text-gray-600 text-sm">إدارة الرواتب والمكافآت والخصومات مع أرشيف كامل.</p>
-      </div>
-      <div class="glass p-6 rounded-2xl hover:-translate-y-1 hover:shadow-xl transition">
-        <div class="text-blue-600 text-4xl mb-3">📊</div>
-        <h4 class="font-bold text-lg mb-2">الإحصائيات</h4>
-        <p class="text-gray-600 text-sm">عرض شامل للأرباح والمصروفات والعملاء والمبيعات.</p>
-      </div>
-      <div class="glass p-6 rounded-2xl hover:-translate-y-1 hover:shadow-xl transition">
-        <div class="text-blue-600 text-4xl mb-3">🛠️</div>
-        <h4 class="font-bold text-lg mb-2">الصيانة</h4>
-        <p class="text-gray-600 text-sm">متابعة الصيانة الدورية وتغيير الفلاتر والشمعات.</p>
-      </div>
+      <div class="glass p-6 rounded-2xl transition hover:-translate-y-1 hover:shadow-xl"><div class="text-blue-600 text-4xl mb-3">👥</div><h4 class="font-bold text-lg mb-2">إدارة العملاء</h4><p class="text-gray-600 text-sm">تسجيل عملاء جدد وقدامى مع متابعة الأقساط والصيانة.</p></div>
+      <div class="glass p-6 rounded-2xl transition hover:-translate-y-1 hover:shadow-xl"><div class="text-blue-600 text-4xl mb-3">📦</div><h4 class="font-bold text-lg mb-2">إدارة المخزن</h4><p class="text-gray-600 text-sm">تسجيل المنتجات بالكمية والأسعار وصور الموردين.</p></div>
+      <div class="glass p-6 rounded-2xl transition hover:-translate-y-1 hover:shadow-xl"><div class="text-blue-600 text-4xl mb-3">💳</div><h4 class="font-bold text-lg mb-2">المبيعات</h4><p class="text-gray-600 text-sm">تسجيل عمليات البيع والربح مع تقارير وطباعة.</p></div>
+      <div class="glass p-6 rounded-2xl transition hover:-translate-y-1 hover:shadow-xl"><div class="text-blue-600 text-4xl mb-3">💰</div><h4 class="font-bold text-lg mb-2">الرواتب</h4><p class="text-gray-600 text-sm">إدارة الرواتب والمكافآت والخصومات مع أرشيف كامل.</p></div>
+      <div class="glass p-6 rounded-2xl transition hover:-translate-y-1 hover:shadow-xl"><div class="text-blue-600 text-4xl mb-3">📊</div><h4 class="font-bold text-lg mb-2">الإحصائيات</h4><p class="text-gray-600 text-sm">عرض شامل للأرباح والمصروفات والعملاء والمبيعات.</p></div>
+      <div class="glass p-6 rounded-2xl transition hover:-translate-y-1 hover:shadow-xl"><div class="text-blue-600 text-4xl mb-3">🛠️</div><h4 class="font-bold text-lg mb-2">الصيانة</h4><p class="text-gray-600 text-sm">متابعة الصيانة الدورية وتغيير الفلاتر والشمعات.</p></div>
     </div>
   </section>
 
-  <!-- ✅ AdSpace -->
+  <!-- ✅ إعلان -->
   <div class="container mx-auto px-6">
     <div class="ad-box">
       <ins class="adsbygoogle"
-           style="display:block"
-           data-ad-client="ca-pub-7770714931220768"
-           data-ad-slot="1234567890"
-           data-ad-format="auto"
-           data-full-width-responsive="true"></ins>
+          style="display:block"
+          data-ad-client="ca-pub-7770714931220768"
+          data-ad-slot="1234567890"
+          data-ad-format="auto"
+          data-full-width-responsive="true"></ins>
       <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
     </div>
   </div>
 
-  <!-- ✅ Pricing -->
+  <!-- ✅ خطط الأسعار -->
   <section id="pricing" class="py-20 bg-gradient-to-r from-indigo-50 to-blue-50">
     <div class="container mx-auto px-6">
       <h3 class="text-3xl font-bold text-center mb-12 text-blue-700">💳 خطط الأسعار</h3>
       <div class="grid md:grid-cols-4 gap-6">
-        <div class="glass p-8 rounded-2xl text-center hover:scale-105 transition">
-          <h4 class="font-bold text-xl mb-2">أسبوع</h4>
-          <p class="text-2xl font-bold text-blue-600 mb-1">100 <span class="text-base text-gray-600">جنيه</span></p>
-          <p class="text-sm text-gray-500">صلاحية لمدة 7 أيام</p>
-        </div>
-        <div class="glass p-8 rounded-2xl border-2 border-blue-600 text-center hover:scale-105 transition">
-          <h4 class="font-bold text-xl mb-2">شهر</h4>
-          <p class="text-2xl font-bold text-blue-600 mb-1">400 <span class="text-base text-gray-600">جنيه</span></p>
-          <p class="text-sm text-gray-500">صلاحية لمدة 30 يوم</p>
-        </div>
-        <div class="glass p-8 rounded-2xl text-center hover:scale-105 transition">
-          <h4 class="font-bold text-xl mb-2">عام</h4>
-          <p class="text-2xl font-bold text-blue-600 mb-1">4800 <span class="text-base text-gray-600">جنيه</span></p>
-          <p class="text-sm text-gray-500">صلاحية لمدة 365 يوم</p>
-        </div>
-        <div class="glass p-8 rounded-2xl text-center hover:scale-105 transition">
-          <h4 class="font-bold text-xl mb-2">مدى الحياة</h4>
-          <p class="text-2xl font-bold text-blue-600 mb-1">34500 <span class="text-base text-gray-600">جنيه</span></p>
-          <p class="text-sm text-gray-500">تفعيل لمرة واحدة فقط</p>
-        </div>
+        <div class="glass p-8 rounded-2xl text-center hover:scale-105 transition"><h4 class="font-bold text-xl mb-2">أسبوع</h4><p class="text-2xl font-bold text-blue-600 mb-1">100 <span class="text-base text-gray-600">جنيه</span></p><p class="text-sm text-gray-500">صلاحية لمدة 7 أيام</p></div>
+        <div class="glass p-8 rounded-2xl border-2 border-blue-600 text-center hover:scale-105 transition"><h4 class="font-bold text-xl mb-2">شهر</h4><p class="text-2xl font-bold text-blue-600 mb-1">400 <span class="text-base text-gray-600">جنيه</span></p><p class="text-sm text-gray-500">صلاحية لمدة 30 يوم</p></div>
+        <div class="glass p-8 rounded-2xl text-center hover:scale-105 transition"><h4 class="font-bold text-xl mb-2">عام</h4><p class="text-2xl font-bold text-blue-600 mb-1">4800 <span class="text-base text-gray-600">جنيه</span></p><p class="text-sm text-gray-500">صلاحية لمدة 365 يوم</p></div>
+        <div class="glass p-8 rounded-2xl text-center hover:scale-105 transition"><h4 class="font-bold text-xl mb-2">مدى الحياة</h4><p class="text-2xl font-bold text-blue-600 mb-1">34500 <span class="text-base text-gray-600">جنيه</span></p><p class="text-sm text-gray-500">تفعيل لمرة واحدة فقط</p></div>
       </div>
     </div>
   </section>
 
-  <!-- ✅ Video -->
+  <!-- ✅ إعلان -->
+  <div class="container mx-auto px-6">
+    <div class="ad-box">
+      <ins class="adsbygoogle"
+          style="display:block"
+          data-ad-client="ca-pub-7770714931220768"
+          data-ad-slot="1234567890"
+          data-ad-format="auto"
+          data-full-width-responsive="true"></ins>
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
+  </div>
+
+  <!-- ✅ فيديو -->
   <section class="py-16">
     <div class="container mx-auto px-6 text-center">
       <h3 class="text-2xl font-bold mb-6 text-blue-700">🎥 شاهد كيف يعمل البرنامج</h3>
@@ -166,13 +137,11 @@
     <div class="container mx-auto px-6">
       <h3 class="text-3xl font-bold mb-4">✨ ابدأ تجربتك الآن</h3>
       <p class="mb-6">سجّل مجانًا واستمتع بجميع المميزات لفترة محدودة.</p>
-      <a id="cta-try" class="bg-white text-blue-600 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition cursor-pointer">
-        ✨ جرّب الآن
-      </a>
+      <a id="cta-try" class="bg-white text-blue-600 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition cursor-pointer">✨ جرّب الآن</a>
     </div>
   </section>
 
-  <!-- ✅ Help -->
+  <!-- ✅ المساعدة -->
   <section id="help" class="py-20 container mx-auto px-6">
     <h3 class="text-3xl font-bold mb-8 text-blue-700">📑 المساعدة</h3>
     <p class="text-gray-700 mb-6">تجد هنا كل ما تحتاج إليه من مستندات ودلائل استخدام:</p>
@@ -184,24 +153,47 @@
     </ul>
   </section>
 
-  <!-- ✅ Footer -->
+  <!-- ✅ إعلان -->
+  <div class="container mx-auto px-6">
+    <div class="ad-box">
+      <ins class="adsbygoogle"
+          style="display:block"
+          data-ad-client="ca-pub-7770714931220768"
+          data-ad-slot="1234567890"
+          data-ad-format="auto"
+          data-full-width-responsive="true"></ins>
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
+  </div>
+
+  <!-- ✅ الفوتر -->
   <footer class="bg-gray-900 text-white text-center py-6 text-sm">
     <p>© 2025 LV12 - جميع الحقوق محفوظة</p>
     <div class="flex flex-col items-center mt-4 space-y-2 text-sm">
-      <a href="https://facebook.com" target="_blank" class="flex items-center gap-2 hover:text-blue-500"><i class="fab fa-facebook"></i> Facebook</a>
-      <a href="https://twitter.com" target="_blank" class="flex items-center gap-2 hover:text-sky-500"><i class="fab fa-x-twitter"></i> Twitter</a>
-      <a href="https://instagram.com" target="_blank" class="flex items-center gap-2 hover:text-pink-500"><i class="fab fa-instagram"></i> Instagram</a>
-      <a href="https://linkedin.com" target="_blank" class="flex items-center gap-2 hover:text-blue-400"><i class="fab fa-linkedin"></i> LinkedIn</a>
-      <a href="https://youtube.com" target="_blank" class="flex items-center gap-2 hover:text-red-500"><i class="fab fa-youtube"></i> YouTube</a>
+      <a href="https://facebook.com" target="_blank" class="flex items-center gap-2 hover:text-blue-500 transition"><i class="fab fa-facebook"></i> <span>Facebook</span></a>
+      <a href="https://twitter.com" target="_blank" class="flex items-center gap-2 hover:text-sky-500 transition"><i class="fab fa-x-twitter"></i> <span>Twitter</span></a>
+      <a href="https://instagram.com" target="_blank" class="flex items-center gap-2 hover:text-pink-500 transition"><i class="fab fa-instagram"></i> <span>Instagram</span></a>
+      <a href="https://linkedin.com" target="_blank" class="flex items-center gap-2 hover:text-blue-400 transition"><i class="fab fa-linkedin"></i> <span>LinkedIn</span></a>
+      <a href="https://youtube.com" target="_blank" class="flex items-center gap-2 hover:text-red-500 transition"><i class="fab fa-youtube"></i> <span>YouTube</span></a>
     </div>
   </footer>
 
-  <!-- ✅ Supabase -->
+  <!-- ✅ Tawk.to Chat -->
+  <script type="text/javascript">
+    var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+    (function(){
+      var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+      s1.async=true;s1.src='https://embed.tawk.to/68c8f642da790c1926b84f20/1j58g3tg0';
+      s1.charset='UTF-8';s1.setAttribute('crossorigin','*');
+      s0.parentNode.insertBefore(s1,s0);
+    })();
+  </script>
+
+  <!-- ✅ Supabase + UI logic -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script>
     const SUPABASE_URL = "https://nszhzfysitppxssplqfb.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemh6ZnlzaXRwcHhzc3BscWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMzA4OTcsImV4cCI6MjA3MzgwNjg5N30.5KvK4bhqkZ_GpIfED4qecIMfeubAJYwSFJslULwOp-w"; 
-
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...";
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const createBtn = document.getElementById("create-account-btn");
@@ -221,29 +213,34 @@
         tryBtn.onclick = () => window.location.href = "layout.html";
         ctaTry.textContent = "✨ افتح حسابي";
         ctaTry.onclick = () => window.location.href = "layout.html";
-        userNameEl.textContent = session.user.email;
+
+        const uid = session.user.id;
+        const { data: profile } = await supabase.from("profiles").select("full_name").eq("id", uid).single();
+        if (profile && profile.full_name) {
+          userNameEl.textContent = "مرحباً، " + profile.full_name;
+        } else {
+          userNameEl.textContent = session.user.email;
+        }
         userArea.classList.remove("hidden");
       } else {
         createBtn.style.display = "inline-block";
         tryBtn.textContent = "✨ جرّب مجانًا";
         tryBtn.onclick = () => window.location.href = "signup.html";
-        ctaTry.textContent = "✨ جرّب الآن";
-        ctaTry.onclick = () => window.location.href = "signup.html";
-        userArea.classList.add("hidden");
+        ctaTry.textContent = "✨
+
       }
     }
 
-    supabase.auth.onAuthStateChange(() => { updateUIFromSession(); });
+    updateUIFromSession();
 
     logoutBtn.addEventListener("click", async () => {
       await supabase.auth.signOut();
-      window.location.href = "/";
+      location.reload();
     });
-
-    updateUIFromSession();
   </script>
 </body>
 </html>
+
 
 
 
