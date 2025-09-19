@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>المستهلكات - LV12</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans text-gray-800 flex">
+
+<aside class="w-64 bg-white shadow-lg h-screen fixed left-0">
+  <div class="p-6 border-b">
+    <h1 class="text-2xl font-bold text-blue-600">LV12</h1>
+  </div>
+  <nav class="p-6 space-y-4">
+    <a href="customers.html" class="block py-2 px-4 rounded hover:bg-blue-100">👥 العملاء</a>
+    <a href="maintenance.html" class="block py-2 px-4 rounded hover:bg-blue-100">🛠️ صيانة العملاء</a>
+    <a href="store.html" class="block py-2 px-4 rounded hover:bg-blue-100">📦 المخزن</a>
+    <a href="sales.html" class="block py-2 px-4 rounded hover:bg-blue-100">💳 المبيعات</a>
+    <a href="salaries.html" class="block py-2 px-4 rounded hover:bg-blue-100">💰 الرواتب</a>
+    <a href="stats.html" class="block py-2 px-4 rounded hover:bg-blue-100">📊 الإحصائيات</a>
+    <a href="consumables.html" class="block py-2 px-4 rounded bg-blue-600 text-white">🧾 المستهلكات</a>
+  </nav>
+</aside>
+
+  <!-- المحتوى -->
+  <main class="flex-1 ml-64 p-10">
+    <h2 class="text-3xl font-bold text-gray-700 mb-6">🧾 إدارة المستهلكات</h2>
+
+    <!-- إضافة مستهلك -->
+    <div class="bg-white p-6 rounded-xl shadow mb-8">
+      <h3 class="text-xl font-semibold mb-4">➕ إضافة مستهلك جديد</h3>
+      <form class="grid md:grid-cols-3 gap-4">
+        <input type="text" placeholder="اسم المستهلك" class="border rounded p-2 w-full">
+        <input type="number" placeholder="الكمية" class="border rounded p-2 w-full">
+        <input type="number" placeholder="التكلفة (جنيه)" class="border rounded p-2 w-full">
+        <button type="submit" class="bg-blue-600 text-white py-2 rounded col-span-3 md:col-span-1">إضافة</button>
+      </form>
+    </div>
+
+    <!-- جدول المستهلكات -->
+    <div class="bg-white p-6 rounded-xl shadow">
+      <h3 class="text-xl font-semibold mb-4">📋 قائمة المستهلكات</h3>
+      <table class="w-full border-collapse">
+        <thead>
+          <tr class="bg-gray-100 text-gray-600">
+            <th class="border p-3">المنتج</th>
+            <th class="border p-3">الكمية</th>
+            <th class="border p-3">التكلفة</th>
+            <th class="border p-3">الإجمالي</th>
+            <th class="border p-3">إجراءات</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="border p-3">فلتر مياه</td>
+            <td class="border p-3">10</td>
+            <td class="border p-3">50 ج.م</td>
+            <td class="border p-3 text-blue-600 font-bold">500 ج.م</td>
+            <td class="border p-3 text-center">
+              <button class="bg-red-500 text-white px-3 py-1 rounded">🗑️ حذف</button>
+            </td>
+          </tr>
+          <tr>
+            <td class="border p-3">شمعة كربون</td>
+            <td class="border p-3">20</td>
+            <td class="border p-3">30 ج.م</td>
+            <td class="border p-3 text-blue-600 font-bold">600 ج.م</td>
+            <td class="border p-3 text-center">
+              <button class="bg-red-500 text-white px-3 py-1 rounded">🗑️ حذف</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</body>
+</html>
