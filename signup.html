@@ -31,7 +31,7 @@
   <script>
     const supabase = window.supabase.createClient(
       "https://nszhzfysitppxssplqfb.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemh6ZnlzaXRwcHhzc3BscWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMzA4OTcsImV4cCI6MjA3MzgwNjg5N30.5KvK4bhqkZ_GpIfED4qecIMfeubAJYwSFJslULwOp-w"
+      "YOUR_PUBLIC_ANON_KEY"
     )
 
     const form = document.getElementById("signup-form")
@@ -40,18 +40,21 @@
     form.addEventListener("submit", async (e) => {
       e.preventDefault()
 
-      const full_name = document.getElementById("full_name").value
-      const phone = document.getElementById("phone").value
-      const email = document.getElementById("email").value
+      const full_name = document.getElementById("full_name").value.trim()
+      const phone = document.getElementById("phone").value.trim()
+      const email = document.getElementById("email").value.trim()
       const password = document.getElementById("password").value
 
       message.textContent = "⏳ جاري إنشاء الحساب..."
       message.className = "text-center mt-4 text-sm text-gray-600"
 
-      // تسجيل المستخدم
+      // التسجيل مع إرسال metadata
       const { data, error } = await supabase.auth.signUp({
         email,
-        password
+        password,
+        options: {
+          data: { full_name, phone }
+        }
       })
 
       if (error) {
@@ -60,34 +63,15 @@
         return
       }
 
-      // إضافة بيانات إضافية في جدول profiles
-      if (data.user) {
-        const { error: insertError } = await supabase
-          .from("profiles")
-          .insert([{ id: data.user.id, full_name, phone }])
+      // لا نحتاج insert يدوياً إذا التريجر مضبوط
+      message.textContent = "✅ تم التسجيل! افحص بريدك الإلكتروني للتفعيل إذا كان مفعل."
+      message.className = "text-center mt-4 text-sm text-green-600"
 
-        if (insertError) {
-          message.textContent = "⚠️ الحساب اتسجل لكن البيانات الإضافية ما اتحفظتش: " + insertError.message
-          message.className = "text-center mt-4 text-sm text-yellow-600"
-          return
-        }
-      }
-
-      // التحقق إذا كان تفعيل البريد مطلوب أو لا
-      if (data.user && !data.session) {
-        // حالة: التفعيل مطلوب بالبريد
-        message.textContent = "✅ تم التسجيل! افحص بريدك الإلكتروني لتفعيل الحساب."
-        message.className = "text-center mt-4 text-sm text-green-600"
-      } else {
-        // حالة: التفعيل غير مطلوب
-        message.textContent = "✅ تم التسجيل بنجاح! سيتم تحويلك لتسجيل الدخول..."
-        message.className = "text-center mt-4 text-sm text-green-600"
-
-        setTimeout(() => {
-          window.location.href = "login.html"
-        }, 1500)
-      }
+      setTimeout(() => {
+        window.location.href = "login.html"
+      }, 2000)
     })
   </script>
 </body>
 </html>
+
