@@ -1,34 +1,17 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>LV12 WarerWeb - إدارة شركتك بسهولة</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
   <style>
     body { font-family: "Tajawal", sans-serif; background: linear-gradient(135deg,#f3f4f6,#eef2ff); }
-    .glass {
-      background: rgba(255,255,255,0.75);
-      backdrop-filter: blur(12px);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-    }
-    .social-icons a {
-      transition: 0.3s;
-    }
-    .social-icons a:hover {
-      transform: scale(1.2) rotate(-5deg);
-      color: #60a5fa;
-    }
-    .ad-box {
-      background: #f9fafb;
-      border: 2px dashed #cbd5e1;
-      text-align: center;
-      padding: 20px;
-      margin: 20px auto;
-      border-radius: 12px;
-      font-size: 14px;
-      color: #475569;
-    }
+    .glass { background: rgba(255,255,255,0.75); backdrop-filter: blur(12px); box-shadow: 0 8px 32px rgba(0,0,0,0.1); }
+    .social-icons a { transition: 0.3s; }
+    .social-icons a:hover { transform: scale(1.1) rotate(-5deg); color: #60a5fa; }
+    .ad-box { background: #f9fafb; border: 2px dashed #cbd5e1; text-align: center; padding: 20px; margin: 20px auto; border-radius: 12px; font-size: 14px; color: #475569; }
   </style>
 </head>
 <body class="text-gray-800">
@@ -37,11 +20,18 @@
   <header class="glass fixed w-full z-20">
     <div class="container mx-auto flex justify-between items-center py-4 px-6">
       <h1 class="text-xl font-extrabold text-blue-700">🚀 LV12 WarerWeb</h1>
-      <nav class="hidden md:flex items-center space-x-6 space-x-reverse font-medium">
-        <a href="#features" class="hover:text-blue-600 transition">المميزات</a>
-        <a href="#pricing" class="hover:text-blue-600 transition">الأسعار</a>
-        <a href="#signup" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-5 py-2 rounded-full hover:opacity-90 transition">جرّب الآن</a>
-      </nav>
+
+      <!-- يمين: روابط / حالة دخول -->
+      <div class="flex items-center gap-4">
+        <!-- مكان يظهر اسم المستخدم و زر الخروج لو مسجل -->
+        <div id="user-area" class="hidden items-center gap-3">
+          <span id="user-name" class="text-sm text-gray-700"></span>
+          <button id="logout-btn" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:opacity-90">تسجيل خروج</button>
+        </div>
+
+        <!-- إنشاء حساب (يُخفي عند تسجيل الدخول) -->
+        <a id="create-account-btn" href="signup.html" class="bg-white text-blue-600 px-4 py-2 rounded-full hover:bg-gray-100 transition font-medium">إنشاء حساب</a>
+      </div>
     </div>
   </header>
 
@@ -52,7 +42,9 @@
         إدارة شركتك لم تكن أسهل من قبل
       </h2>
       <p class="text-gray-700 max-w-2xl mx-auto mb-6">كل ما تحتاجه من إدارة عملاء، مخزن، مبيعات، رواتب وإحصائيات في منصة واحدة منظمة وسهلة الاستخدام.</p>
-      <a href="#signup" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-full shadow-lg font-semibold hover:scale-105 transition inline-block">
+
+      <!-- زر التجربة: يتصرف بناءً على حالة الدخول -->
+      <a id="try-btn" href="#" class="inline-block bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-full shadow-lg font-semibold hover:scale-105 transition">
         ✨ جرّب مجانًا
       </a>
     </div>
@@ -145,7 +137,7 @@
     </div>
   </div>
 
-  <!-- فيديو -->
+  <!-- الفيديو -->
   <section class="py-16">
     <div class="container mx-auto px-6 text-center">
       <h3 class="text-2xl font-bold mb-6 text-blue-700">🎥 شاهد كيف يعمل البرنامج</h3>
@@ -158,8 +150,8 @@
   <div class="container mx-auto px-6">
     <h3 class="text-3xl font-bold mb-4">✨ ابدأ تجربتك الآن</h3>
     <p class="mb-6">سجّل مجانًا واستمتع بجميع المميزات لفترة محدودة.</p>
-    <a href="signup.html" class="bg-white text-blue-600 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition">
-      إنشاء حساب
+    <a id="cta-try" class="bg-white text-blue-600 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition cursor-pointer">
+      ✨ جرّب الآن
     </a>
   </div>
 </section>
@@ -186,29 +178,26 @@
   <!-- الفوتر -->
   <footer class="bg-gray-900 text-white text-center py-6 text-sm">
     <p>© 2025 LV12  - جميع الحقوق محفوظة</p>
-   <div class="flex flex-col items-center mt-4 space-y-2 text-sm">
-  <a href="https://facebook.com" target="_blank" class="flex items-center gap-2 hover:text-blue-500 transition">
-    <i class="fab fa-facebook"></i> <span>Facebook</span>
-  </a>
-  <a href="https://twitter.com" target="_blank" class="flex items-center gap-2 hover:text-sky-500 transition">
-    <i class="fab fa-x-twitter"></i> <span>Twitter</span>
-  </a>
-  <a href="https://instagram.com" target="_blank" class="flex items-center gap-2 hover:text-pink-500 transition">
-    <i class="fab fa-instagram"></i> <span>Instagram</span>
-  </a>
-  <a href="https://linkedin.com" target="_blank" class="flex items-center gap-2 hover:text-blue-400 transition">
-    <i class="fab fa-linkedin"></i> <span>LinkedIn</span>
-  </a>
-  <a href="https://youtube.com" target="_blank" class="flex items-center gap-2 hover:text-red-500 transition">
-    <i class="fab fa-youtube"></i> <span>YouTube</span>
-  </a>
-</div>
-
+    <div class="flex flex-col items-center mt-4 space-y-2 text-sm">
+      <a href="https://facebook.com" target="_blank" class="flex items-center gap-2 hover:text-blue-500 transition">
+        <i class="fab fa-facebook"></i> <span>Facebook</span>
+      </a>
+      <a href="https://twitter.com" target="_blank" class="flex items-center gap-2 hover:text-sky-500 transition">
+        <i class="fab fa-x-twitter"></i> <span>Twitter</span>
+      </a>
+      <a href="https://instagram.com" target="_blank" class="flex items-center gap-2 hover:text-pink-500 transition">
+        <i class="fab fa-instagram"></i> <span>Instagram</span>
+      </a>
+      <a href="https://linkedin.com" target="_blank" class="flex items-center gap-2 hover:text-blue-400 transition">
+        <i class="fab fa-linkedin"></i> <span>LinkedIn</span>
+      </a>
+      <a href="https://youtube.com" target="_blank" class="flex items-center gap-2 hover:text-red-500 transition">
+        <i class="fab fa-youtube"></i> <span>YouTube</span>
+      </a>
+    </div>
   </footer>
 
-  <!-- FontAwesome -->
-  <script src="https://kit.fontawesome.com/a2e0e9e91b.js" crossorigin="anonymous"></script>
-
+  <!-- FontAwesome already included above -->
   <!-- Tawk.to Chat -->
   <script type="text/javascript">
     var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
@@ -221,5 +210,73 @@
     s0.parentNode.insertBefore(s1,s0);
     })();
   </script>
+
+  <!-- Supabase + UI logic -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script>
+    // --- استبدل هنا إن احتاجت بمفتاحك الخاص (الـ anon key اللي وضعته)
+    const SUPABASE_URL = "https://nszhzfysitppxssplqfb.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemh6ZnlzaXRwcHhzc3BscWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMzA4OTcsImV4cCI6MjA3MzgwNjg5N30.5KvK4bhqkZ_GpIfED4qecIMfeubAJYwSFJslULwOp-w";
+
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const createBtn = document.getElementById("create-account-btn");
+    const tryBtn = document.getElementById("cta-try");
+    const userArea = document.getElementById("user-area");
+    const userNameEl = document.getElementById("user-name");
+    const logoutBtn = document.getElementById("logout-btn");
+
+    // دالة لتحديث واجهة المستخدم بناءً على حالة الجلسة
+    async function updateUIFromSession() {
+      const { data } = await supabase.auth.getSession();
+      const session = data.session;
+
+      if (session && session.user) {
+        // المستخدم مسجّل
+        createBtn.style.display = "none";
+        tryBtn.textContent = "✨ افتح حسابي";
+        tryBtn.onclick = () => { window.location.href = "layout.html"; };
+
+        // جلب بيانات البروفايل لو موجودة
+        const uid = session.user.id;
+        const { data: profile, error } = await supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("id", uid)
+          .single();
+
+        if (profile && profile.full_name) {
+          userNameEl.textContent = "مرحباً، " + profile.full_name;
+        } else {
+          userNameEl.textContent = session.user.email;
+        }
+        userArea.classList.remove("hidden");
+      } else {
+        // المستخدم مش مسجّل
+        createBtn.style.display = "inline-block";
+        tryBtn.textContent = "✨ جرّب مجانًا";
+        tryBtn.onclick = () => { window.location.href = "signup.html"; };
+        userArea.classList.add("hidden");
+      }
+    }
+
+    // عند تغيير الحالة (تسجيل دخول/خروج) حدّث الواجهة فورًا
+    supabase.auth.onAuthStateChange((event, session) => {
+      updateUIFromSession();
+    });
+
+    // زر تسجيل الخروج
+    logoutBtn.addEventListener("click", async () => {
+      await supabase.auth.signOut();
+      // لو حابب تعيد توجيه بعد الخروج:
+      window.location.href = "/";
+    });
+
+    // تشغيل التحقق من الجلسة عند فتح الصفحة
+    updateUIFromSession();
+  </script>
 </body>
 </html>
+
+
+
