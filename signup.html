@@ -29,9 +29,10 @@
   </div>
 
   <script>
+    // 🔹 Supabase Client
     const supabase = window.supabase.createClient(
-      "https://nszhzfysitppxssplqfb.supabase.co",
-      "YOUR_PUBLIC_ANON_KEY"
+      "https://nszhzfysitppxssplqfb.supabase.co", // API URL
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemh6ZnlzaXRwcHhzc3BscWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMzA4OTcsImV4cCI6MjA3MzgwNjg5N30.5KvK4bhqkZ_GpIfED4qecIMfeubAJYwSFJslULwOp-w" // anon key
     )
 
     const form = document.getElementById("signup-form")
@@ -48,7 +49,7 @@
       message.textContent = "⏳ جاري إنشاء الحساب..."
       message.className = "text-center mt-4 text-sm text-gray-600"
 
-      // التسجيل مع إرسال metadata
+      // 🔹 تسجيل المستخدم + metadata
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -63,8 +64,7 @@
         return
       }
 
-      // لا نحتاج insert يدوياً إذا التريجر مضبوط
-      message.textContent = "✅ تم التسجيل! افحص بريدك الإلكتروني للتفعيل إذا كان مفعل."
+      message.textContent = "✅ تم التسجيل! افحص بريدك الإلكتروني للتفعيل (إن كان مفعّل)"
       message.className = "text-center mt-4 text-sm text-green-600"
 
       setTimeout(() => {
