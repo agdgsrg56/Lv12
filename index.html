@@ -238,6 +238,22 @@
     }
 
     updateUIFromSession();
+const heroBtn = document.getElementById("hero-btn");
+
+async function updateUIFromSession() {
+  const { data } = await supabase.auth.getSession();
+  const session = data.session;
+
+  if (session && session.user) {
+    // المستخدم مسجل دخول
+    heroBtn.textContent = "🚀 دخول للنظام";
+    heroBtn.href = "layout.html";
+  } else {
+    // المستخدم مش مسجل
+    heroBtn.textContent = "✨ ابدأ الآن";
+    heroBtn.href = "signup.html";
+  }
+}
 
     logoutBtn.addEventListener("click", async () => {
       await supabase.auth.signOut();
@@ -246,6 +262,7 @@
   </script>
 </body>
 </html>
+
 
 
 
