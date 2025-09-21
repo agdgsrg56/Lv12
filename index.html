@@ -208,15 +208,13 @@
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemh6ZnlzaXRwcHhzc3BscWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMzA4OTcsImV4cCI6MjA3MzgwNjg5N30.5KvK4bhqkZ_GpIfED4qecIMfeubAJYwSFJslULwOp-w";
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const createBtn = document.getElementById("create-account-btn");
-    const tryBtn = document.getElementById("try-btn");
-    const userArea = document.getElementById("user-area");
-    const userNameEl = document.getElementById("user-name");
-    const logoutBtn = document.getElementById("logout-btn");
-    const heroBtn = document.getElementById("hero-btn");
-    async function updateUIFromSession() {
-      const { data } = await supabase.auth.getSession();
-      const session = data.session;
+const createBtn = document.getElementById("create-account-btn");
+const tryBtn = document.getElementById("try-btn");
+const userArea = document.getElementById("user-area");
+const userNameEl = document.getElementById("user-name");
+const logoutBtn = document.getElementById("logout-btn");
+const heroBtn = document.getElementById("hero-btn");
+
 async function updateUIFromSession() {
   try {
     // نجيب السيشن الحالي
@@ -291,6 +289,7 @@ supabase.auth.onAuthStateChange((event, session) => {
   </script>
 </body>
 </html>
+
 
 
 
