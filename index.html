@@ -8,10 +8,19 @@
     <link rel="icon" href="lv12.ico" type="image/x-icon">
 </head>
 
+ <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LV12 WarerWeb - إدارة شركتك بسهولة</title>
   <meta name="description" content="LV12 WarerWeb - نظام متكامل لإدارة العملاء، المبيعات، الرواتب، المخزن والإحصائيات بسهولة في منصة واحدة." />
   <meta name="keywords" content="LV12, إدارة شركة, ERP, مبيعات, عملاء, رواتب, مخزن, صيانة, إحصائيات" />
   <meta name="author" content="LV12 Team" />
 
+
+  <meta property="og:title" content="LV12 WarerWeb - إدارة شركتك بسهولة" />
+  <meta property="og:description" content="كل ما تحتاجه من إدارة شركتك في منصة واحدة منظمة وسهلة." />
+  <meta property="og:image" content="assets/images/preview.png" />
+  <meta property="og:url" content="https://lv-12.vercel.app" />
+  <meta name="twitter:card" content="summary_large_image" />
   <link rel="icon" type="image/png" href="favicon.png" />
 
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
@@ -38,22 +47,23 @@
         <a href="#features" class="hover:text-blue-600">المميزات</a>
         <a href="#pricing" class="hover:text-blue-600">خطط الأسعار</a>
         <a href="#help" class="hover:text-blue-600">المساعدة</a>
+        <a href="#contact" class="hover:text-blue-600">تواصل معنا</a>
       </nav>
       <div class="flex items-center gap-4">
-        <div id="user-area" class="hidden items-center gap-3">
-          <span id="user-name" class="text-sm text-gray-700"></span>
-          <button id="logout-btn" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:opacity-90">تسجيل خروج</button>
-        </div>
-        <a id="create-account-btn" href="signup.html" class="bg-white text-blue-600 px-4 py-2 rounded-full hover:bg-gray-100 transition font-medium">إنشاء حساب</a>
+        <a href="login.html" class="text-sm text-gray-700 hover:text-blue-600">تسجيل دخول</a>
+        <a href="signup.html" class="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 transition font-medium shadow-md">✨ جرّب مجانًا</a>
       </div>
     </div>
   </header>
 
-  <section class="pt-28 pb-20 text-center bg-gradient-to-r from-indigo-100 to-blue-100">
+ <section class="pt-28 pb-20 text-center bg-gradient-to-r from-indigo-100 to-blue-100">
     <div class="container mx-auto px-6">
       <h2 class="text-3xl md:text-5xl font-bold mb-6 text-blue-700 drop-shadow">إدارة شركتك لم تكن أسهل من قبل</h2>
-      <p class="text-gray-700 max-w-2xl mx-auto mb-6">كل ما تحتاجه من إدارة عملاء، مخزن، مبيعات، رواتب وإحصائيات في منصة واحدة منظمة وسهلة الاستخدام.</p>
-      <a id="try-btn" class="inline-block bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-full shadow-lg font-semibold hover:scale-105 transition cursor-pointer">✨ جرّب مجانًا</a>
+      <p class="text-gray-700 max-w-2xl mx-auto mb-6">كل أدواتك في مكان واحد: العملاء، المخزن، المبيعات، الرواتب، والإحصائيات.</p>
+      <div class="flex justify-center gap-4">
+        <a href="signup.html" class="bg-blue-600 text-white px-6 py-3 rounded-full shadow-lg hover:scale-105 transition font-semibold">ابدأ الآن</a>
+        <a href="#intro-video" class="bg-white text-blue-600 border px-6 py-3 rounded-full shadow hover:bg-gray-100 transition font-semibold">🎥 شاهد الفيديو</a>
+      </div>
     </div>
   </section>
 
@@ -67,10 +77,10 @@
       <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
     </div>
   </div>
-  <section id="intro-video" class="py-16 bg-gradient-to-r from-indigo-50 to-blue-50">
+ <section id="intro-video" class="py-16 bg-gradient-to-r from-indigo-50 to-blue-50">
     <div class="container mx-auto px-6 text-center">
       <h3 class="text-3xl font-bold mb-8 text-blue-700">🎥 تعرّف على النظام</h3>
-      <div class="aspect-w-16 aspect-h-9 rounded-2xl overflow-hidden shadow-xl">
+      <div class="aspect-[16/9] rounded-2xl overflow-hidden shadow-xl">
         <iframe class="w-full h-96 rounded-2xl"
           src="https://www.youtube.com/embed/dQw4w9WgXcQ"
           title="LV12 WarerWeb Demo"
@@ -82,15 +92,15 @@
     </div>
   </section>
 
-  <section id="features" class="py-16 container mx-auto px-6">
+<section id="features" class="py-16 container mx-auto px-6">
     <h3 class="text-3xl font-bold text-center mb-10 text-blue-700">🔥 مميزات البرنامج</h3>
     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div class="glass p-6 rounded-2xl text-center"><div class="text-blue-600 text-4xl mb-3">👥</div><h4 class="font-bold mb-2">إدارة العملاء</h4><p class="text-gray-600 text-sm">تسجيل عملاء جدد وقدامى مع متابعة الأقساط والصيانة.</p></div>
-      <div class="glass p-6 rounded-2xl text-center"><div class="text-blue-600 text-4xl mb-3">📦</div><h4 class="font-bold mb-2">إدارة المخزن</h4><p class="text-gray-600 text-sm">تسجيل المنتجات بالكمية والأسعار وصور الموردين.</p></div>
-      <div class="glass p-6 rounded-2xl text-center"><div class="text-blue-600 text-4xl mb-3">💳</div><h4 class="font-bold mb-2">المبيعات</h4><p class="text-gray-600 text-sm">تسجيل عمليات البيع والربح مع تقارير وطباعة.</p></div>
-      <div class="glass p-6 rounded-2xl text-center"><div class="text-blue-600 text-4xl mb-3">💰</div><h4 class="font-bold mb-2">الرواتب</h4><p class="text-gray-600 text-sm">إدارة الرواتب والمكافآت والخصومات مع أرشيف كامل.</p></div>
-      <div class="glass p-6 rounded-2xl text-center"><div class="text-blue-600 text-4xl mb-3">📊</div><h4 class="font-bold mb-2">الإحصائيات</h4><p class="text-gray-600 text-sm">عرض شامل للأرباح والمصروفات والعملاء والمبيعات.</p></div>
-      <div class="glass p-6 rounded-2xl text-center"><div class="text-blue-600 text-4xl mb-3">🛠️</div><h4 class="font-bold mb-2">الصيانة</h4><p class="text-gray-600 text-sm">متابعة الصيانة الدورية وتغيير الفلاتر والشمعات.</p></div>
+      <div class="glass p-6 rounded-2xl text-center"><i class="fa fa-users text-blue-600 text-4xl mb-3"></i><h4 class="font-bold mb-2">إدارة العملاء</h4><p class="text-gray-600 text-sm">تسجيل عملاء جدد وقدامى مع متابعة الأقساط والصيانة.</p></div>
+      <div class="glass p-6 rounded-2xl text-center"><i class="fa fa-box text-blue-600 text-4xl mb-3"></i><h4 class="font-bold mb-2">إدارة المخزن</h4><p class="text-gray-600 text-sm">تسجيل المنتجات بالكمية والأسعار وصور الموردين.</p></div>
+      <div class="glass p-6 rounded-2xl text-center"><i class="fa fa-credit-card text-blue-600 text-4xl mb-3"></i><h4 class="font-bold mb-2">المبيعات</h4><p class="text-gray-600 text-sm">تسجيل عمليات البيع والربح مع تقارير وطباعة.</p></div>
+      <div class="glass p-6 rounded-2xl text-center"><i class="fa fa-sack-dollar text-blue-600 text-4xl mb-3"></i><h4 class="font-bold mb-2">الرواتب</h4><p class="text-gray-600 text-sm">إدارة الرواتب والمكافآت والخصومات مع أرشيف كامل.</p></div>
+      <div class="glass p-6 rounded-2xl text-center"><i class="fa fa-chart-line text-blue-600 text-4xl mb-3"></i><h4 class="font-bold mb-2">الإحصائيات</h4><p class="text-gray-600 text-sm">عرض شامل للأرباح والمصروفات والعملاء والمبيعات.</p></div>
+      <div class="glass p-6 rounded-2xl text-center"><i class="fa fa-tools text-blue-600 text-4xl mb-3"></i><h4 class="font-bold mb-2">الصيانة</h4><p class="text-gray-600 text-sm">متابعة الصيانة الدورية وتغيير الفلاتر والشمعات.</p></div>
     </div>
   </section>
 
@@ -105,17 +115,18 @@
     </div>
   </div>
 
-  <section id="pricing" class="py-20 bg-gradient-to-r from-indigo-50 to-blue-50">
+ <section id="pricing" class="py-20 bg-gradient-to-r from-indigo-50 to-blue-50">
     <div class="container mx-auto px-6">
       <h3 class="text-3xl font-bold text-center mb-12 text-blue-700">💳 خطط الأسعار</h3>
       <div class="grid md:grid-cols-4 gap-6">
-        <div class="glass p-8 rounded-2xl text-center"><h4 class="font-bold text-xl mb-2">أسبوع</h4><p class="text-2xl font-bold text-blue-600 mb-1">100 <span class="text-sm text-gray-600">جنيه</span></p></div>
-        <div class="glass p-8 rounded-2xl border-2 border-blue-600 text-center"><h4 class="font-bold text-xl mb-2">شهر</h4><p class="text-2xl font-bold text-blue-600 mb-1">400 <span class="text-sm text-gray-600">جنيه</span></p></div>
-        <div class="glass p-8 rounded-2xl text-center"><h4 class="font-bold text-xl mb-2">عام</h4><p class="text-2xl font-bold text-blue-600 mb-1">4800 <span class="text-sm text-gray-600">جنيه</span></p></div>
-        <div class="glass p-8 rounded-2xl text-center"><h4 class="font-bold text-xl mb-2">مدى الحياة</h4><p class="text-2xl font-bold text-blue-600 mb-1">34500 <span class="text-sm text-gray-600">جنيه</span></p></div>
+        <div class="glass p-8 rounded-2xl text-center"><h4 class="font-bold text-xl mb-2">أسبوع</h4><p class="text-2xl font-bold text-blue-600 mb-4">100 <span class="text-sm text-gray-600">جنيه</span></p><a href="signup.html" class="bg-blue-600 text-white px-4 py-2 rounded-full">اشترك</a></div>
+        <div class="glass p-8 rounded-2xl border-2 border-blue-600 text-center"><h4 class="font-bold text-xl mb-2">شهر</h4><p class="text-2xl font-bold text-blue-600 mb-4">400 <span class="text-sm text-gray-600">جنيه</span></p><a href="signup.html" class="bg-blue-600 text-white px-4 py-2 rounded-full">اشترك</a></div>
+        <div class="glass p-8 rounded-2xl text-center"><h4 class="font-bold text-xl mb-2">عام</h4><p class="text-2xl font-bold text-blue-600 mb-4">4800 <span class="text-sm text-gray-600">جنيه</span></p><a href="signup.html" class="bg-blue-600 text-white px-4 py-2 rounded-full">اشترك</a></div>
+        <div class="glass p-8 rounded-2xl text-center"><h4 class="font-bold text-xl mb-2">مدى الحياة</h4><p class="text-2xl font-bold text-blue-600 mb-4">34500 <span class="text-sm text-gray-600">جنيه</span></p><a href="signup.html" class="bg-blue-600 text-white px-4 py-2 rounded-full">اشترك</a></div>
       </div>
     </div>
   </section>
+
 
   <section id="help" class="py-20 container mx-auto px-6">
     <h3 class="text-3xl font-bold mb-8 text-blue-700 text-center">📑 المساعدة</h3>
@@ -202,6 +213,7 @@
   </script>
 </body>
 </html>
+
 
 
 
