@@ -1,18 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://lv-12.vercel.app/</loc>
-    <lastmod>2025-09-21</lastmod>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>https://lv-12.vercel.app/signup.html</loc>
-    <lastmod>2025-09-21</lastmod>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://lv-12.vercel.app/help.html</loc>
-    <lastmod>2025-09-21</lastmod>
-    <priority>0.7</priority>
-  </url>
+  <url><loc>https://lv-12.vercel.app/</loc><lastmod>2025-09-21</lastmod><priority>1.0</priority></url>
+  <url><loc>https://lv-12.vercel.app/add-user.html</loc><lastmod>2025-09-21</lastmod><priority>0.8</priority></url>
+  <url><loc>https://lv-12.vercel.app/consumables.html</loc><lastmod>2025-09-21</lastmod><priority>0.8</priority></url>
+  <url><loc>https://lv-12.vercel.app/contact.html</loc><lastmod>2025-09-21</lastmod><priority>0.8</priority></url>
+  <url><loc>https://lv-12.vercel.app/customers.html</loc><lastmod>2025-09-21</lastmod><priority>0.8</priority></url>
+  <url><loc>https://lv-12.vercel.app/cv.html</loc><lastmod>2025-09-21</lastmod><priority>0.6</priority></url>
+  <url><loc>https://lv-12.vercel.app/guide.html</loc><lastmod>2025-09-21</lastmod><priority>0.6</priority></url>
+  <url><loc>https://lv-12.vercel.app/help.html</loc><lastmod>2025-09-21</lastmod><priority>0.6</priority></url>
+  <url><loc>https://lv-12.vercel.app/help2.html</loc><lastmod>2025-09-21</lastmod><priority>0.6</priority></url>
+  <url><loc>https://lv-12.vercel.app/index.html</loc><lastmod>2025-09-21</lastmod><priority>1.0</priority></url>
+  <url><loc>https://lv-12.vercel.app/layout.html</loc><lastmod>2025-09-21</lastmod><priority>0.5</priority></url>
+  <url><loc>https://lv-12.vercel.app/login.html</loc><lastmod>2025-09-21</lastmod><priority>0.7</priority></url>
+  <url><loc>https://lv-12.vercel.app/maintenance.html</loc><lastmod>2025-09-21</lastmod><priority>0.5</priority></url>
+  <url><loc>https://lv-12.vercel.app/salaries.html</loc><lastmod>2025-09-21</lastmod><priority>0.8</priority></url>
+  <url><loc>https://lv-12.vercel.app/sales.html</loc><lastmod>2025-09-21</lastmod><priority>0.8</priority></url>
+  <url><loc>https://lv-12.vercel.app/signup.html</loc><lastmod>2025-09-21</lastmod><priority>0.7</priority></url>
+  <url><loc>https://lv-12.vercel.app/stats.html</loc><lastmod>2025-09-21</lastmod><priority>0.7</priority></url>
+  <url><loc>https://lv-12.vercel.app/store.html</loc><lastmod>2025-09-21</lastmod><priority>0.7</priority></url>
+  <url><loc>https://lv-12.vercel.app/support.html</loc><lastmod>2025-09-21</lastmod><priority>0.7</priority></url>
 </urlset>
