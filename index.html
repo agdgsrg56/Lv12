@@ -213,47 +213,43 @@
     const userArea = document.getElementById("user-area");
     const userNameEl = document.getElementById("user-name");
     const logoutBtn = document.getElementById("logout-btn");
-
+    const heroBtn = document.getElementById("hero-btn");
     async function updateUIFromSession() {
       const { data } = await supabase.auth.getSession();
       const session = data.session;
+if (session && session.user) {
+  createBtn.style.display = "none";
 
-      if (session && session.user) {
-        createBtn.style.display = "none";
-        tryBtn.textContent = "✨ جرّب الآن";
-        tryBtn.onclick = () => window.location.href = "layout.html";
-        const uid = session.user.id;
-        const { data: profile } = await supabase.from("profiles").select("full_name").eq("id", uid).single();
-        if (profile && profile.full_name) {
-          userNameEl.textContent = "مرحباً، " + profile.full_name;
-        } else {
-          userNameEl.textContent = session.user.email;
-        }
-        userArea.classList.remove("hidden");
-      } else {
-        createBtn.style.display = "inline-block";
-        tryBtn.textContent = "✨ إنشاء حساب وجرب";
-        tryBtn.onclick = () => window.location.href = "signup.html";
-      }
-    }
+  tryBtn.textContent = "🚀 دخول للنظام";
+  tryBtn.onclick = () => window.location.href = "layout.html";
 
-    updateUIFromSession();
-const heroBtn = document.getElementById("hero-btn");
+  heroBtn.textContent = "🚀 دخول للنظام";
+  heroBtn.href = "layout.html";
 
-async function updateUIFromSession() {
-  const { data } = await supabase.auth.getSession();
-  const session = data.session;
+  const uid = session.user.id;
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("full_name")
+    .eq("id", uid)
+    .single();
 
-  if (session && session.user) {
-    // المستخدم مسجل دخول
-    heroBtn.textContent = "🚀 دخول للنظام";
-    heroBtn.href = "layout.html";
+  if (profile && profile.full_name) {
+    userNameEl.textContent = "مرحباً، " + profile.full_name;
   } else {
-    // المستخدم مش مسجل
-    heroBtn.textContent = "✨ ابدأ الآن";
-    heroBtn.href = "signup.html";
+    userNameEl.textContent = session.user.email;
   }
+  userArea.classList.remove("hidden");
+} else {
+  createBtn.style.display = "inline-block";
+
+  tryBtn.textContent = "✨ إنشاء حساب وجرب";
+  tryBtn.onclick = () => window.location.href = "signup.html";
+
+  heroBtn.textContent = "✨ ابدأ الآن";
+  heroBtn.href = "signup.html";
 }
+
+
 
     logoutBtn.addEventListener("click", async () => {
       await supabase.auth.signOut();
@@ -262,6 +258,7 @@ async function updateUIFromSession() {
   </script>
 </body>
 </html>
+
 
 
 
