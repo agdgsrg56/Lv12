@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://lv-12.vercel.app/sitemap.xml
