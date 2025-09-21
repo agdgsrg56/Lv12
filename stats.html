@@ -3,112 +3,81 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>الإحصائيات - LV12</title>
+  <title>💳 المبيعات - LV12</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+  <head>
+    <link rel="icon" href="assets/images/lv12.ico" type="image/x-icon">
 </head>
 <body class="bg-gray-100 font-sans text-gray-800 flex">
 <aside class="w-64 bg-white shadow-lg h-screen fixed left-0">
   <div class="p-6 border-b">
     <h1 class="text-2xl font-bold text-blue-600">LV12</h1>
   </div>
-  <nav class="p-6 space-y-4">
-    <a href="customers.html" class="block py-2 px-4 rounded hover:bg-blue-100">👥 العملاء</a>
-    <a href="maintenance.html" class="block py-2 px-4 rounded hover:bg-blue-100">🛠️ صيانة العملاء</a>
-    <a href="store.html" class="block py-2 px-4 rounded hover:bg-blue-100">📦 المخزن</a>
-    <a href="sales.html" class="block py-2 px-4 rounded hover:bg-blue-100">💳 المبيعات</a>
-    <a href="salaries.html" class="block py-2 px-4 rounded hover:bg-blue-100">💰 الرواتب</a>
-    <a href="stats.html" class="block py-2 px-4 rounded hover:bg-blue-100">📊 الإحصائيات</a>
-    <a href="consumables.html" class="block py-2 px-4 rounded bg-blue-600 text-white">🧾 المستهلكات</a>
-  </nav>
+   <nav class="flex-1 p-4 space-y-3">
+      <a href="index.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">🏠 الرئيسية</a>
+      <a href="cv.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">📄 السيرة الذاتية</a>
+      <a href="customers.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">👥 العملاء</a>
+      <a href="maintenance.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">🛠 صيانة العملاء</a>
+      <a href="store.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">📦 المخزن</a>
+      <a href="add-user.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">➕ إضافة مستخدم</a>
+      <a href="salaries.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">💰 رواتب الموظفين</a>
+      <a href="support.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">📞 خدمة العملاء</a>
+      <a href="guide.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">📘 دليل الاستخدام</a>
+      <a href="" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">⬅ رجوع</a>
+      <a href="" class="nav-link block py-3 px-4 rounded-xl bg-red-600 hover:bg-red-700 transition text-right font-semibold">🚪 تسجيل الخروج</a>
+   </nav>
+
 </aside>
 
-  <!-- المحتوى -->
-  <main class="flex-1 ml-64 p-10">
-    <h2 class="text-3xl font-bold text-gray-700 mb-6">📊 الإحصائيات والتقارير</h2>
+<main class="flex-1 ml-64 p-10">
+  <h2 class="text-3xl font-bold text-gray-700 mb-6">💳 سجل المبيعات</h2>
 
-    <!-- إحصائيات عامة -->
-    <div class="grid md:grid-cols-4 gap-6 mb-10">
-      <div class="bg-white p-6 rounded-xl shadow text-center">
-        <h3 class="text-gray-500">📦 المخزون</h3>
-        <p class="text-2xl font-bold text-blue-600">120 جهاز</p>
-      </div>
-      <div class="bg-white p-6 rounded-xl shadow text-center">
-        <h3 class="text-gray-500">💰 الأرباح</h3>
-        <p class="text-2xl font-bold text-green-600">250,000 ج.م</p>
-      </div>
-      <div class="bg-white p-6 rounded-xl shadow text-center">
-        <h3 class="text-gray-500">👥 العملاء</h3>
-        <p class="text-2xl font-bold text-purple-600">560 عميل</p>
-      </div>
-      <div class="bg-white p-6 rounded-xl shadow text-center">
-        <h3 class="text-gray-500">🛠️ الصيانة</h3>
-        <p class="text-2xl font-bold text-orange-600">320 عملية</p>
-      </div>
+  <button class="mb-4 bg-green-600 text-white px-6 py-2 rounded-xl shadow hover:bg-green-700 transition">
+    ➕ إضافة عملية بيع جديدة
+  </button>
+
+  <div class="overflow-x-auto">
+    <table class="w-full text-right border-collapse bg-white rounded-xl shadow">
+      <thead class="bg-gray-200">
+        <tr>
+          <th class="p-3">رقم الفاتورة</th>
+          <th class="p-3">اسم العميل</th>
+          <th class="p-3">المنتج</th>
+          <th class="p-3">المبلغ</th>
+          <th class="p-3">التاريخ</th>
+          <th class="p-3">الإجراءات</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y">
+        <tr>
+          <td class="p-3">#1001</td>
+          <td class="p-3">محمد علي</td>
+          <td class="p-3">فلتر مياه 7 مراحل</td>
+          <td class="p-3 text-green-600 font-semibold">1500 ج.م</td>
+          <td class="p-3">2025-09-01</td>
+          <td class="p-3">
+            <button class="bg-blue-500 text-white px-3 py-1 rounded">تعديل</button>
+            <button class="bg-red-500 text-white px-3 py-1 rounded">حذف</button>
+          </td>
+        </tr>
+        <tr>
+          <td class="p-3">#1002</td>
+          <td class="p-3">أحمد محمود</td>
+          <td class="p-3">شمعة كربون</td>
+          <td class="p-3 text-green-600 font-semibold">50 ج.م</td>
+          <td class="p-3">2025-09-05</td>
+          <td class="p-3">
+            <button class="bg-blue-500 text-white px-3 py-1 rounded">تعديل</button>
+            <button class="bg-red-500 text-white px-3 py-1 rounded">حذف</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center">
+      <img src="assets/images/صفحة سجل المبيعات.png" alt="" class="mx-auto rounded-lg shadow">
     </div>
-
-    <!-- الرسوم البيانية -->
-    <div class="grid md:grid-cols-2 gap-8">
-      <!-- رسم بياني المبيعات الشهرية -->
-      <div class="bg-white p-6 rounded-xl shadow">
-        <h3 class="text-lg font-semibold mb-4">📈 المبيعات الشهرية</h3>
-        <canvas id="salesChart"></canvas>
-      </div>
-
-      <!-- رسم بياني العملاء -->
-      <div class="bg-white p-6 rounded-xl shadow">
-        <h3 class="text-lg font-semibold mb-4">👥 توزيع العملاء</h3>
-        <canvas id="customersChart"></canvas>
-      </div>
-    </div>
-  </main>
-
-  <script>
-    // المبيعات الشهرية
-    const salesCtx = document.getElementById('salesChart').getContext('2d');
-    new Chart(salesCtx, {
-      type: 'line',
-      data: {
-        labels: ['يناير', 'فبراير', 'مارس', 'إبريل', 'مايو', 'يونيو'],
-        datasets: [{
-          label: 'المبيعات (جنيه)',
-          data: [12000, 19000, 15000, 22000, 30000, 28000],
-          borderColor: 'rgba(37, 99, 235, 1)',
-          backgroundColor: 'rgba(37, 99, 235, 0.2)',
-          borderWidth: 2,
-          fill: true,
-          tension: 0.3
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: { legend: { display: false } }
-      }
-    });
-
-    // توزيع العملاء
-    const customersCtx = document.getElementById('customersChart').getContext('2d');
-    new Chart(customersCtx, {
-      type: 'doughnut',
-      data: {
-        labels: ['كاش', 'أقساط', 'مجاني', 'خارجي'],
-        datasets: [{
-          data: [300, 150, 50, 60],
-          backgroundColor: [
-            'rgba(34,197,94,0.7)', // أخضر
-            'rgba(59,130,246,0.7)', // أزرق
-            'rgba(250,204,21,0.7)', // أصفر
-            'rgba(239,68,68,0.7)'  // أحمر
-          ],
-          borderColor: ['#fff'],
-          borderWidth: 2
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: { legend: { position: 'bottom' } }
-      }
-    });
-  </script>
+</main>
 </body>
 </html>

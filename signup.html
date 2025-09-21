@@ -7,6 +7,9 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 </head>
+  <head>
+    <link rel="icon" href="assets/images/lv12.ico" type="image/x-icon">
+</head>
 <body class="bg-gray-100 flex items-center justify-center h-screen">
 
   <div class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
@@ -29,9 +32,9 @@
   </div>
 
   <script>
-    // 🔹 Supabase Client
+  
     const supabase = window.supabase.createClient(
-      "https://nszhzfysitppxssplqfb.supabase.co", // API URL
+      "https://nszhzfysitppxssplqfb.supabase.co", 
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemh6ZnlzaXRwcHhzc3BscWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMzA4OTcsImV4cCI6MjA3MzgwNjg5N30.5KvK4bhqkZ_GpIfED4qecIMfeubAJYwSFJslULwOp-w" // anon key
     )
 
@@ -49,7 +52,6 @@
       message.textContent = "⏳ جاري إنشاء الحساب..."
       message.className = "text-center mt-4 text-sm text-gray-600"
 
-      // 🔹 تسجيل المستخدم + metadata
       const { data, error } = await supabase.auth.signUp({
         email,
         password,

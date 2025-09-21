@@ -6,28 +6,34 @@
   <title>المبيعات - LV12</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
+  <head>
+    <link rel="icon" href="assets/images/lv12.ico" type="image/x-icon">
+</head>
 <body class="bg-gray-100 font-sans text-gray-800 flex">
 
  <aside class="w-64 bg-white shadow-lg h-screen fixed left-0">
   <div class="p-6 border-b">
     <h1 class="text-2xl font-bold text-blue-600">LV12</h1>
   </div>
-  <nav class="p-6 space-y-4">
-    <a href="customers.html" class="block py-2 px-4 rounded hover:bg-blue-100">👥 العملاء</a>
-    <a href="maintenance.html" class="block py-2 px-4 rounded hover:bg-blue-100">🛠️ صيانة العملاء</a>
-    <a href="store.html" class="block py-2 px-4 rounded hover:bg-blue-100">📦 المخزن</a>
-    <a href="sales.html" class="block py-2 px-4 rounded hover:bg-blue-100">💳 المبيعات</a>
-    <a href="salaries.html" class="block py-2 px-4 rounded hover:bg-blue-100">💰 الرواتب</a>
-    <a href="stats.html" class="block py-2 px-4 rounded hover:bg-blue-100">📊 الإحصائيات</a>
-    <a href="consumables.html" class="block py-2 px-4 rounded bg-blue-600 text-white">🧾 المستهلكات</a>
-  </nav>
+   <nav class="flex-1 p-4 space-y-3">
+      <a href="index.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">🏠 الرئيسية</a>
+      <a href="cv.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">📄 السيرة الذاتية</a>
+      <a href="customers.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">👥 العملاء</a>
+      <a href="maintenance.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">🛠 صيانة العملاء</a>
+      <a href="store.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">📦 المخزن</a>
+      <a href="add-user.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">➕ إضافة مستخدم</a>
+      <a href="salaries.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">💰 رواتب الموظفين</a>
+      <a href="support.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">📞 خدمة العملاء</a>
+      <a href="guide.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">📘 دليل الاستخدام</a>
+      <a href="" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">⬅ رجوع</a>
+      <a href="" class="nav-link block py-3 px-4 rounded-xl bg-red-600 hover:bg-red-700 transition text-right font-semibold">🚪 تسجيل الخروج</a>
+   </nav>
+
 </aside>
 
-  <!-- المحتوى -->
   <main class="flex-1 ml-64 p-10">
     <h2 class="text-3xl font-bold text-gray-700 mb-6">💳 إدارة المبيعات</h2>
 
-    <!-- نموذج تسجيل عملية بيع -->
     <div class="bg-white p-6 rounded-xl shadow mb-8">
       <h3 class="text-xl font-semibold mb-4">➕ إضافة عملية بيع جديدة</h3>
       <form class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -46,7 +52,6 @@
       </form>
     </div>
 
-    <!-- جدول المبيعات -->
     <div class="bg-white p-6 rounded-xl shadow">
       <h3 class="text-xl font-semibold mb-4">📋 قائمة المبيعات</h3>
       <table class="w-full text-right border-collapse">
@@ -91,6 +96,14 @@
           </tr>
         </tbody>
       </table>
+    </div>
+     <div class="mt-6 p-4 bg-gradient-to-r from-red-100 to-red-200 border-r-4 border-red-500 rounded-xl shadow">
+      <p class="font-semibold text-red-800">⚠️ تنبيه:</p>
+      <p class="text-red-700">هذه الصفحة محاكاة وليست بيانات حقيقية.</p>
+    </div>
+
+    <div class="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center">
+      <img src="assets/images/المخزن.png" alt="" class="mx-auto rounded-lg shadow">
     </div>
   </main>
 

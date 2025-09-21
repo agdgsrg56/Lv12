@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <head>
+    <link rel="icon" href="assets/images/lv12.ico" type="image/x-icon">
+</head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>إضافة مستخدم - المدير</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Tajawal', sans-serif; }
+  </style>
+</head>
+<body class="bg-[#F0F3F7] text-gray-800 flex">
+
+  <aside class="w-64 bg-[#1B2631] text-white shadow-xl h-screen fixed left-0 flex flex-col">
+    <div class="p-6 border-b border-gray-700">
+      <h1 class="text-3xl font-extrabold">LV12</h1>
+      <p class="text-sm text-gray-400 mt-1">لوحة المدير</p>
+    </div>
+
+    <nav class="flex-1 p-4 space-y-3">
+      <a href="index.html" class="block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">🏠 الرئيسية</a>
+      <a href="cv.html" class="block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">📄 السيرة الذاتية</a>
+      <a href="customers.html" class="block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">👥 العملاء</a>
+      <a href="maintenance.html" class="block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">🛠 صيانة العملاء</a>
+      <a href="store.html" class="block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">📦 المخزن</a>
+      <a href="add-user.html" class="block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right font-bold border border-blue-400">➕ إضافة مستخدم</a>
+      <a href="salaries.html" class="block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">💰 رواتب الموظفين</a>
+      <a href="support.html" class="block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">📞 خدمة العملاء</a>
+      <a href="guide.html" class="block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">📘 دليل الاستخدام</a>
+      <a href="#" class="block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">⬅ رجوع</a>
+      <a href="#" class="block py-3 px-4 rounded-xl bg-red-600 hover:bg-red-700 transition text-right font-semibold">🚪 تسجيل الخروج</a>
+    </nav>
+
+    <div class="p-4 border-t border-gray-700 text-center text-xs text-gray-400">
+      © 2025 LV12
+    </div>
+  </aside>
+
+  <main class="flex-1 ml-64 p-10 space-y-10">
+    <section class="bg-white p-8 rounded-2xl shadow-md">
+      <h2 class="text-3xl font-bold text-gray-800 mb-6">➕ إضافة مستخدم جديد</h2>
+
+      <form class="space-y-6" onsubmit="event.preventDefault(); showSuccessMessage();">
+        <div>
+          <label class="block text-gray-700 font-semibold mb-2">👤 اسم المستخدم</label>
+          <input type="text" placeholder="أدخل اسم المستخدم" required class="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500">
+        </div>
+
+        <div>
+          <label class="block text-gray-700 font-semibold mb-2">📧 البريد الإلكتروني</label>
+          <input type="email" placeholder="example@email.com" required class="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500">
+        </div>
+
+        <div>
+          <label class="block text-gray-700 font-semibold mb-2">🔑 كلمة المرور</label>
+          <input type="password" placeholder="••••••••" required class="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500">
+        </div>
+
+        <div>
+          <label class="block text-gray-700 font-semibold mb-2">👥 الدور</label>
+          <select required class="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500">
+            <option value="">اختر الدور</option>
+            <option>مدير</option>
+            <option>موظف</option>
+            <option>فني</option>
+          </select>
+        </div>
+
+        <button type="submit" class="bg-green-600 text-white px-6 py-3 rounded-xl shadow hover:bg-green-700 transition w-full text-lg">
+          ✅ إضافة المستخدم
+        </button>
+      </form>
+
+      <div id="successMessage" class="hidden mt-6 p-4 bg-green-100 border-r-4 border-green-500 rounded-xl shadow">
+        <p class="font-semibold text-green-800">✅ تم إضافة المستخدم بنجاح (محاكاة)!</p>
+      </div>
+    </section>
+
+    <div class="mt-6 p-4 bg-gradient-to-r from-red-100 to-red-200 border-r-4 border-red-500 rounded-xl shadow">
+      <p class="font-semibold text-red-800">⚠️ تنبيه:</p>
+      <p class="text-red-700">هذه الصفحة محاكاة وليست بيانات حقيقية.</p>
+    </div>
+
+    <div class="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center">
+      <img src="assets\images\اضافة مستخدم.png" alt="" class="mx-auto rounded-lg shadow">
+    </div>
+  </main>
+
+  <script>
+    function showSuccessMessage() {
+      document.getElementById('successMessage').classList.remove('hidden');
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+  </script>
+
+</body>
+</html>

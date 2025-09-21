@@ -4,42 +4,41 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>LV12 WarerWeb - إدارة شركتك بسهولة</title>
+<head>
+    <link rel="icon" href="assets/images/lv12.ico" type="image/x-icon">
+</head>
 
-  <!-- ✅ تحسين SEO -->
   <meta name="description" content="LV12 WarerWeb - نظام متكامل لإدارة العملاء، المبيعات، الرواتب، المخزن والإحصائيات بسهولة في منصة واحدة." />
   <meta name="keywords" content="LV12, إدارة شركة, ERP, مبيعات, عملاء, رواتب, مخزن, صيانة, إحصائيات" />
   <meta name="author" content="LV12 Team" />
 
-  <!-- ✅ Favicon -->
   <link rel="icon" type="image/png" href="favicon.png" />
 
-  <!-- ✅ Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
 
-  <!-- ✅ Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- ✅ FontAwesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" />
 
-  <!-- ✅ AdSense -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7770714931220768"
-     crossorigin="anonymous"></script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7770714931220768" crossorigin="anonymous"></script>
 
   <style>
-    body { font-family: "Tajawal", sans-serif; background: linear-gradient(135deg,#f3f4f6,#eef2ff); }
-    .glass { background: rgba(255,255,255,0.75); backdrop-filter: blur(12px); box-shadow: 0 8px 32px rgba(0,0,0,0.1); }
-    .social-icons a { transition: 0.3s; }
-    .social-icons a:hover { transform: scale(1.1) rotate(-5deg); color: #60a5fa; }
-    .ad-box { background: #f9fafb; border: 2px dashed #cbd5e1; text-align: center; padding: 20px; margin: 20px auto; border-radius: 12px; font-size: 14px; color: #475569; }
+    body { font-family: "Tajawal", sans-serif; background: linear-gradient(135deg,#f9fafb,#eef2ff); }
+    .glass { background: rgba(255,255,255,0.8); backdrop-filter: blur(12px); box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
+    .ad-box { background: #fff; border: 2px dashed #d1d5db; text-align: center; padding: 20px; margin: 20px auto; border-radius: 12px; }
+    html { scroll-behavior: smooth; }
   </style>
 </head>
 <body class="text-gray-800">
 
-  <!-- ✅ الهيدر -->
   <header class="glass fixed w-full z-20">
     <div class="container mx-auto flex justify-between items-center py-4 px-6">
       <h1 class="text-xl font-extrabold text-blue-700">🚀 LV12 WarerWeb</h1>
+      <nav class="hidden md:flex gap-6 text-sm font-medium text-gray-700">
+        <a href="#features" class="hover:text-blue-600">المميزات</a>
+        <a href="#pricing" class="hover:text-blue-600">خطط الأسعار</a>
+        <a href="#help" class="hover:text-blue-600">المساعدة</a>
+      </nav>
       <div class="flex items-center gap-4">
         <div id="user-area" class="hidden items-center gap-3">
           <span id="user-name" class="text-sm text-gray-700"></span>
@@ -50,20 +49,17 @@
     </div>
   </header>
 
-  <!-- ✅ الهيرو -->
   <section class="pt-28 pb-20 text-center bg-gradient-to-r from-indigo-100 to-blue-100">
     <div class="container mx-auto px-6">
-      <h2 class="text-3xl md:text-5xl font-bold mb-6 text-blue-700 drop-shadow animate-pulse">إدارة شركتك لم تكن أسهل من قبل</h2>
+      <h2 class="text-3xl md:text-5xl font-bold mb-6 text-blue-700 drop-shadow">إدارة شركتك لم تكن أسهل من قبل</h2>
       <p class="text-gray-700 max-w-2xl mx-auto mb-6">كل ما تحتاجه من إدارة عملاء، مخزن، مبيعات، رواتب وإحصائيات في منصة واحدة منظمة وسهلة الاستخدام.</p>
-      <a id="try-btn" href="#" class="inline-block bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-full shadow-lg font-semibold hover:scale-105 transition">✨ جرّب مجانًا</a>
+      <a id="try-btn" class="inline-block bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-full shadow-lg font-semibold hover:scale-105 transition cursor-pointer">✨ جرّب مجانًا</a>
     </div>
   </section>
 
-  <!-- ✅ إعلان جاهز -->
   <div class="container mx-auto px-6">
     <div class="ad-box">
-      <ins class="adsbygoogle"
-          style="display:block"
+      <ins class="adsbygoogle" style="display:block"
           data-ad-client="ca-pub-7770714931220768"
           data-ad-slot="1234567890"
           data-ad-format="auto"
@@ -71,51 +67,36 @@
       <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
     </div>
   </div>
-
-  <!-- ✅ المميزات -->
-  <section id="features" class="py-16 container mx-auto px-6">
-    <h3 class="text-3xl font-bold text-center mb-10 text-blue-700">🔥 مميزات البرنامج</h3>
-    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div class="glass p-6 rounded-2xl transition hover:-translate-y-1 hover:shadow-xl"><div class="text-blue-600 text-4xl mb-3">👥</div><h4 class="font-bold text-lg mb-2">إدارة العملاء</h4><p class="text-gray-600 text-sm">تسجيل عملاء جدد وقدامى مع متابعة الأقساط والصيانة.</p></div>
-      <div class="glass p-6 rounded-2xl transition hover:-translate-y-1 hover:shadow-xl"><div class="text-blue-600 text-4xl mb-3">📦</div><h4 class="font-bold text-lg mb-2">إدارة المخزن</h4><p class="text-gray-600 text-sm">تسجيل المنتجات بالكمية والأسعار وصور الموردين.</p></div>
-      <div class="glass p-6 rounded-2xl transition hover:-translate-y-1 hover:shadow-xl"><div class="text-blue-600 text-4xl mb-3">💳</div><h4 class="font-bold text-lg mb-2">المبيعات</h4><p class="text-gray-600 text-sm">تسجيل عمليات البيع والربح مع تقارير وطباعة.</p></div>
-      <div class="glass p-6 rounded-2xl transition hover:-translate-y-1 hover:shadow-xl"><div class="text-blue-600 text-4xl mb-3">💰</div><h4 class="font-bold text-lg mb-2">الرواتب</h4><p class="text-gray-600 text-sm">إدارة الرواتب والمكافآت والخصومات مع أرشيف كامل.</p></div>
-      <div class="glass p-6 rounded-2xl transition hover:-translate-y-1 hover:shadow-xl"><div class="text-blue-600 text-4xl mb-3">📊</div><h4 class="font-bold text-lg mb-2">الإحصائيات</h4><p class="text-gray-600 text-sm">عرض شامل للأرباح والمصروفات والعملاء والمبيعات.</p></div>
-      <div class="glass p-6 rounded-2xl transition hover:-translate-y-1 hover:shadow-xl"><div class="text-blue-600 text-4xl mb-3">🛠️</div><h4 class="font-bold text-lg mb-2">الصيانة</h4><p class="text-gray-600 text-sm">متابعة الصيانة الدورية وتغيير الفلاتر والشمعات.</p></div>
-    </div>
-  </section>
-
-  <!-- ✅ إعلان -->
-  <div class="container mx-auto px-6">
-    <div class="ad-box">
-      <ins class="adsbygoogle"
-          style="display:block"
-          data-ad-client="ca-pub-7770714931220768"
-          data-ad-slot="1234567890"
-          data-ad-format="auto"
-          data-full-width-responsive="true"></ins>
-      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-    </div>
-  </div>
-
-  <!-- ✅ خطط الأسعار -->
-  <section id="pricing" class="py-20 bg-gradient-to-r from-indigo-50 to-blue-50">
-    <div class="container mx-auto px-6">
-      <h3 class="text-3xl font-bold text-center mb-12 text-blue-700">💳 خطط الأسعار</h3>
-      <div class="grid md:grid-cols-4 gap-6">
-        <div class="glass p-8 rounded-2xl text-center hover:scale-105 transition"><h4 class="font-bold text-xl mb-2">أسبوع</h4><p class="text-2xl font-bold text-blue-600 mb-1">100 <span class="text-base text-gray-600">جنيه</span></p><p class="text-sm text-gray-500">صلاحية لمدة 7 أيام</p></div>
-        <div class="glass p-8 rounded-2xl border-2 border-blue-600 text-center hover:scale-105 transition"><h4 class="font-bold text-xl mb-2">شهر</h4><p class="text-2xl font-bold text-blue-600 mb-1">400 <span class="text-base text-gray-600">جنيه</span></p><p class="text-sm text-gray-500">صلاحية لمدة 30 يوم</p></div>
-        <div class="glass p-8 rounded-2xl text-center hover:scale-105 transition"><h4 class="font-bold text-xl mb-2">عام</h4><p class="text-2xl font-bold text-blue-600 mb-1">4800 <span class="text-base text-gray-600">جنيه</span></p><p class="text-sm text-gray-500">صلاحية لمدة 365 يوم</p></div>
-        <div class="glass p-8 rounded-2xl text-center hover:scale-105 transition"><h4 class="font-bold text-xl mb-2">مدى الحياة</h4><p class="text-2xl font-bold text-blue-600 mb-1">34500 <span class="text-base text-gray-600">جنيه</span></p><p class="text-sm text-gray-500">تفعيل لمرة واحدة فقط</p></div>
+  <section id="intro-video" class="py-16 bg-gradient-to-r from-indigo-50 to-blue-50">
+    <div class="container mx-auto px-6 text-center">
+      <h3 class="text-3xl font-bold mb-8 text-blue-700">🎥 تعرّف على النظام</h3>
+      <div class="aspect-w-16 aspect-h-9 rounded-2xl overflow-hidden shadow-xl">
+        <iframe class="w-full h-96 rounded-2xl"
+          src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+          title="LV12 WarerWeb Demo"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen>
+        </iframe>
       </div>
     </div>
   </section>
 
-  <!-- ✅ إعلان -->
+  <section id="features" class="py-16 container mx-auto px-6">
+    <h3 class="text-3xl font-bold text-center mb-10 text-blue-700">🔥 مميزات البرنامج</h3>
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="glass p-6 rounded-2xl text-center"><div class="text-blue-600 text-4xl mb-3">👥</div><h4 class="font-bold mb-2">إدارة العملاء</h4><p class="text-gray-600 text-sm">تسجيل عملاء جدد وقدامى مع متابعة الأقساط والصيانة.</p></div>
+      <div class="glass p-6 rounded-2xl text-center"><div class="text-blue-600 text-4xl mb-3">📦</div><h4 class="font-bold mb-2">إدارة المخزن</h4><p class="text-gray-600 text-sm">تسجيل المنتجات بالكمية والأسعار وصور الموردين.</p></div>
+      <div class="glass p-6 rounded-2xl text-center"><div class="text-blue-600 text-4xl mb-3">💳</div><h4 class="font-bold mb-2">المبيعات</h4><p class="text-gray-600 text-sm">تسجيل عمليات البيع والربح مع تقارير وطباعة.</p></div>
+      <div class="glass p-6 rounded-2xl text-center"><div class="text-blue-600 text-4xl mb-3">💰</div><h4 class="font-bold mb-2">الرواتب</h4><p class="text-gray-600 text-sm">إدارة الرواتب والمكافآت والخصومات مع أرشيف كامل.</p></div>
+      <div class="glass p-6 rounded-2xl text-center"><div class="text-blue-600 text-4xl mb-3">📊</div><h4 class="font-bold mb-2">الإحصائيات</h4><p class="text-gray-600 text-sm">عرض شامل للأرباح والمصروفات والعملاء والمبيعات.</p></div>
+      <div class="glass p-6 rounded-2xl text-center"><div class="text-blue-600 text-4xl mb-3">🛠️</div><h4 class="font-bold mb-2">الصيانة</h4><p class="text-gray-600 text-sm">متابعة الصيانة الدورية وتغيير الفلاتر والشمعات.</p></div>
+    </div>
+  </section>
+
   <div class="container mx-auto px-6">
     <div class="ad-box">
-      <ins class="adsbygoogle"
-          style="display:block"
+      <ins class="adsbygoogle" style="display:block"
           data-ad-client="ca-pub-7770714931220768"
           data-ad-slot="1234567890"
           data-ad-format="auto"
@@ -124,37 +105,29 @@
     </div>
   </div>
 
-  <!-- ✅ فيديو -->
-  <section class="py-16">
-    <div class="container mx-auto px-6 text-center">
-      <h3 class="text-2xl font-bold mb-6 text-blue-700">🎥 شاهد كيف يعمل البرنامج</h3>
-      <iframe class="w-full max-w-2xl mx-auto aspect-video rounded-2xl shadow-lg" src="https://www.youtube.com/embed/VIDEO_ID" allowfullscreen></iframe>
-    </div>
-  </section>
-
-  <!-- ✅ CTA -->
-  <section id="signup" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16 text-center">
+  <section id="pricing" class="py-20 bg-gradient-to-r from-indigo-50 to-blue-50">
     <div class="container mx-auto px-6">
-      <h3 class="text-3xl font-bold mb-4">✨ ابدأ تجربتك الآن</h3>
-      <p class="mb-6">سجّل مجانًا واستمتع بجميع المميزات لفترة محدودة.</p>
-      <a id="cta-try" class="bg-white text-blue-600 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition cursor-pointer">✨ جرّب الآن</a>
+      <h3 class="text-3xl font-bold text-center mb-12 text-blue-700">💳 خطط الأسعار</h3>
+      <div class="grid md:grid-cols-4 gap-6">
+        <div class="glass p-8 rounded-2xl text-center"><h4 class="font-bold text-xl mb-2">أسبوع</h4><p class="text-2xl font-bold text-blue-600 mb-1">100 <span class="text-sm text-gray-600">جنيه</span></p></div>
+        <div class="glass p-8 rounded-2xl border-2 border-blue-600 text-center"><h4 class="font-bold text-xl mb-2">شهر</h4><p class="text-2xl font-bold text-blue-600 mb-1">400 <span class="text-sm text-gray-600">جنيه</span></p></div>
+        <div class="glass p-8 rounded-2xl text-center"><h4 class="font-bold text-xl mb-2">عام</h4><p class="text-2xl font-bold text-blue-600 mb-1">4800 <span class="text-sm text-gray-600">جنيه</span></p></div>
+        <div class="glass p-8 rounded-2xl text-center"><h4 class="font-bold text-xl mb-2">مدى الحياة</h4><p class="text-2xl font-bold text-blue-600 mb-1">34500 <span class="text-sm text-gray-600">جنيه</span></p></div>
+      </div>
     </div>
   </section>
 
-  <!-- ✅ المساعدة -->
   <section id="help" class="py-20 container mx-auto px-6">
-    <h3 class="text-3xl font-bold mb-8 text-blue-700">📑 المساعدة</h3>
-    <p class="text-gray-700 mb-6">تجد هنا كل ما تحتاج إليه من مستندات ودلائل استخدام:</p>
-    <ul class="space-y-4 text-lg">
-      <li><a href="help.html#terms" class="text-blue-600 hover:underline">📌 الشروط والأحكام</a></li>
-      <li><a href="help.html#specs" class="text-blue-600 hover:underline">⚙️ مواصفات الجهاز</a></li>
-      <li><a href="help.html#guide" class="text-blue-600 hover:underline">📖 دليل الاستخدام</a></li>
-      <li><a href="help.html#faq" class="text-blue-600 hover:underline">❓ الأسئلة الشائعة</a></li>
-    </ul>
+    <h3 class="text-3xl font-bold mb-8 text-blue-700 text-center">📑 المساعدة</h3>
+    <div class="grid md:grid-cols-2 gap-6 text-center">
+      <a href="help.html#terms" class="glass p-6 rounded-2xl hover:scale-105 transition block">📌 الشروط والأحكام</a>
+      <a href="help.html#specs" class="glass p-6 rounded-2xl hover:scale-105 transition block">⚙️ مواصفات الجهاز</a>
+      <a href="help.html#guide" class="glass p-6 rounded-2xl hover:scale-105 transition block">📖 دليل الاستخدام</a>
+      <a href="help.html#faq" class="glass p-6 rounded-2xl hover:scale-105 transition block">❓ الأسئلة الشائعة</a>
+    </div>
   </section>
 
-  <!-- ✅ إعلان -->
-  <div class="container mx-auto px-6">
+ <div class="container mx-auto px-6">
     <div class="ad-box">
       <ins class="adsbygoogle"
           style="display:block"
@@ -166,19 +139,15 @@
     </div>
   </div>
 
-  <!-- ✅ الفوتر -->
   <footer class="bg-gray-900 text-white text-center py-6 text-sm">
     <p>© 2025 LV12 - جميع الحقوق محفوظة</p>
     <div class="flex flex-col items-center mt-4 space-y-2 text-sm">
-      <a href="https://facebook.com" target="_blank" class="flex items-center gap-2 hover:text-blue-500 transition"><i class="fab fa-facebook"></i> <span>Facebook</span></a>
-      <a href="https://twitter.com" target="_blank" class="flex items-center gap-2 hover:text-sky-500 transition"><i class="fab fa-x-twitter"></i> <span>Twitter</span></a>
-      <a href="https://instagram.com" target="_blank" class="flex items-center gap-2 hover:text-pink-500 transition"><i class="fab fa-instagram"></i> <span>Instagram</span></a>
-      <a href="https://linkedin.com" target="_blank" class="flex items-center gap-2 hover:text-blue-400 transition"><i class="fab fa-linkedin"></i> <span>LinkedIn</span></a>
-      <a href="https://youtube.com" target="_blank" class="flex items-center gap-2 hover:text-red-500 transition"><i class="fab fa-youtube"></i> <span>YouTube</span></a>
+      <a href="https://facebook.com" target="_blank" class="hover:text-blue-500">Facebook</a>
+      <a href="https://instagram.com" target="_blank" class="hover:text-pink-500">Instagram</a>
+      <a href="https://youtube.com" target="_blank" class="hover:text-red-500">YouTube</a>
     </div>
   </footer>
 
-  <!-- ✅ Tawk.to Chat -->
   <script type="text/javascript">
     var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
     (function(){
@@ -188,17 +157,15 @@
       s0.parentNode.insertBefore(s1,s0);
     })();
   </script>
-
-  <!-- ✅ Supabase + UI logic -->
+ 
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script>
     const SUPABASE_URL = "https://nszhzfysitppxssplqfb.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemh6ZnlzaXRwcHhzc3BscWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMzA4OTcsImV4cCI6MjA3MzgwNjg5N30.5KvK4bhqkZ_GpIfED4qecIMfeubAJYwSFJslULwOp-w";
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const createBtn = document.getElementById("create-account-btn");
     const tryBtn = document.getElementById("try-btn");
-    const ctaTry = document.getElementById("cta-try");
     const userArea = document.getElementById("user-area");
     const userNameEl = document.getElementById("user-name");
     const logoutBtn = document.getElementById("logout-btn");
@@ -209,11 +176,8 @@
 
       if (session && session.user) {
         createBtn.style.display = "none";
-        tryBtn.textContent = "✨ افتح حسابي";
+        tryBtn.textContent = "✨ جرّب الآن";
         tryBtn.onclick = () => window.location.href = "layout.html";
-        ctaTry.textContent = "✨ افتح حسابي";
-        ctaTry.onclick = () => window.location.href = "layout.html";
-
         const uid = session.user.id;
         const { data: profile } = await supabase.from("profiles").select("full_name").eq("id", uid).single();
         if (profile && profile.full_name) {
@@ -224,10 +188,8 @@
         userArea.classList.remove("hidden");
       } else {
         createBtn.style.display = "inline-block";
-        tryBtn.textContent = "✨ جرّب مجانًا";
+        tryBtn.textContent = "✨ إنشاء حساب وجرب";
         tryBtn.onclick = () => window.location.href = "signup.html";
-        ctaTry.textContent = "✨
-
       }
     }
 
@@ -240,9 +202,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
-

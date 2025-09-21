@@ -3,8 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>المخزن - LV12</title>
+  <title>📦 المخزن - LV12</title>
   <script src="https://cdn.tailwindcss.com"></script>
+</head>
+  <head>
+    <link rel="icon" href="assets/images/lv12.ico" type="image/x-icon">
 </head>
 <body class="bg-gray-100 font-sans text-gray-800 flex">
 
@@ -12,38 +15,50 @@
   <div class="p-6 border-b">
     <h1 class="text-2xl font-bold text-blue-600">LV12</h1>
   </div>
-  <nav class="p-6 space-y-4">
-    <a href="customers.html" class="block py-2 px-4 rounded hover:bg-blue-100">👥 العملاء</a>
-    <a href="maintenance.html" class="block py-2 px-4 rounded hover:bg-blue-100">🛠️ صيانة العملاء</a>
-    <a href="store.html" class="block py-2 px-4 rounded hover:bg-blue-100">📦 المخزن</a>
-    <a href="sales.html" class="block py-2 px-4 rounded hover:bg-blue-100">💳 المبيعات</a>
-    <a href="salaries.html" class="block py-2 px-4 rounded hover:bg-blue-100">💰 الرواتب</a>
-    <a href="stats.html" class="block py-2 px-4 rounded hover:bg-blue-100">📊 الإحصائيات</a>
-    <a href="consumables.html" class="block py-2 px-4 rounded bg-blue-600 text-white">🧾 المستهلكات</a>
-  </nav>
+    <nav class="flex-1 p-4 space-y-3">
+      <a href="index.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">🏠 الرئيسية</a>
+      <a href="cv.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">📄 السيرة الذاتية</a>
+      <a href="customers.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">👥 العملاء</a>
+      <a href="maintenance.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">🛠 صيانة العملاء</a>
+      <a href="store.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">📦 المخزن</a>
+      <a href="add-user.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">➕ إضافة مستخدم</a>
+      <a href="salaries.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">💰 رواتب الموظفين</a>
+      <a href="support.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">📞 خدمة العملاء</a>
+      <a href="guide.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">📘 دليل الاستخدام</a>
+      <a href="" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">⬅ رجوع</a>
+      <a href="" class="nav-link block py-3 px-4 rounded-xl bg-red-600 hover:bg-red-700 transition text-right font-semibold">🚪 تسجيل الخروج</a>
+   </nav>
+
 </aside>
 
-  <main class="flex-1 ml-64 p-10">
-    <h2 class="text-3xl font-bold text-gray-700 mb-6">📦 إدارة المخزن</h2>
+<main class="flex-1 ml-64 p-10 space-y-10">
+  <header>
+    <h2 class="text-3xl font-bold text-gray-700 mb-2">📦 إدارة المخزن</h2>
+    <p class="text-gray-500">كل التغييرات يتم حفظها محلياً على جهازك (LocalStorage)</p>
+  </header>
 
-    <!-- نموذج إضافة منتج -->
-    <div class="bg-white p-6 rounded-xl shadow mb-8">
-      <h3 class="text-xl font-semibold mb-4">➕ إضافة جهاز / فلتر</h3>
-      <form class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <input type="text" placeholder="اسم المنتج" class="border p-3 rounded" />
-        <input type="number" placeholder="الكمية" class="border p-3 rounded" />
-        <input type="number" placeholder="سعر الشراء" class="border p-3 rounded" />
-        <input type="number" placeholder="سعر البيع" class="border p-3 rounded" />
-        <input type="text" placeholder="اللون / النوع" class="border p-3 rounded" />
-        <textarea placeholder="ملاحظات" class="border p-3 rounded md:col-span-2"></textarea>
-        <button type="submit" class="bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 md:col-span-2">حفظ</button>
-      </form>
+  <div class="bg-white p-6 rounded-xl shadow space-y-6">
+    <h3 class="text-xl font-semibold">➕ إضافة جهاز / فلتر</h3>
+    <form id="productForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <input id="name" type="text" placeholder="اسم المنتج" class="border p-3 rounded" required>
+      <input id="quantity" type="number" placeholder="الكمية" class="border p-3 rounded" required>
+      <input id="purchasePrice" type="number" placeholder="سعر الشراء" class="border p-3 rounded" required>
+      <input id="salePrice" type="number" placeholder="سعر البيع" class="border p-3 rounded" required>
+      <input id="color" type="text" placeholder="اللون / النوع" class="border p-3 rounded">
+      <textarea id="notes" placeholder="ملاحظات" class="border p-3 rounded md:col-span-2"></textarea>
+      <button type="submit" class="bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 md:col-span-2">
+        💾 حفظ
+      </button>
+    </form>
+  </div>
+
+  <div class="bg-white p-6 rounded-xl shadow">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-xl font-semibold">📋 قائمة المنتجات</h3>
+      <input id="search" type="text" placeholder="🔍 بحث..." class="border px-3 py-2 rounded">
     </div>
-
-    <!-- جدول المنتجات -->
-    <div class="bg-white p-6 rounded-xl shadow">
-      <h3 class="text-xl font-semibold mb-4">📋 قائمة المنتجات</h3>
-      <table class="w-full text-right border-collapse">
+    <div class="overflow-x-auto">
+      <table class="w-full text-right border-collapse" id="productsTable">
         <thead>
           <tr class="bg-gray-200">
             <th class="p-3 border">#</th>
@@ -56,37 +71,110 @@
             <th class="p-3 border">إجراءات</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td class="p-3 border">1</td>
-            <td class="p-3 border">فلتر 7 مراحل</td>
-            <td class="p-3 border">25</td>
-            <td class="p-3 border">600</td>
-            <td class="p-3 border">850</td>
-            <td class="p-3 border text-green-600">+250</td>
-            <td class="p-3 border">مباع بكثرة</td>
-            <td class="p-3 border">
-              <button class="text-blue-600 hover:underline">✏️ تعديل</button>
-              <button class="text-red-600 hover:underline ml-2">🗑️ حذف</button>
-            </td>
-          </tr>
-          <tr>
-            <td class="p-3 border">2</td>
-            <td class="p-3 border">جهاز تبريد</td>
-            <td class="p-3 border">10</td>
-            <td class="p-3 border">3000</td>
-            <td class="p-3 border">4200</td>
-            <td class="p-3 border text-green-600">+1200</td>
-            <td class="p-3 border">جديد</td>
-            <td class="p-3 border">
-              <button class="text-blue-600 hover:underline">✏️ تعديل</button>
-              <button class="text-red-600 hover:underline ml-2">🗑️ حذف</button>
-            </td>
-          </tr>
-        </tbody>
+        <tbody id="productsBody"></tbody>
       </table>
     </div>
-  </main>
+    <div id="totals" class="mt-4 text-lg font-semibold text-gray-700"></div>
+  </div>
+     <div class="mt-6 p-4 bg-gradient-to-r from-red-100 to-red-200 border-r-4 border-red-500 rounded-xl shadow">
+      <p class="font-semibold text-red-800">⚠️ تنبيه:</p>
+      <p class="text-red-700">هذه الصفحة محاكاة وليست بيانات حقيقية.</p>
+    </div>
+
+   <div class="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center">
+      <img src="assets/images/المخزن.png" alt="" class="mx-auto rounded-lg shadow">
+    </div>
+</main>
+
+<script>
+  let inventory = JSON.parse(localStorage.getItem("inventory")) || [
+    { name: "فلتر 7 مراحل", quantity: 10, purchasePrice: 500, salePrice: 750, color: "أبيض", notes: "مطلوب باستمرار" },
+    { name: "مضخة مياه", quantity: 3, purchasePrice: 300, salePrice: 500, color: "أسود", notes: "قليلة بالمخزن" },
+    { name: "ممبرين 100 GPD", quantity: 15, purchasePrice: 150, salePrice: 250, color: "أزرق", notes: "" }
+  ];
+
+  function saveInventory() {
+    localStorage.setItem("inventory", JSON.stringify(inventory));
+  }
+
+  function renderTable(filter = "") {
+    const tbody = document.getElementById("productsBody");
+    tbody.innerHTML = "";
+    let totalValue = 0;
+    let totalProfit = 0;
+
+    inventory
+      .filter(p => Object.values(p).some(v => String(v).includes(filter)))
+      .forEach((p, i) => {
+        const profit = (p.salePrice - p.purchasePrice) * p.quantity;
+        totalValue += p.purchasePrice * p.quantity;
+        totalProfit += profit;
+        const rowColor = p.quantity <= 5 ? "bg-red-50" : "";
+        tbody.innerHTML += `
+          <tr class="hover:bg-gray-50 transition ${rowColor}">
+            <td class="p-3 border">${i + 1}</td>
+            <td class="p-3 border">${p.name}</td>
+            <td class="p-3 border font-semibold ${p.quantity <= 5 ? "text-red-600" : ""}">${p.quantity}</td>
+            <td class="p-3 border">${p.purchasePrice}</td>
+            <td class="p-3 border">${p.salePrice}</td>
+            <td class="p-3 border text-green-600 font-semibold">+${profit}</td>
+            <td class="p-3 border">${p.notes || ""}</td>
+            <td class="p-3 border flex gap-2">
+              <button onclick="editProduct(${i})" class="bg-blue-100 text-blue-600 px-3 py-1 rounded hover:bg-blue-200">✏️</button>
+              <button onclick="deleteProduct(${i})" class="bg-red-100 text-red-600 px-3 py-1 rounded hover:bg-red-200">🗑️</button>
+            </td>
+          </tr>
+        `;
+      });
+
+    document.getElementById("totals").innerHTML =
+      `إجمالي قيمة المخزون: <span class="text-blue-600">${totalValue} ج.م</span> | إجمالي الربح المتوقع: <span class="text-green-600">+${totalProfit} ج.م</span>`;
+  }
+
+  document.getElementById("productForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const newProduct = {
+      name: document.getElementById("name").value,
+      quantity: parseInt(document.getElementById("quantity").value),
+      purchasePrice: parseFloat(document.getElementById("purchasePrice").value),
+      salePrice: parseFloat(document.getElementById("salePrice").value),
+      color: document.getElementById("color").value,
+      notes: document.getElementById("notes").value
+    };
+    inventory.push(newProduct);
+    saveInventory();
+    renderTable();
+    e.target.reset();
+  });
+
+  function editProduct(index) {
+    const p = inventory[index];
+    document.getElementById("name").value = p.name;
+    document.getElementById("quantity").value = p.quantity;
+    document.getElementById("purchasePrice").value = p.purchasePrice;
+    document.getElementById("salePrice").value = p.salePrice;
+    document.getElementById("color").value = p.color;
+    document.getElementById("notes").value = p.notes;
+    inventory.splice(index, 1);
+    saveInventory();
+    renderTable();
+  }
+
+  function deleteProduct(index) {
+    if (confirm("هل أنت متأكد من الحذف؟")) {
+      inventory.splice(index, 1);
+      saveInventory();
+      renderTable();
+    }
+  }
+
+  document.getElementById("search").addEventListener("input", e => {
+    renderTable(e.target.value);
+  });
+
+  renderTable();
+</script>
 
 </body>
+
 </html>

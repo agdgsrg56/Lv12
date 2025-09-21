@@ -1,89 +1,136 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+  <head>
+    <link rel="icon" href="assets/images/lv12.ico" type="image/x-icon">
+</head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>العملاء - LV12</title>
+  <title>👥 العملاء - لوحة الإدارة</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Tajawal', sans-serif; }
+  </style>
 </head>
-<body class="bg-gray-100 font-sans text-gray-800 flex">
+<body class="bg-[#F4F6F9] text-gray-800 flex">
 
-  <!-- القائمة الجانبية -->
-<aside class="w-64 bg-white shadow-lg h-screen fixed left-0">
-  <div class="p-6 border-b">
-    <h1 class="text-2xl font-bold text-blue-600">LV12</h1>
-  </div>
-  <nav class="p-6 space-y-4">
-    <a href="customers.html" class="block py-2 px-4 rounded hover:bg-blue-100">👥 العملاء</a>
-    <a href="maintenance.html" class="block py-2 px-4 rounded hover:bg-blue-100">🛠️ صيانة العملاء</a>
-    <a href="store.html" class="block py-2 px-4 rounded hover:bg-blue-100">📦 المخزن</a>
-    <a href="sales.html" class="block py-2 px-4 rounded hover:bg-blue-100">💳 المبيعات</a>
-    <a href="salaries.html" class="block py-2 px-4 rounded hover:bg-blue-100">💰 الرواتب</a>
-    <a href="stats.html" class="block py-2 px-4 rounded hover:bg-blue-100">📊 الإحصائيات</a>
-    <a href="consumables.html" class="block py-2 px-4 rounded bg-blue-600 text-white">🧾 المستهلكات</a>
-  </nav>
-</aside>
-
-
-  <!-- المحتوى -->
-  <main class="flex-1 ml-64 p-10">
-    <h2 class="text-3xl font-bold text-gray-700 mb-6">👥 إدارة العملاء</h2>
-
-    <!-- نموذج إضافة عميل -->
-    <div class="bg-white p-6 rounded-xl shadow mb-8">
-      <h3 class="text-xl font-semibold mb-4">➕ إضافة عميل جديد</h3>
-      <form class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <input type="text" placeholder="اسم العميل" class="border p-3 rounded" />
-        <input type="text" placeholder="رقم الهاتف" class="border p-3 rounded" />
-        <input type="text" placeholder="العنوان" class="border p-3 rounded md:col-span-2" />
-        <select class="border p-3 rounded">
-          <option>كاش</option>
-          <option>أقساط</option>
-          <option>مجاني</option>
-          <option>خارجي</option>
-        </select>
-        <button type="submit" class="bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700">إضافة</button>
-      </form>
+  <aside class="w-64 bg-[#1B2631] text-white shadow-xl h-screen fixed left-0 flex flex-col">
+    <div class="p-6 border-b border-gray-700">
+      <h1 class="text-3xl font-extrabold">LV12</h1>
+      <p class="text-sm text-gray-400 mt-1">لوحة المدير</p>
     </div>
 
-    <!-- جدول العملاء -->
-    <div class="bg-white p-6 rounded-xl shadow">
-      <h3 class="text-xl font-semibold mb-4">📋 قائمة العملاء</h3>
-      <table class="w-full text-right border-collapse">
-        <thead>
-          <tr class="bg-gray-200">
-            <th class="p-3 border">#</th>
-            <th class="p-3 border">الاسم</th>
-            <th class="p-3 border">الهاتف</th>
-            <th class="p-3 border">النوع</th>
-            <th class="p-3 border">إجراءات</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="p-3 border">1</td>
-            <td class="p-3 border">أحمد علي</td>
-            <td class="p-3 border">0101234567</td>
-            <td class="p-3 border">أقساط</td>
-            <td class="p-3 border">
-              <button class="text-blue-600 hover:underline">✏️ تعديل</button>
-              <button class="text-red-600 hover:underline ml-2">🗑️ حذف</button>
-            </td>
-          </tr>
-          <tr>
-            <td class="p-3 border">2</td>
-            <td class="p-3 border">منى محمد</td>
-            <td class="p-3 border">0107654321</td>
-            <td class="p-3 border">كاش</td>
-            <td class="p-3 border">
-              <button class="text-blue-600 hover:underline">✏️ تعديل</button>
-              <button class="text-red-600 hover:underline ml-2">🗑️ حذف</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <nav class="flex-1 p-4 space-y-3">
+      <a href="index.html" class="block py-3 px-4 rounded-xl hover:bg-[#34495E] transition">🏠 الرئيسية</a>
+      <a href="cv.html" class="block py-3 px-4 rounded-xl hover:bg-[#34495E] transition">📄 السيرة الذاتية</a>
+      <a href="customers.html" class="block py-3 px-4 rounded-xl bg-[#2E4053] text-white">👥 العملاء</a>
+      <a href="maintenance.html" class="block py-3 px-4 rounded-xl hover:bg-[#34495E] transition">🛠 صيانة العملاء</a>
+      <a href="store.html" class="block py-3 px-4 rounded-xl hover:bg-[#34495E] transition">📦 المخزن</a>
+      <a href="add-user.html" class="block py-3 px-4 rounded-xl hover:bg-[#34495E] transition">➕ إضافة مستخدم</a>
+      <a href="salaries.html" class="block py-3 px-4 rounded-xl hover:bg-[#34495E] transition">💰 الرواتب</a>
+      <a href="support.html" class="block py-3 px-4 rounded-xl hover:bg-[#34495E] transition">📞 خدمة العملاء</a>
+      <a href="guide.html" class="block py-3 px-4 rounded-xl hover:bg-[#34495E] transition">📘 دليل الاستخدام</a>
+      <a href="#" class="block py-3 px-4 rounded-xl hover:bg-red-100 text-red-600">🚪 تسجيل الخروج</a>
+    </nav>
+
+    <div class="p-4 border-t border-gray-700 text-center text-xs text-gray-400">
+      © 2025 LV12
+    </div>
+  </aside>
+
+  <main class="flex-1 ml-64 p-10 space-y-10">
+    <section class="bg-white p-6 rounded-2xl shadow-md">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
+        <h2 class="text-3xl font-bold text-gray-800">👥 قائمة العملاء</h2>
+        <div class="flex gap-3">
+          <input id="searchInput" type="text" placeholder="🔍 ابحث عن عميل..." 
+                 class="px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl shadow">
+            ➕ إضافة عميل
+          </button>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-right border-collapse">
+          <thead>
+            <tr class="bg-gray-200 text-gray-700">
+              <th class="p-3">الاسم</th>
+              <th class="p-3">الهاتف</th>
+              <th class="p-3">العنوان</th>
+              <th class="p-3">الفني</th>
+              <th class="p-3">المتابع</th>
+              <th class="p-3">المنتج</th>
+              <th class="p-3">الحالة</th>
+              <th class="p-3">الإجراءات</th>
+            </tr>
+          </thead>
+          <tbody id="customerTable" class="divide-y divide-gray-200">
+            <tr>
+              <td class="p-3">أحمد محمود</td>
+              <td class="p-3">01012345678</td>
+              <td class="p-3">القاهرة - مدينة نصر</td>
+              <td class="p-3">محمود فني</td>
+              <td class="p-3">سارة متابع</td>
+              <td class="p-3">فلتر مياه 7 مراحل</td>
+              <td class="p-3 text-green-600 font-bold">نشط</td>
+              <td class="p-3 flex gap-2">
+                <button class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg text-sm">👁 عرض</button>
+                <button class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg text-sm">✏ تعديل</button>
+                <button class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg text-sm">🗑 حذف</button>
+              </td>
+            </tr>
+            <tr>
+              <td class="p-3">منى علي</td>
+              <td class="p-3">01198765432</td>
+              <td class="p-3">الإسكندرية - سموحة</td>
+              <td class="p-3">أحمد فني</td>
+              <td class="p-3">كريم متابع</td>
+              <td class="p-3">اشتراك خدمة + فلتر</td>
+              <td class="p-3 text-red-600 font-bold">غير نشط</td>
+              <td class="p-3 flex gap-2">
+                <button class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg text-sm">👁 عرض</button>
+                <button class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg text-sm">✏ تعديل</button>
+                <button class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg text-sm">🗑 حذف</button>
+              </td>
+            </tr>
+            <tr>
+              <td class="p-3">محمد حسن</td>
+              <td class="p-3">01234567890</td>
+              <td class="p-3">الجيزة - فيصل</td>
+              <td class="p-3">محمود فني</td>
+              <td class="p-3">سارة متابع</td>
+              <td class="p-3">صيانة دورية</td>
+              <td class="p-3 text-green-600 font-bold">نشط</td>
+              <td class="p-3 flex gap-2">
+                <button class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg text-sm">👁 عرض</button>
+                <button class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg text-sm">✏ تعديل</button>
+                <button class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg text-sm">🗑 حذف</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-6 p-4 bg-gradient-to-r from-red-100 to-red-200 border-r-4 border-red-500 rounded-xl shadow">
+        <p class="font-semibold text-red-800">⚠️ تنبيه:</p>
+        <p class="text-red-700">هذه الصفحة محاكاة وليست بيانات حقيقية.</p>
+      </div>
+    </section>
+
+    <div class="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center">
+      <img src="assets/images/صفحة العملاء.png" alt="" class="mx-auto rounded-lg shadow">
     </div>
   </main>
 
+  <script>
+    document.getElementById('searchInput').addEventListener('input', function() {
+      const filter = this.value.trim();
+      const rows = document.querySelectorAll('#customerTable tr');
+      rows.forEach(row => {
+        row.style.display = row.innerText.includes(filter) ? '' : 'none';
+      });
+    });
+  </script>
 </body>
 </html>
