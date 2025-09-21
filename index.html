@@ -40,33 +40,38 @@
 </head>
 <body class="text-gray-800">
 
-  <header class="glass fixed w-full z-20">
-    <div class="container mx-auto flex justify-between items-center py-4 px-6">
-      <h1 class="text-xl font-extrabold text-blue-700">🚀 LV12 WarerWeb</h1>
-      <nav class="hidden md:flex gap-6 text-sm font-medium text-gray-700">
-        <a href="#features" class="hover:text-blue-600">المميزات</a>
-        <a href="#pricing" class="hover:text-blue-600">خطط الأسعار</a>
-        <a href="#help" class="hover:text-blue-600">المساعدة</a>
-        <a href="#contact" class="hover:text-blue-600">تواصل معنا</a>
-      </nav>
-      <div class="flex items-center gap-4">
-        <a href="login.html" class="text-sm text-gray-700 hover:text-blue-600">تسجيل دخول</a>
-        <a href="signup.html" class="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 transition font-medium shadow-md">✨ جرّب مجانًا</a>
+ <header class="glass fixed w-full z-20">
+  <div class="container mx-auto flex justify-between items-center py-4 px-6">
+    <h1 class="text-xl font-extrabold text-blue-700">🚀 LV12 WarerWeb</h1>
+    <nav class="hidden md:flex gap-6 text-sm font-medium text-gray-700">
+      <a href="#features" class="hover:text-blue-600">المميزات</a>
+      <a href="#pricing" class="hover:text-blue-600">خطط الأسعار</a>
+      <a href="#help" class="hover:text-blue-600">المساعدة</a>
+      <a href="#contact" class="hover:text-blue-600">تواصل معنا</a>
+    </nav>
+
+    <div class="flex items-center gap-4">
+      <a id="create-account-btn" href="signup.html" 
+         class="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 transition font-medium shadow-md">
+        ✨ إنشاء حساب
+      </a>
+
+      <button id="try-btn" 
+              class="bg-green-600 text-white px-4 py-2 rounded-full hover:bg-green-700 transition font-medium shadow-md">
+        ✨ جرّب الآن
+      </button>
+
+      <div id="user-area" class="hidden flex items-center gap-3">
+        <span id="user-name" class="font-medium text-gray-700"></span>
+        <button id="logout-btn" 
+                class="bg-red-600 text-white px-3 py-1 rounded-full text-sm hover:bg-red-700 transition">
+          تسجيل خروج
+        </button>
       </div>
     </div>
-  </header>
-<div id="user-area" class="hidden flex items-center gap-2">
-  <span id="user-name" class="font-medium text-gray-700"></span>
-  <button id="logout-btn" class="bg-red-600 text-white px-3 py-1 rounded-full text-sm">تسجيل خروج</button>
-</div>
+  </div>
+</header>
 
-<a id="create-account-btn" href="signup.html" class="bg-blue-600 text-white px-4 py-2 rounded-full">
-  ✨ إنشاء حساب
-</a>
-
-<button id="try-btn" class="bg-green-600 text-white px-4 py-2 rounded-full">
-  ✨ جرّب الآن
-</button>
 
  <section class="pt-28 pb-20 text-center bg-gradient-to-r from-indigo-100 to-blue-100">
     <div class="container mx-auto px-6">
