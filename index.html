@@ -415,35 +415,43 @@
 </script>
 
 
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 
- <section id="help" class="py-20 bg-gradient-to-r from-indigo-50 to-blue-50">
+<section id="help" class="py-20 bg-gradient-to-r from-indigo-50 to-blue-50">
   <div class="container mx-auto px-6">
-    <h3 class="text-4xl font-extrabold mb-12 text-blue-700 text-center">📑 المساعدة</h3>
+    <h3 class="text-4xl font-extrabold mb-12 text-blue-700 text-center" data-aos="fade-down">
+      📑 المساعدة
+    </h3>
     
     <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
       <a href="help.html#terms" 
-         class="glass p-8 rounded-2xl shadow-md hover:shadow-xl transition transform hover:-translate-y-2 block text-center">
+         class="glass p-8 rounded-2xl shadow-md hover:shadow-xl transition transform hover:-translate-y-2 block text-center"
+         data-aos="fade-up" data-aos-delay="100">
         <i class="fa fa-file-contract text-blue-600 text-4xl mb-4"></i>
         <h4 class="font-bold text-lg mb-2">الشروط والأحكام</h4>
         <p class="text-sm text-gray-600">تعرف على حقوقك والتزاماتك.</p>
       </a>
 
       <a href="help.html#specs" 
-         class="glass p-8 rounded-2xl shadow-md hover:shadow-xl transition transform hover:-translate-y-2 block text-center">
+         class="glass p-8 rounded-2xl shadow-md hover:shadow-xl transition transform hover:-translate-y-2 block text-center"
+         data-aos="fade-up" data-aos-delay="200">
         <i class="fa fa-cogs text-indigo-600 text-4xl mb-4"></i>
         <h4 class="font-bold text-lg mb-2">مواصفات الجهاز</h4>
         <p class="text-sm text-gray-600">المتطلبات اللازمة لتشغيل البرنامج.</p>
       </a>
 
       <a href="help.html#guide" 
-         class="glass p-8 rounded-2xl shadow-md hover:shadow-xl transition transform hover:-translate-y-2 block text-center">
+         class="glass p-8 rounded-2xl shadow-md hover:shadow-xl transition transform hover:-translate-y-2 block text-center"
+         data-aos="fade-up" data-aos-delay="300">
         <i class="fa fa-book-open text-green-600 text-4xl mb-4"></i>
         <h4 class="font-bold text-lg mb-2">دليل الاستخدام</h4>
         <p class="text-sm text-gray-600">تعليمات مبسطة خطوة بخطوة.</p>
       </a>
 
       <a href="help.html#faq" 
-         class="glass p-8 rounded-2xl shadow-md hover:shadow-xl transition transform hover:-translate-y-2 block text-center">
+         class="glass p-8 rounded-2xl shadow-md hover:shadow-xl transition transform hover:-translate-y-2 block text-center"
+         data-aos="fade-up" data-aos-delay="400">
         <i class="fa fa-question-circle text-red-600 text-4xl mb-4"></i>
         <h4 class="font-bold text-lg mb-2">الأسئلة الشائعة</h4>
         <p class="text-sm text-gray-600">إجابات عن أكثر الأسئلة تكراراً.</p>
@@ -451,6 +459,13 @@
     </div>
   </div>
 </section>
+
+<script>
+  AOS.init({
+    duration: 1000,
+    once: true      
+  });
+</script>
 
 
  <div class="container mx-auto px-6">
@@ -575,6 +590,7 @@ supabase.auth.onAuthStateChange((event, session) => {
   </script>
 </body>
 </html>
+
 
 
 
