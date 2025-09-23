@@ -325,7 +325,7 @@
   <div class="container mx-auto px-6 text-center">
     <h2 class="text-4xl font-extrabold mb-12 text-blue-700">💰 خطط الأسعار</h2>
     
-    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+    <div class="grid md:grid-cols-2 lg:grid-cols-5 gap-8">
       
       <div class="glass p-6 rounded-2xl shadow-md hover:shadow-xl transition">
         <h3 class="text-xl font-bold text-gray-800 mb-4">📅 أسبوعي</h3>
@@ -335,7 +335,7 @@
           <li>✅ استخدام كامل</li>
           <li>✅ دعم أساسي</li>
         </ul>
-        <button class="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 w-full">ابدأ الآن</button>
+        <button onclick="openModal()" class="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 w-full">ابدأ الآن</button>
       </div>
 
       <div class="glass p-6 rounded-2xl shadow-md hover:shadow-xl transition border-2 border-blue-600">
@@ -347,7 +347,7 @@
           <li>✅ تحديثات مستمرة</li>
           <li>✅ دعم فني أساسي</li>
         </ul>
-        <button class="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 w-full">اختر الشهري</button>
+        <button onclick="openModal()" class="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 w-full">اختر الشهري</button>
       </div>
 
       <div class="glass p-6 rounded-2xl shadow-md hover:shadow-xl transition">
@@ -359,7 +359,19 @@
           <li>✅ خصم 15%</li>
           <li>✅ نسخة احتياطية أسبوعية</li>
         </ul>
-        <button class="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 w-full">وفّر الآن</button>
+        <button onclick="openModal()" class="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 w-full">وفّر الآن</button>
+      </div>
+
+      <div class="glass p-6 rounded-2xl shadow-md hover:shadow-xl transition">
+        <h3 class="text-xl font-bold text-gray-800 mb-4">📅 سنوي</h3>
+        <p class="text-3xl font-extrabold text-blue-600 mb-2">2800ج</p>
+        <p class="text-gray-600 mb-4">كل سنة</p>
+        <ul class="text-sm text-gray-700 text-right mb-6 space-y-2">
+          <li>✅ خصم 20%</li>
+          <li>✅ دعم فني مميز</li>
+          <li>✅ نسخة احتياطية شهرية</li>
+        </ul>
+        <button onclick="openModal()" class="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 w-full">اختر السنوي</button>
       </div>
 
       <div class="glass p-6 rounded-2xl shadow-md hover:shadow-xl transition">
@@ -371,11 +383,37 @@
           <li>✅ دعم فني مميز</li>
           <li>✅ نسخة احتياطية يومية</li>
         </ul>
-        <button class="bg-green-600 text-white px-4 py-2 rounded-full hover:bg-green-700 w-full">اشترِ لمرة واحدة</button>
+        <button onclick="openModal()" class="bg-green-600 text-white px-4 py-2 rounded-full hover:bg-green-700 w-full">اشترِ لمرة واحدة</button>
       </div>
     </div>
   </div>
 </section>
+
+<div id="contactModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
+  <div class="bg-white rounded-2xl shadow-lg p-8 max-w-md w-full text-center">
+    <h3 class="text-2xl font-bold text-blue-700 mb-4">📞 تواصل معنا</h3>
+    <p class="text-gray-700 mb-4">لإتمام الاشتراك أو الحصول على تفاصيل أكثر:</p>
+    <p class="font-bold text-gray-900">📱 0</p>
+    <p class="font-bold text-gray-900">📧lv12warerweb@gmail.com</p>
+    <div class="flex justify-center gap-6 mt-4">
+      <a href="https://www.facebook.com/people/LV12-WarerWeb/61581029411296/" target="_blank" class="text-blue-600 hover:underline">فيسبوك</a>
+      <a href="https://www.instagram.com/lv12_waterweb/?igsh=ZWdrZGpzcWJ5djUz#" target="_blank" class="text-pink-600 hover:underline">إنستجرام</a>
+        <a href="" target="_blank" class="hover:text-blue-500">Facebook</a>
+      <a href=" target="_blank" class="hover:text-pink-500">Instagram</a>
+    </div>
+    <button onclick="closeModal()" class="mt-6 bg-red-600 text-white px-4 py-2 rounded-full hover:bg-red-700">إغلاق</button>
+  </div>
+</div>
+
+<script>
+  function openModal() {
+    document.getElementById("contactModal").classList.remove("hidden");
+  }
+  function closeModal() {
+    document.getElementById("contactModal").classList.add("hidden");
+  }
+</script>
+
 
 
   <section id="help" class="py-20 container mx-auto px-6">
@@ -510,6 +548,7 @@ supabase.auth.onAuthStateChange((event, session) => {
   </script>
 </body>
 </html>
+
 
 
 
