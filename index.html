@@ -55,12 +55,61 @@
  <header class="glass fixed w-full z-20">
   <div class="container mx-auto flex justify-between items-center py-4 px-6">
     <h1 class="text-xl font-extrabold text-blue-700">🚀 LV12 WarerWeb</h1>
-    <nav class="hidden md:flex gap-6 text-sm font-medium text-gray-700">
-      <a href="#features" class="hover:text-blue-600">المميزات</a>
-      <a href="#pricing" class="hover:text-blue-600">خطط الأسعار</a>
-      <a href="#help" class="hover:text-blue-600">المساعدة</a>
-      <a href="#contact" class="hover:text-blue-600">تواصل معنا</a>
-    </nav>
+  <nav class="hidden md:flex gap-8 text-base font-semibold text-gray-800">
+  <a href="#features" class="nav-link">المميزات</a>
+  <a href="#pricing" class="nav-link">خطط الأسعار</a>
+  <a href="#help" class="nav-link">المساعدة</a>
+  <a href="#contact" class="nav-link">تواصل معنا</a>
+</nav>
+
+<div class="mt-6 text-center">
+  <span class="text-lg font-bold text-gray-700">📥 عدد التنزيلات:</span>
+  <span id="downloads" class="text-xl font-extrabold text-blue-600 ml-2">0</span>
+</div>
+
+<style>
+  .nav-link {
+    position: relative;
+    padding: 6px 12px;
+    transition: all 0.3s ease;
+  }
+
+  .nav-link:hover {
+    color: #2563eb; 
+  }
+
+  .nav-link::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0%;
+    height: 2px;
+    background: #2563eb;
+    transition: width 0.3s ease;
+  }
+
+  .nav-link:hover::after {
+    width: 100%;
+  }
+</style>
+
+<script>
+  // عداد وهمي للتنزيلات
+  const downloadsEl = document.getElementById("downloads");
+  const startCount = 1200; 
+  const increasePerHour = 5;
+
+  function updateDownloads() {
+    const now = new Date();
+    const hoursSinceStart = Math.floor((now - new Date("2025-01-01")) / (1000 * 60 * 60));
+    const downloads = startCount + (hoursSinceStart * increasePerHour);
+    downloadsEl.textContent = downloads.toLocaleString("ar-EG");
+  }
+
+  updateDownloads();
+  setInterval(updateDownloads, 60 * 60 * 1000); // يحدث كل ساعة
+</script>
 
     <div class="flex items-center gap-4">
       <a id="create-account-btn" href="signup.html" 
@@ -403,6 +452,7 @@ supabase.auth.onAuthStateChange((event, session) => {
   </script>
 </body>
 </html>
+
 
 
 
