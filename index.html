@@ -59,11 +59,11 @@
   <a href="#features" class="nav-link">المميزات</a>
   <a href="#pricing" class="nav-link">خطط الأسعار</a>
   <a href="#help" class="nav-link">المساعدة</a>
-  <a href="#contact" class="nav-link">تواصل معنا</a>
+
 </nav>
 
 <div class="mt-6 text-center">
-  <span class="text-lg font-bold text-gray-700">📥 عدد التنزيلات:</span>
+  <span class="text-lg font-bold text-gray-700"> عدد التنزيلات:</span>
   <span id="downloads" class="text-xl font-extrabold text-blue-600 ml-2">0</span>
 </div>
 
@@ -184,11 +184,16 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.08); 
   }
 </style>
- <section id="intro-video" class="py-16 bg-gradient-to-r from-indigo-50 to-blue-50">
-    <div class="container mx-auto px-6 text-center">
-      <h3 class="text-3xl font-bold mb-8 text-blue-700">🎥 تعرّف على النظام</h3>
-      <div class="aspect-[16/9] rounded-2xl overflow-hidden shadow-xl">
-        <iframe class="w-full h-96 rounded-2xl"
+<section id="intro-video" class="py-20 bg-gradient-to-r from-indigo-100 via-blue-50 to-cyan-50">
+  <div class="container mx-auto px-6 text-center">
+    
+    <h3 class="text-4xl font-extrabold mb-10 text-blue-700 tracking-tight">
+      🎥 تعرّف على النظام
+    </h3>
+    
+    <div class="relative group max-w-4xl mx-auto">
+      <div class="aspect-[16/9] rounded-3xl overflow-hidden shadow-2xl ring-4 ring-white/70 group-hover:ring-blue-300 transition duration-500">
+        <iframe class="w-full h-96 rounded-3xl"
           src="https://www.youtube.com/embed/dQw4w9WgXcQ"
           title="LV12 WarerWeb Demo"
           frameborder="0"
@@ -196,8 +201,14 @@
           allowfullscreen>
         </iframe>
       </div>
+      
+      <div class="absolute inset-0 rounded-3xl bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition duration-500 flex items-center justify-center">
+        <span class="text-white text-2xl font-bold">▶ شاهد الآن</span>
+      </div>
     </div>
-  </section>
+
+  </div>
+</section>
 
 <section id="features" class="py-16 container mx-auto px-6">
   <h3 class="text-3xl font-bold text-center mb-10 text-blue-700">🔥 مميزات البرنامج</h3>
@@ -452,6 +463,7 @@ supabase.auth.onAuthStateChange((event, session) => {
   </script>
 </body>
 </html>
+
 
 
 
