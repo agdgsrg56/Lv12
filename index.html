@@ -416,15 +416,42 @@
 
 
 
-  <section id="help" class="py-20 container mx-auto px-6">
-    <h3 class="text-3xl font-bold mb-8 text-blue-700 text-center">📑 المساعدة</h3>
-    <div class="grid md:grid-cols-2 gap-6 text-center">
-      <a href="help.html#terms" class="glass p-6 rounded-2xl hover:scale-105 transition block">📌 الشروط والأحكام</a>
-      <a href="help.html#specs" class="glass p-6 rounded-2xl hover:scale-105 transition block">⚙️ مواصفات الجهاز</a>
-      <a href="help.html#guide" class="glass p-6 rounded-2xl hover:scale-105 transition block">📖 دليل الاستخدام</a>
-      <a href="help.html#faq" class="glass p-6 rounded-2xl hover:scale-105 transition block">❓ الأسئلة الشائعة</a>
+ <section id="help" class="py-20 bg-gradient-to-r from-indigo-50 to-blue-50">
+  <div class="container mx-auto px-6">
+    <h3 class="text-4xl font-extrabold mb-12 text-blue-700 text-center">📑 المساعدة</h3>
+    
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <a href="help.html#terms" 
+         class="glass p-8 rounded-2xl shadow-md hover:shadow-xl transition transform hover:-translate-y-2 block text-center">
+        <i class="fa fa-file-contract text-blue-600 text-4xl mb-4"></i>
+        <h4 class="font-bold text-lg mb-2">الشروط والأحكام</h4>
+        <p class="text-sm text-gray-600">تعرف على حقوقك والتزاماتك.</p>
+      </a>
+
+      <a href="help.html#specs" 
+         class="glass p-8 rounded-2xl shadow-md hover:shadow-xl transition transform hover:-translate-y-2 block text-center">
+        <i class="fa fa-cogs text-indigo-600 text-4xl mb-4"></i>
+        <h4 class="font-bold text-lg mb-2">مواصفات الجهاز</h4>
+        <p class="text-sm text-gray-600">المتطلبات اللازمة لتشغيل البرنامج.</p>
+      </a>
+
+      <a href="help.html#guide" 
+         class="glass p-8 rounded-2xl shadow-md hover:shadow-xl transition transform hover:-translate-y-2 block text-center">
+        <i class="fa fa-book-open text-green-600 text-4xl mb-4"></i>
+        <h4 class="font-bold text-lg mb-2">دليل الاستخدام</h4>
+        <p class="text-sm text-gray-600">تعليمات مبسطة خطوة بخطوة.</p>
+      </a>
+
+      <a href="help.html#faq" 
+         class="glass p-8 rounded-2xl shadow-md hover:shadow-xl transition transform hover:-translate-y-2 block text-center">
+        <i class="fa fa-question-circle text-red-600 text-4xl mb-4"></i>
+        <h4 class="font-bold text-lg mb-2">الأسئلة الشائعة</h4>
+        <p class="text-sm text-gray-600">إجابات عن أكثر الأسئلة تكراراً.</p>
+      </a>
     </div>
-  </section>
+  </div>
+</section>
+
 
  <div class="container mx-auto px-6">
     <div class="ad-box">
@@ -548,6 +575,7 @@ supabase.auth.onAuthStateChange((event, session) => {
   </script>
 </body>
 </html>
+
 
 
 
