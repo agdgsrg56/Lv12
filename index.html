@@ -51,67 +51,27 @@
 
 
 <body class="text-gray-800">
-
- <header class="glass fixed w-full z-20">
+<header class="backdrop-blur-md bg-white/70 fixed w-full z-20 shadow-md">
   <div class="container mx-auto flex justify-between items-center py-4 px-6">
-    <h1 class="text-xl font-extrabold text-blue-700">🚀 LV12 WarerWeb</h1>
-  <nav class="hidden md:flex gap-8 text-base font-semibold text-gray-800">
-  <a href="#features" class="nav-link">المميزات</a>
-  <a href="#pricing" class="nav-link">خطط الأسعار</a>
-  <a href="#help" class="nav-link">المساعدة</a>
+    
+    <h1 class="text-2xl font-extrabold text-blue-700 flex items-center gap-2">
+      🚀 LV12 <span class="text-gray-800">WarerWeb</span>
+    </h1>
 
-</nav>
+    <nav class="hidden md:flex gap-8 text-base font-semibold text-gray-700">
+      <a href="#features" class="nav-link">المميزات</a>
+      <a href="#pricing" class="nav-link">خطط الأسعار</a>
+      <a href="#help" class="nav-link">المساعدة</a>
+      <a href="#contact" class="nav-link">تواصل معنا</a>
+    </nav>
 
-<div class="mt-6 text-center">
-  <span class="text-lg font-bold text-gray-700"> عدد التنزيلات:</span>
-  <span id="downloads" class="text-xl font-extrabold text-blue-600 ml-2">0</span>
-</div>
+    <div class="flex items-center gap-6">
 
-<style>
-  .nav-link {
-    position: relative;
-    padding: 6px 12px;
-    transition: all 0.3s ease;
-  }
+      <div class="hidden sm:block text-center">
+        <span class="text-sm font-medium text-gray-600">عدد التنزيلات</span>
+        <div class="text-xl font-extrabold text-blue-600" id="downloads">0</div>
+      </div>
 
-  .nav-link:hover {
-    color: #2563eb; 
-  }
-
-  .nav-link::after {
-    content: "";
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    width: 0%;
-    height: 2px;
-    background: #2563eb;
-    transition: width 0.3s ease;
-  }
-
-  .nav-link:hover::after {
-    width: 100%;
-  }
-</style>
-
-<script>
-  // عداد وهمي للتنزيلات
-  const downloadsEl = document.getElementById("downloads");
-  const startCount = 1200; 
-  const increasePerHour = 5;
-
-  function updateDownloads() {
-    const now = new Date();
-    const hoursSinceStart = Math.floor((now - new Date("2025-01-01")) / (1000 * 60 * 60));
-    const downloads = startCount + (hoursSinceStart * increasePerHour);
-    downloadsEl.textContent = downloads.toLocaleString("ar-EG");
-  }
-
-  updateDownloads();
-  setInterval(updateDownloads, 60 * 60 * 1000); // يحدث كل ساعة
-</script>
-
-    <div class="flex items-center gap-4">
       <a id="create-account-btn" href="signup.html" 
          class="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 transition font-medium shadow-md">
         ✨ إنشاء حساب
@@ -119,7 +79,7 @@
 
       <button id="try-btn" 
               class="bg-green-600 text-white px-4 py-2 rounded-full hover:bg-green-700 transition font-medium shadow-md">
-        ✨ جرّب الآن
+        🚀 جرّب الآن
       </button>
 
       <div id="user-area" class="hidden flex items-center gap-3">
@@ -131,7 +91,51 @@
       </div>
     </div>
   </div>
+
+  <style>
+    .nav-link {
+      position: relative;
+      padding: 6px 0;
+      transition: all 0.3s ease;
+    }
+
+    .nav-link:hover {
+      color: #2563eb; 
+    }
+
+    .nav-link::after {
+      content: "";
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0%;
+      height: 2px;
+      background: #2563eb;
+      transition: width 0.3s ease;
+    }
+
+    .nav-link:hover::after {
+      width: 100%;
+    }
+  </style>
+
+  <script>
+    const downloadsEl = document.getElementById("downloads");
+    const startCount = 1200; 
+    const increasePerHour = 5;
+
+    function updateDownloads() {
+      const now = new Date();
+      const hoursSinceStart = Math.floor((now - new Date("2025-01-01")) / (1000 * 60 * 60));
+      const downloads = startCount + (hoursSinceStart * increasePerHour);
+      downloadsEl.textContent = downloads.toLocaleString("ar-EG");
+    }
+
+    updateDownloads();
+    setInterval(updateDownloads, 60 * 60 * 1000); 
+  </script>
 </header>
+
 
 
 <section class="pt-28 pb-20 text-center bg-gradient-to-r from-indigo-100 to-blue-100">
@@ -317,18 +321,61 @@
 </style>
 
   
+<section id="pricing" class="py-20 bg-gradient-to-r from-blue-50 to-indigo-50">
+  <div class="container mx-auto px-6 text-center">
+    <h2 class="text-4xl font-extrabold mb-12 text-blue-700">💰 خطط الأسعار</h2>
+    
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+      
+      <div class="glass p-6 rounded-2xl shadow-md hover:shadow-xl transition">
+        <h3 class="text-xl font-bold text-gray-800 mb-4">📅 أسبوعي</h3>
+        <p class="text-3xl font-extrabold text-blue-600 mb-2">100ج</p>
+        <p class="text-gray-600 mb-4">لكل أسبوع</p>
+        <ul class="text-sm text-gray-700 text-right mb-6 space-y-2">
+          <li>✅ استخدام كامل</li>
+          <li>✅ دعم أساسي</li>
+        </ul>
+        <button class="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 w-full">ابدأ الآن</button>
+      </div>
 
- <section id="pricing" class="py-20 bg-gradient-to-r from-indigo-50 to-blue-50">
-    <div class="container mx-auto px-6">
-      <h3 class="text-3xl font-bold text-center mb-12 text-blue-700">💳 خطط الأسعار</h3>
-      <div class="grid md:grid-cols-4 gap-6">
-        <div class="glass p-8 rounded-2xl text-center"><h4 class="font-bold text-xl mb-2">أسبوع</h4><p class="text-2xl font-bold text-blue-600 mb-4">100 <span class="text-sm text-gray-600">جنيه</span></p><a href="signup.html" class="bg-blue-600 text-white px-4 py-2 rounded-full">اشترك</a></div>
-        <div class="glass p-8 rounded-2xl border-2 border-blue-600 text-center"><h4 class="font-bold text-xl mb-2">شهر</h4><p class="text-2xl font-bold text-blue-600 mb-4">400 <span class="text-sm text-gray-600">جنيه</span></p><a href="signup.html" class="bg-blue-600 text-white px-4 py-2 rounded-full">اشترك</a></div>
-        <div class="glass p-8 rounded-2xl text-center"><h4 class="font-bold text-xl mb-2">عام</h4><p class="text-2xl font-bold text-blue-600 mb-4">4800 <span class="text-sm text-gray-600">جنيه</span></p><a href="signup.html" class="bg-blue-600 text-white px-4 py-2 rounded-full">اشترك</a></div>
-        <div class="glass p-8 rounded-2xl text-center"><h4 class="font-bold text-xl mb-2">مدى الحياة</h4><p class="text-2xl font-bold text-blue-600 mb-4">34500 <span class="text-sm text-gray-600">جنيه</span></p><a href="signup.html" class="bg-blue-600 text-white px-4 py-2 rounded-full">اشترك</a></div>
+      <div class="glass p-6 rounded-2xl shadow-md hover:shadow-xl transition border-2 border-blue-600">
+        <h3 class="text-xl font-bold text-gray-800 mb-4">📆 شهري</h3>
+        <p class="text-3xl font-extrabold text-blue-600 mb-2">300ج</p>
+        <p class="text-gray-600 mb-4">لكل شهر</p>
+        <ul class="text-sm text-gray-700 text-right mb-6 space-y-2">
+          <li>✅ جميع الخصائص</li>
+          <li>✅ تحديثات مستمرة</li>
+          <li>✅ دعم فني أساسي</li>
+        </ul>
+        <button class="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 w-full">اختر الشهري</button>
+      </div>
+
+      <div class="glass p-6 rounded-2xl shadow-md hover:shadow-xl transition">
+        <h3 class="text-xl font-bold text-gray-800 mb-4">📊 نصف سنوي</h3>
+        <p class="text-3xl font-extrabold text-blue-600 mb-2">1500ج</p>
+        <p class="text-gray-600 mb-4">كل 6 شهور</p>
+        <ul class="text-sm text-gray-700 text-right mb-6 space-y-2">
+          <li>✅ كل المميزات</li>
+          <li>✅ خصم 15%</li>
+          <li>✅ نسخة احتياطية أسبوعية</li>
+        </ul>
+        <button class="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 w-full">وفّر الآن</button>
+      </div>
+
+      <div class="glass p-6 rounded-2xl shadow-md hover:shadow-xl transition">
+        <h3 class="text-xl font-bold text-gray-800 mb-4">♾️ دائم</h3>
+        <p class="text-3xl font-extrabold text-blue-600 mb-2">6000ج</p>
+        <p class="text-gray-600 mb-4">مدى الحياة</p>
+        <ul class="text-sm text-gray-700 text-right mb-6 space-y-2">
+          <li>✅ تحديثات مجانية مدى الحياة</li>
+          <li>✅ دعم فني مميز</li>
+          <li>✅ نسخة احتياطية يومية</li>
+        </ul>
+        <button class="bg-green-600 text-white px-4 py-2 rounded-full hover:bg-green-700 w-full">اشترِ لمرة واحدة</button>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
 
   <section id="help" class="py-20 container mx-auto px-6">
@@ -463,6 +510,7 @@ supabase.auth.onAuthStateChange((event, session) => {
   </script>
 </body>
 </html>
+
 
 
 
