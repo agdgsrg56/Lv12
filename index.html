@@ -657,189 +657,215 @@
     </p>
   </div>
 </section>
-<section id="fake-reviews" class="py-16 container mx-auto px-6">
-  <h2 class="text-3xl font-extrabold text-center mb-6 text-blue-700">⭐ آراء العملاء</h2>
 
-  <!-- نموذج إضافة تعليق -->
-  <section id="real-review-form" class="py-8 max-w-3xl mx-auto px-6">
-    <div class="glass p-6 rounded-2xl shadow-md">
-      <h3 class="text-xl font-bold mb-4">أضف تقييمك</h3>
-      <form id="reviewForm" class="space-y-4">
-        <div>
-          <label class="text-sm font-medium">اسمك</label>
-          <input id="rv-name" type="text" required class="w-full mt-1 p-3 border rounded-md" placeholder="مثال: أحمد علي" />
-        </div>
-        <div>
-          <label class="text-sm font-medium">تقييم (1-5)</label>
-          <select id="rv-rating" required class="w-full mt-1 p-3 border rounded-md">
-            <option value="">اختر</option>
-            <option value="5">5 - ممتاز</option>
-            <option value="4">4 - جيد جداً</option>
-            <option value="3">3 - جيد</option>
-            <option value="2">2 - مقبول</option>
-            <option value="1">1 - ضعيف</option>
-          </select>
-        </div>
-        <div>
-          <label class="text-sm font-medium">تعليقك</label>
-          <textarea id="rv-text" rows="3" required class="w-full mt-1 p-3 border rounded-md" placeholder="شارك تجربتك..."></textarea>
-        </div>
-        <div class="flex items-center gap-3">
-          <button type="submit" id="rv-submit" class="bg-blue-600 text-white px-4 py-2 rounded-full">أرسل التقييم</button>
-          <div id="rv-message" class="text-sm text-gray-600"></div>
-        </div>
-      </form>
-    </div>
-  </section>
 
-  <!-- مكان عرض التعليقات -->
-  <div id="reviews-list" class="space-y-4 max-w-3xl mx-auto mt-6"></div>
+
+
+
+
+
+<section id="real-review-form" class="py-8 max-w-3xl mx-auto px-6">
+  <div class="glass p-6 rounded-2xl shadow-md">
+    <h3 class="text-xl font-bold mb-4">أضف تقييمك</h3>
+    <form id="reviewForm" class="space-y-4">
+      <div>
+        <label class="text-sm font-medium">اسمك</label>
+        <input id="rv-name" type="text" required class="w-full mt-1 p-3 border rounded-md" placeholder="مثال: أحمد علي" />
+      </div>
+      <div>
+        <label class="text-sm font-medium">تقييم (1-5)</label>
+        <select id="rv-rating" required class="w-full mt-1 p-3 border rounded-md">
+          <option value="">اختر</option>
+          <option value="5">5 - ممتاز</option>
+          <option value="4">4 - جيد جداً</option>
+          <option value="3">3 - جيد</option>
+          <option value="2">2 - مقبول</option>
+          <option value="1">1 - ضعيف</option>
+        </select>
+      </div>
+      <div>
+        <label class="text-sm font-medium">تعليقك</label>
+        <textarea id="rv-text" rows="3" required class="w-full mt-1 p-3 border rounded-md" placeholder="شارك تجربتك..."></textarea>
+      </div>
+      <div class="flex items-center gap-3">
+        <button type="submit" id="rv-submit" class="bg-blue-600 text-white px-4 py-2 rounded-full">أرسل التقييم</button>
+        <div id="rv-message" class="text-sm text-gray-600"></div>
+      </div>
+    </form>
+  </div>
 </section>
 
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<!-- مكان التعليقات -->
+<section id="reviews-section" class="py-8 max-w-3xl mx-auto px-6">
+  <h3 class="text-xl font-bold mb-4">آراء العملاء</h3>
+  <div id="reviews-list" class="space-y-4"></div>
+  <div class="text-center mt-6">
+    <button id="load-more" class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-full">
+      تحميل المزيد
+    </button>
+  </div>
+</section>
+
 <script>
-/* 🔑 بيانات Supabase */
-const SUPABASE_URL = "https://nszhzfysitppxssplqfb.supabase.co"; 
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemh6ZnlzaXRwcHhzc3BscWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMzA4OTcsImV4cCI6MjA3MzgwNjg5N30.5KvK4bhqkZ_GpIfED4qecIMfeubAJYwSFJslULwOp-w";
-
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-/* ⚡ إعداد التعليقات الوهمية */
-const START_DATE = new Date(Date.UTC(2025, 0, 1, 0, 0, 0));
-const MINUTES_PER_REVIEW = 3; 
-const MAX_REVIEWS_SHOWN = 30;  
-
-const NAMES = ["أحمد علي","سارة محمود","محمود جمال","ليلى سمير","هشام عمر","نورا حسين","مروان خالد","منى إبراهيم","خالد حسن","ريم عبد الله"];
-const TEMPLATES = [
-  "خدمة ممتازة وسهلة الاستخدام.",
-  "التطبيق عملي ومفيد جداً.",
-  "النظام ساعدنا نوفر وقت ومجهود.",
-  "واجهة بسيطة وسهلة.",
-  "تجربة ممتازة بشكل عام."
-];
-
-function deterministicBetween(seed, min, max) {
-  const x = Math.abs(Math.sin(seed * 9301 + 49297));
-  return Math.floor(min + (x - Math.floor(x)) * (max - min + 1));
-}
-
-function generateReviewForIndex(index) {
-  const name = NAMES[ deterministicBetween(index, 0, NAMES.length - 1) ];
-  const template = TEMPLATES[ deterministicBetween(index + 7, 0, TEMPLATES.length - 1) ];
-  const rating = deterministicBetween(index + 13, 3, 5);
-  const ts = new Date( START_DATE.getTime() + (index * MINUTES_PER_REVIEW * 60 * 1000) );
-  return { id: 'fake-' + index, name, text: template, rating, date: ts, source: 'fake' };
-}
-
-function computeReviewsNow() {
-  const now = new Date();
-  const minutesPassed = Math.floor((now - START_DATE) / 60000);
-  const reviewCount = Math.floor(minutesPassed / MINUTES_PER_REVIEW);
-  return Array.from({length: reviewCount}, (_,i)=>generateReviewForIndex(i+1)).reverse().slice(0, MAX_REVIEWS_SHOWN);
-}
-
-/* ⏳ أدوات مساعدة */
-function timeAgoShort(date) {
-  const sec = Math.floor((Date.now() - date.getTime()) / 1000);
-  if (sec < 60) return `${sec} ثانية مضت`;
-  const min = Math.floor(sec / 60);
-  if (min < 60) return `${min} دقيقة مضت`;
-  const hr = Math.floor(min / 60);
-  if (hr < 24) return `${hr} ساعة مضت`;
-  const d = Math.floor(hr / 24);
-  return `${d} يوم${d>1?'ـات':''} مضت`;
-}
-function renderStars(n) {
-  return Array.from({length:5},(_,i)=>`<span style="color:${i<n?'#f59e0b':'#e5e7eb'}">★</span>`).join('');
-}
-function escapeHtml(text){return text.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');}
-
-/* 🗄️ جلب التعليقات من Supabase */
-async function fetchRealReviews() {
-  try {
-    const { data, error } = await supabase
-      .from('reviews')
-      .select('id, user_name, comment, rating, created_at')
-      .eq('moderated', true)
-      .order('created_at', { ascending: false })
-      .limit(20);
-    if (error) {
-      console.error("⚠️ fetch error", error);
-      return [];
-    }
-    return data.map(r => ({
-      id: 'real-' + r.id,
-      name: r.user_name,
-      text: r.comment,
-      rating: r.rating,
-      date: new Date(r.created_at),
-      source: 'real'
-    }));
-  } catch(e) {
-    console.error(e);
-    return [];
-  }
-}
-
-/* 🖼️ عرض التعليقات */
-const reviewsEl = document.getElementById('reviews-list');
-
-async function renderMergedReviews() {
-  const real = await fetchRealReviews();
-  const fake = computeReviewsNow();
-  const merged = [...real, ...fake].sort((a,b)=>b.date-a.date);
-
-  if (!merged.length) {
-    reviewsEl.innerHTML = `<div class="p-6 text-center text-gray-600">لا توجد تقييمات حتى الآن — كن أول من يقيّم!</div>`;
+(async function(){
+  if (typeof supabase === 'undefined') {
+    console.warn("❌ supabase client غير معرف، لازم تعمل init فوق هذا الكود");
     return;
   }
 
-  reviewsEl.innerHTML = merged.map(r=>`
-    <div class="glass p-4 rounded-2xl shadow-sm">
-      <div class="flex justify-between">
-        <div>
-          <div class="font-semibold">${r.name} ${r.source==='real' ? '<span class="text-xs text-green-600">(مستخدم)</span>' : ''}</div>
-          <div class="text-xs text-gray-500">${timeAgoShort(r.date)}</div>
-        </div>
-        <div>${renderStars(r.rating)}</div>
-      </div>
-      <p class="mt-2 text-gray-700 text-sm">${escapeHtml(r.text)}</p>
-    </div>
-  `).join('');
-}
-
-/* 📝 معالجة النموذج */
-(function attachFormHandler(){
+  const reviewsEl = document.getElementById('reviews-list');
   const form = document.getElementById('reviewForm');
-  if (!form) return;
   const nameInput = document.getElementById('rv-name');
   const ratingInput = document.getElementById('rv-rating');
   const textInput = document.getElementById('rv-text');
   const submitBtn = document.getElementById('rv-submit');
   const msgEl = document.getElementById('rv-message');
-  form.addEventListener('submit', async e=>{
-    e.preventDefault();
-    msgEl.textContent='';
-    const user_name=nameInput.value.trim();
-    const comment=textInput.value.trim();
-    const rating=parseInt(ratingInput.value,10);
-    if(!user_name||!comment||!rating){msgEl.textContent='املأ كل الحقول';return;}
-    submitBtn.disabled=true;submitBtn.textContent='جاري الإرسال...';
-    try{
-      const {error}=await supabase.from('reviews').insert([{user_name,comment,rating,moderated:true}]);
-      if(error){msgEl.textContent='خطأ في الإرسال';console.error(error);}
-      else{msgEl.textContent='✅ تم الإرسال';nameInput.value='';textInput.value='';ratingInput.value='';await renderMergedReviews();}
-    }catch(err){console.error(err);msgEl.textContent='مشكلة في الاتصال';}
-    finally{submitBtn.disabled=false;submitBtn.textContent='أرسل التقييم';}
-  });
-})();
+  const loadMoreBtn = document.getElementById('load-more');
 
-/* 🚀 تشغيل */
-renderMergedReviews();
-setInterval(renderMergedReviews, 30000);
+  let reviewsLimit = 20;
+
+  async function fetchRealReviews(limit = 100) {
+    try {
+      const { data, error } = await supabase
+        .from('reviews')
+        .select('id, user_name, comment, rating, created_at')
+        .order('created_at', { ascending: false })
+        .limit(limit);
+
+      if (error) {
+        console.error('fetch reviews error', error);
+        return [];
+      }
+
+      return data.map(r => ({
+        id: 'real-' + r.id,
+        name: r.user_name,
+        text: r.comment,
+        rating: r.rating,
+        date: new Date(r.created_at),
+        source: 'real'
+      }));
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
+  }
+
+  function getFakeReviewsFromPage() {
+    if (typeof computeReviewsNow === 'function') {
+      return computeReviewsNow().map(r => ({ ...r, source: 'fake' }));
+    }
+    return [];
+  }
+
+  async function renderMergedReviews() {
+    const real = await fetchRealReviews(200);
+    const fake = getFakeReviewsFromPage();
+    const merged = [...real, ...fake].sort((a, b) => b.date - a.date).slice(0, reviewsLimit);
+
+    if (!merged.length) {
+      reviewsEl.innerHTML = `<div class="glass p-6 rounded-2xl text-center text-gray-600">لا توجد تقييمات حتى الآن — كن أول من يقيّم!</div>`;
+      return;
+    }
+
+    reviewsEl.innerHTML = merged.map(r => `
+      <div class="glass p-4 rounded-2xl shadow-sm">
+        <div class="flex justify-between">
+          <div>
+            <div class="font-semibold text-gray-800">${r.name} ${r.source === 'real' ? '<span class="text-xs text-green-600">(مستخدم)</span>' : ''}</div>
+            <div class="text-xs text-gray-500">${timeAgoShort(r.date)}</div>
+          </div>
+          <div>${renderStars(r.rating)}</div>
+        </div>
+        <p class="mt-2 text-gray-700 text-sm">${escapeHtml(r.text)}</p>
+      </div>
+    `).join('');
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    msgEl.textContent = '';
+    const user_name = nameInput.value.trim();
+    const comment = textInput.value.trim();
+    const rating = parseInt(ratingInput.value, 10);
+
+    if (!user_name || !comment || !rating) {
+      msgEl.textContent = '⚠️ املأ كل الحقول';
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'جاري الإرسال...';
+
+    try {
+      const { data, error } = await supabase
+        .from('reviews')
+        .insert([{ user_name, comment, rating, moderated: true }])
+        .select();
+
+      if (error) {
+        console.error('❌ Supabase error:', error);
+        msgEl.textContent = 'حصل خطأ أثناء الإرسال';
+      } else {
+        console.log('✅ تمت الإضافة:', data);
+        msgEl.textContent = 'تم إرسال تقييمك بنجاح 🎉';
+        nameInput.value = '';
+        textInput.value = '';
+        ratingInput.value = '';
+        await renderMergedReviews();
+      }
+    } catch (err) {
+      console.error('⚠️ مشكلة اتصال:', err);
+      msgEl.textContent = 'مشكلة في الاتصال';
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'أرسل التقييم';
+    }
+  });
+
+  loadMoreBtn.addEventListener('click', async () => {
+    reviewsLimit += 20;
+    await renderMergedReviews();
+  });
+
+  function timeAgoShort(date) {
+    const sec = Math.floor((Date.now() - date.getTime()) / 1000);
+    if (sec < 60) return `${sec} ثانية مضت`;
+    const min = Math.floor(sec / 60);
+    if (min < 60) return `${min} دقيقة مضت`;
+    const hr = Math.floor(min / 60);
+    if (hr < 24) return `${hr} ساعة مضت`;
+    const d = Math.floor(hr / 24);
+    return `${d} يوم${d > 1 ? 'ـات' : ''} مضت`;
+  }
+
+  function renderStars(n) {
+    let out = '';
+    for (let i = 1; i <= 5; i++) {
+      out += `<span class="inline-block w-4 h-4 align-middle" style="color:${i <= n ? '#f59e0b' : '#e5e7eb'}">★</span>`;
+    }
+    return out;
+  }
+
+  function escapeHtml(text){
+    return text.replaceAll('&','&amp;')
+               .replaceAll('<','&lt;')
+               .replaceAll('>','&gt;')
+               .replaceAll('"','&quot;')
+               .replaceAll("'", '&#039;');
+  }
+
+  await renderMergedReviews();
+  setInterval(renderMergedReviews, 30 * 1000);
+
+})();
 </script>
 
 
+
+
+ 
 
  <div class="container mx-auto px-6">
     <div class="ad-box">
@@ -961,61 +987,3 @@ supabase.auth.onAuthStateChange((event, session) => {
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
