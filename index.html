@@ -98,7 +98,7 @@
 
       <div class="hidden sm:block text-center">
         <span class="text-sm font-medium text-gray-600">عدد التنزيلات</span>
-        <div class="text-xl font-extrabold text-blue-600" id="downloads">10000</div>
+        <div class="text-xl font-extrabold text-blue-600" id="downloads">35000</div>
       </div>
 
       <a id="create-account-btn" href="signup.html" 
@@ -150,17 +150,39 @@
 
   <script>
     const downloadsEl = document.getElementById("downloads");
-    const startCount = 1200; 
-    const increasePerHour = 5;
+  const START_COUNT = 32000;
+  const STORAGE_KEY = "lv12_downloads_count";
 
-    function updateDownloads() {
-      const now = new Date();
-      const hoursSinceStart = Math.floor((now - new Date("2025-01-01")) / (1000 * 60 * 60));
-      const downloads = startCount + (hoursSinceStart * increasePerHour);
-      downloadsEl.textContent = downloads.toLocaleString("ar-EG");
-    }
+  function getSavedCount() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved !== null) return parseInt(saved, 10);
+    localStorage.setItem(STORAGE_KEY, String(START_COUNT));
+    return START_COUNT;
+  }
 
+   localStorage
+  function saveCount(n) {
+    localStorage.setItem(STORAGE_KEY, String(n));
+  }
+
+  function randomIncrement() {
+    return Math.random() < 0.5 ? 3 : 5;
+  }
+
+  function renderCount(n) {
+    downloadsEl.textContent = n.toLocaleString("ar-EG");
+  }
     updateDownloads();
+     function increaseOnce() {
+    let current = getSavedCount();
+    const inc = randomIncrement();
+    current += inc;
+    saveCount(current);
+    renderCount(current);
+  }
+  renderCount( getSavedCount() );
+ setInterval(increaseOnce, 60 * 1000);
+
     setInterval(updateDownloads, 60 * 60 * 1000); 
   </script>
 </header>
@@ -722,6 +744,7 @@ supabase.auth.onAuthStateChange((event, session) => {
   </script>
 </body>
 </html>
+
 
 
 
