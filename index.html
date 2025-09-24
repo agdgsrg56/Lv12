@@ -833,9 +833,174 @@ supabase.auth.onAuthStateChange((event, session) => {
       s0.parentNode.insertBefore(s1,s0);
     })();
   </script>
+<script>
+const SUPABASE_URL = "https://nszhzfysitppxssplqfb.supabase.co"; 
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemh6ZnlzaXRwcHhzc3BscWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMzA4OTcsImV4cCI6MjA3MzgwNjg5N30.5KvK4bhqkZ_GpIfED4qecIMfeubAJYwSFJslULwOp-w";
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+(async function(){
+  const reviewsEl = document.getElementById('reviews-list');
+  const form = document.getElementById('reviewForm');
+  const nameInput = document.getElementById('rv-name');
+  const ratingInput = document.getElementById('rv-rating');
+  const textInput = document.getElementById('rv-text');
+  const submitBtn = document.getElementById('rv-submit');
+  const msgEl = document.getElementById('rv-message');
+  const loadMoreBtn = document.getElementById('load-more');
+
+  let reviewsLimit = 20;
+
+  async function fetchRealReviews(limit = 100) {
+    try {
+      const { data, error } = await supabase
+        .from('reviews')
+        .select('id, user_name, comment, rating, created_at')
+        .eq('moderated', true) // جلب المؤكدة فقط
+        .order('created_at', { ascending: false })
+        .limit(limit);
+
+      if (error) {
+        console.error('❌ خطأ جلب البيانات:', error);
+        return [];
+      }
+
+      return data.map(r => ({
+        id: 'real-' + r.id,
+        name: r.user_name,
+        text: r.comment,
+        rating: r.rating,
+        date: new Date(r.created_at),
+        source: 'real'
+      }));
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
+  }
+
+  function getFakeReviewsFromPage() {
+    if (typeof computeReviewsNow === 'function') {
+      return computeReviewsNow().map(r => ({ ...r, source: 'fake' }));
+    }
+    return [];
+  }
+
+  async function renderMergedReviews() {
+    reviewsEl.innerHTML = `<div class="text-center text-gray-500">⏳ جاري تحميل التعليقات...</div>`;
+
+    const real = await fetchRealReviews(200);
+    const fake = getFakeReviewsFromPage();
+    const merged = [...real, ...fake]
+      .sort((a, b) => b.date - a.date)
+      .slice(0, reviewsLimit);
+
+    if (!merged.length) {
+      reviewsEl.innerHTML = `<div class="glass p-6 rounded-2xl text-center text-gray-600">
+        لا توجد تقييمات حتى الآن — كن أول من يقيّم!
+      </div>`;
+      return;
+    }
+
+    reviewsEl.innerHTML = merged.map(r => `
+      <div class="glass p-4 rounded-2xl shadow-sm">
+        <div class="flex justify-between items-center">
+          <div>
+            <div class="font-semibold text-gray-800">
+              ${r.name} ${r.source === 'real' ? '<span class="text-xs text-green-600">(مستخدم)</span>' : ''}
+            </div>
+            <div class="text-xs text-gray-500">${timeAgoShort(r.date)}</div>
+          </div>
+          <div>${renderStars(r.rating)}</div>
+        </div>
+        <p class="mt-2 text-gray-700 text-sm">${escapeHtml(r.text)}</p>
+      </div>
+    `).join('');
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    msgEl.textContent = '';
+
+    const user_name = nameInput.value.trim();
+    const comment = textInput.value.trim();
+    const rating = parseInt(ratingInput.value, 10);
+
+    if (!user_name || !comment || !rating) {
+      msgEl.textContent = '⚠️ املأ كل الحقول';
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'جاري الإرسال...';
+
+    try {
+      const { data, error } = await supabase
+        .from('reviews')
+        .insert([{ user_name, comment, rating, moderated: true }]) // مباشر
+        .select();
+
+      if (error) {
+        console.error('❌ Supabase error:', error);
+        msgEl.textContent = 'حصل خطأ أثناء الإرسال';
+      } else {
+        msgEl.textContent = '✅ تم إرسال تقييمك بنجاح';
+        nameInput.value = '';
+        textInput.value = '';
+        ratingInput.value = '';
+        await renderMergedReviews();
+      }
+    } catch (err) {
+      console.error('⚠️ مشكلة اتصال:', err);
+      msgEl.textContent = 'مشكلة في الاتصال';
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'أرسل التقييم';
+    }
+  });
+
+  loadMoreBtn.addEventListener('click', async () => {
+    reviewsLimit += 20;
+    await renderMergedReviews();
+  });
+
+  function timeAgoShort(date) {
+    const sec = Math.floor((Date.now() - date.getTime()) / 1000);
+    if (sec < 60) return `${sec} ثانية مضت`;
+    const min = Math.floor(sec / 60);
+    if (min < 60) return `${min} دقيقة مضت`;
+    const hr = Math.floor(min / 60);
+    if (hr < 24) return `${hr} ساعة مضت`;
+    const d = Math.floor(hr / 24);
+    return `${d} يوم${d > 1 ? 'ـات' : ''} مضت`;
+  }
+
+  function renderStars(n) {
+    let out = '';
+    for (let i = 1; i <= 5; i++) {
+      out += `<span class="inline-block w-4 h-4 align-middle" 
+        style="color:${i <= n ? '#f59e0b' : '#e5e7eb'}">★</span>`;
+    }
+    return out;
+  }
+
+  function escapeHtml(text){
+    return text.replaceAll('&','&amp;')
+               .replaceAll('<','&lt;')
+               .replaceAll('>','&gt;')
+               .replaceAll('"','&quot;')
+               .replaceAll("'", '&#039;');
+  }
+
+  await renderMergedReviews();
+  setInterval(renderMergedReviews, 30 * 1000);
+
+})();
+</script>
 
 </body>
 </html>
+
 
 
 
