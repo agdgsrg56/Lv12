@@ -705,7 +705,6 @@
   </div>
 </section>
 
-<!-- تحميل مكتبة Supabase -->
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
 <script>
@@ -726,7 +725,6 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   let reviewsLimit = 20;
 
-  // 🔹 جلب التعليقات الحقيقية من قاعدة البيانات
   async function fetchRealReviews(limit = 100) {
     try {
       const { data, error } = await supabase
@@ -755,7 +753,6 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     }
   }
 
-  // 🔹 التعليقات الوهمية (لو عندك computeReviewsNow() معرف)
   function getFakeReviewsFromPage() {
     if (typeof computeReviewsNow === 'function') {
       return computeReviewsNow().map(r => ({ ...r, source: 'fake' }));
@@ -763,7 +760,6 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     return [];
   }
 
-  // 🔹 عرض التعليقات المدموجة
   async function renderMergedReviews() {
     reviewsEl.innerHTML = `<div class="text-center text-gray-500">⏳ جاري تحميل التعليقات...</div>`;
 
@@ -796,7 +792,6 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     `).join('');
   }
 
-  // 🔹 معالجة فورم الإرسال
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     msgEl.textContent = '';
@@ -838,13 +833,11 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     }
   });
 
-  // 🔹 تحميل المزيد
   loadMoreBtn.addEventListener('click', async () => {
     reviewsLimit += 20;
     await renderMergedReviews();
   });
 
-  // 🔹 دوال مساعدة
   function timeAgoShort(date) {
     const sec = Math.floor((Date.now() - date.getTime()) / 1000);
     if (sec < 60) return `${sec} ثانية مضت`;
@@ -873,7 +866,6 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                .replaceAll("'", '&#039;');
   }
 
-  // أول تحميل
   await renderMergedReviews();
   setInterval(renderMergedReviews, 30 * 1000);
 
@@ -895,7 +887,57 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
     </div>
   </div>
+async function checkAuth() {
+  const { data: { session } } = await supabase.auth.getSession();
+  
+  if (session && session.user) {
+    const user = session.user;
+    document.getElementById("rv-name").value = user.email; // أو user.user_metadata.full_name لو مسجل
+    document.getElementById("rv-name").dataset.uid = user.id; 
+  } else {
+    document.getElementById("rv-message").textContent = "⚠️ لازم تسجل الدخول قبل إضافة تقييم.";
+    document.getElementById("rv-submit").disabled = true;
+  }
+}
+checkAuth();
 
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const user = (await supabase.auth.getUser()).data.user;
+  if (!user) {
+    msgEl.textContent = "⚠️ لازم تسجل الدخول عشان تضيف تقييم.";
+    return;
+  }
+
+  const user_name = user.user_metadata.full_name || user.email;
+  const rating = parseInt(ratingInput.value, 10);
+  const comment = textInput.value.trim();
+
+  if (!comment || !rating) {
+    msgEl.textContent = "⚠️ املأ كل الحقول.";
+    return;
+  }
+
+  const { error } = await supabase
+    .from("reviews")
+    .insert([{ user_id: user.id, user_name, comment, rating, moderated: true }]);
+
+  if (error) {
+    console.error(error);
+    msgEl.textContent = "❌ حصل خطأ أثناء الإرسال.";
+  } else {
+    msgEl.textContent = "✅ تم إرسال تقييمك.";
+    textInput.value = "";
+    ratingInput.value = "";
+    await renderMergedReviews();
+  }
+});
+
+
+
+
+ 
   <footer class="bg-gray-900 text-white text-center py-6 text-sm">
     <p>© 2025 LV12 - جميع الحقوق محفوظة</p>
     <div class="flex flex-col items-center mt-4 space-y-2 text-sm">
@@ -1004,4 +1046,5 @@ supabase.auth.onAuthStateChange((event, session) => {
   </script>
 </body>
 </html>
+
 
