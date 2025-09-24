@@ -58,18 +58,47 @@
       🚀 LV12 <span class="text-gray-800">WarerWeb</span>
     </h1>
 
-    <nav class="hidden md:flex gap-8 text-base font-semibold text-gray-700">
-      <a href="#features" class="nav-link">المميزات</a>
-      <a href="#pricing" class="nav-link">خطط الأسعار</a>
-      <a href="#help" class="nav-link">المساعدة</a>
-      <a href="#contact" class="nav-link">تواصل معنا</a>
-    </nav>
+<nav class="hidden md:flex gap-8 text-base font-semibold text-gray-700">
+  <a href="#features" class="nav-link">المميزات</a>
+  <a href="#pricing" class="nav-link">خطط الأسعار</a>
+  <a href="#about" class="nav-link">من نحن</a>
+  <a href="#help" class="nav-link">المساعدة</a>
+  <a href="#contact" class="nav-link">تواصل معنا</a>
+</nav>
+
+<style>
+  .nav-link {
+    position: relative;
+    padding: 6px 12px;
+    transition: all 0.3s ease;
+  }
+
+  .nav-link:hover {
+    color: #2563eb; 
+  }
+
+  .nav-link::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0%;
+    height: 2px;
+    background: #2563eb;
+    transition: width 0.3s ease;
+  }
+
+  .nav-link:hover::after {
+    width: 100%;
+  }
+</style>
+
 
     <div class="flex items-center gap-6">
 
       <div class="hidden sm:block text-center">
         <span class="text-sm font-medium text-gray-600">عدد التنزيلات</span>
-        <div class="text-xl font-extrabold text-blue-600" id="downloads">0</div>
+        <div class="text-xl font-extrabold text-blue-600" id="downloads">10000</div>
       </div>
 
       <a id="create-account-btn" href="signup.html" 
@@ -158,15 +187,6 @@
         🎥 شاهد الفيديو
       </a>
     </div>
-  </div>
-</section>
-<section id="vision" class="py-16 bg-gradient-to-r from-blue-50 to-indigo-50 text-center">
-  <div class="container mx-auto px-6">
-    <h2 class="text-3xl font-bold text-blue-700 mb-6">🌍 رؤيتنا ورسالتنا</h2>
-    <p class="text-gray-700 max-w-3xl mx-auto">
-      رؤيتنا هي تقديم نظام ERP بسيط وذكي يخدم الشركات الصغيرة والمتوسطة، 
-      مع التركيز على سهولة الاستخدام، تقارير دقيقة، ودعم فني مستمر.
-    </p>
   </div>
 </section>
 
@@ -529,41 +549,58 @@
 
 <section id="about" class="py-20 container mx-auto px-6">
   <h2 class="text-4xl font-extrabold mb-12 text-blue-700 text-center">👥 من نحن</h2>
-  <p class="text-gray-700 text-center max-w-3xl mx-auto mb-12">
-    نحن فريق مكوّن من روّاد أعمال ومبرمجين هدفنا تطوير نظام إدارة متكامل للشركات والأعمال.
+  <p class="text-gray-700 text-center max-w-3xl mx-auto mb-12 leading-relaxed">
+    يضم فريقنا مجموعة من الخبراء في ريادة الأعمال وتطوير البرمجيات، اجتمعوا من أجل تقديم نظام إدارة مبتكر 
+    يخدم مختلف الشركات والأعمال بكفاءة واحترافية.
   </p>
+
   <div class="grid md:grid-cols-3 gap-8">
     
-    <div class="glass p-6 rounded-2xl shadow-md text-center">
-   <img src="ضاري حاين الغازي.png" alt="ضاري حاين الغازي" class="w-32 h-32 mx-auto rounded-full mb-4 shadow-md">
-      <h3 class="text-xl font-bold text-gray-800">ضاري حاين الغازي</h3>
-      <p class="text-sm text-gray-600">📍 الأردن – 29 سنة</p>
-      <p class="text-gray-700 mt-3 text-sm">
-        صاحب الشركة، مستثمر في عدة شركات منها <strong>W Gen</strong> المتخصصة في الأبحاث العلمية.
+    <div class="glass p-6 rounded-2xl shadow-md text-center hover:shadow-lg transition">
+      <img src="images/dhari.jpg" alt="ضاري حاين الغازي" class="w-32 h-32 mx-auto rounded-full mb-4 shadow-md object-cover">
+      <h3 class="text-2xl font-bold text-gray-800 mb-2">ضاري حاين الغازي</h3>
+      <p class="text-sm text-gray-600 mb-3">📍 الأردن – 29 عاماً</p>
+      <p class="text-gray-700 text-sm leading-relaxed">
+        رجل أعمال وصاحب الشركة، يمتلك عدداً من الاستثمارات المتنوعة في قطاعات مختلفة. 
+        من أبرز شركاته <strong>W Gen</strong> المتخصصة في الأبحاث العلمية، ويعد الداعم الرئيسي 
+        لمشروع <strong>LV12 WarerWeb</strong>.
       </p>
     </div>
 
-    <div class="glass p-6 rounded-2xl shadow-md text-center">
-      <img src="images/kamal.jpg" alt="كمال مطر" class="w-28 h-28 rounded-full mx-auto mb-4 object-cover">
-      <h3 class="text-xl font-bold text-gray-800">كمال مطر</h3>
-      <p class="text-sm text-gray-600">📍 صاحب شركة توزيع فلاتر</p>
-      <p class="text-gray-700 mt-3 text-sm">
-        صاحب فكرة مشروع النظام الإداري وإدارة الفلاتر والأجهزة.
+    <div class="glass p-6 rounded-2xl shadow-md text-center hover:shadow-lg transition">
+      <img src="images/kamal.jpg" alt="كمال مطر" class="w-32 h-32 mx-auto rounded-full mb-4 shadow-md object-cover">
+      <h3 class="text-2xl font-bold text-gray-800 mb-2">كمال مطر</h3>
+      <p class="text-sm text-gray-600 mb-3">📍 مصر</p>
+      <p class="text-gray-700 text-sm leading-relaxed">
+        صاحب شركة رائدة في مجال توزيع الفلاتر والأجهزة، وصاحب فكرة المشروع 
+        الذي تم تطويره ليصبح نظام إدارة متكامل يخدم الشركات والعملاء بكفاءة عالية.
       </p>
     </div>
 
-    <div class="glass p-6 rounded-2xl shadow-md text-center">
-      <img src="images/lv12.jpg" alt="LV12" class="w-28 h-28 rounded-full mx-auto mb-4 object-cover">
-      <h3 class="text-xl font-bold text-gray-800">LV12</h3>
-      <p class="text-sm text-gray-600">📍 مصر – 31 سنة</p>
-      <p class="text-gray-700 mt-3 text-sm">
-        المبرمج والمنفذ الرئيسي للبرنامج، مطور أدوات حماية وصاحب منصة 
-        <strong>lv12than.onion</strong>.
+    <div class="glass p-6 rounded-2xl shadow-md text-center hover:shadow-lg transition">
+      <img src="images/lv12.jpg" alt="LV12" class="w-32 h-32 mx-auto rounded-full mb-4 shadow-md object-cover">
+      <h3 class="text-2xl font-bold text-gray-800 mb-2">LV12</h3>
+      <p class="text-sm text-gray-600 mb-3">📍 مصر – 31 عاماً</p>
+      <p class="text-gray-700 text-sm leading-relaxed">
+        المبرمج والمنفذ الرئيسي للبرنامج، شارك في تطوير العديد من أدوات الحماية 
+        والتقنيات الأمنية. يمتلك منصة <strong>lv12than.onion</strong>، ويتمتع بخبرة واسعة 
+        في بناء الأنظمة الإدارية وحلول التقنية.
       </p>
     </div>
+
   </div>
 </section>
 
+
+<section id="vision" class="py-16 bg-gradient-to-r from-blue-50 to-indigo-50 text-center">
+  <div class="container mx-auto px-6">
+    <h2 class="text-3xl font-bold text-blue-700 mb-6">🌍 رؤيتنا ورسالتنا</h2>
+    <p class="text-gray-700 max-w-3xl mx-auto">
+      رؤيتنا هي تقديم نظام ERP بسيط وذكي يخدم الشركات الصغيرة والمتوسطة، 
+      مع التركيز على سهولة الاستخدام، تقارير دقيقة، ودعم فني مستمر.
+    </p>
+  </div>
+</section>
 
  <div class="container mx-auto px-6">
     <div class="ad-box">
@@ -685,6 +722,7 @@ supabase.auth.onAuthStateChange((event, session) => {
   </script>
 </body>
 </html>
+
 
 
 
