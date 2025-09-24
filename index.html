@@ -660,6 +660,7 @@
 <section id="fake-reviews" class="py-16 container mx-auto px-6">
   <h2 class="text-3xl font-extrabold text-center mb-6 text-blue-700">⭐ آراء العملاء</h2>
 
+  <!-- نموذج إضافة تعليق -->
   <section id="real-review-form" class="py-8 max-w-3xl mx-auto px-6">
     <div class="glass p-6 rounded-2xl shadow-md">
       <h3 class="text-xl font-bold mb-4">أضف تقييمك</h3>
@@ -691,74 +692,35 @@
     </div>
   </section>
 
+  <!-- مكان عرض التعليقات -->
   <div id="reviews-list" class="space-y-4 max-w-3xl mx-auto mt-6"></div>
 </section>
 
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script>
+/* 🔑 بيانات Supabase */
 const SUPABASE_URL = "https://nszhzfysitppxssplqfb.supabase.co"; 
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemh6ZnlzaXRwcHhzc3BscWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMzA4OTcsImV4cCI6MjA3MzgwNjg5N30.5KvK4bhqkZ_GpIfED4qecIMfeubAJYwSFJslULwOp-w";
 
-const supabase = window.supabase?.createClient
-  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-  : supabaseJs?.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const START_DATE = new Date(Date.UTC(2025, 0, 1, 0, 0, 0)); 
+/* ⚡ إعداد التعليقات الوهمية */
+const START_DATE = new Date(Date.UTC(2025, 0, 1, 0, 0, 0));
 const MINUTES_PER_REVIEW = 3; 
 const MAX_REVIEWS_SHOWN = 30;  
-const NAMES = [
-  "أحمد علي","سارة محمود","محمود جمال","ليلى سمير","هشام عمر",
-  "نورا حسين","مروان خالد","منى إبراهيم","خالد حسن","ريم عبد الله",
-  "يوسف عبد الرحمن","فاطمة محمد","إبراهيم عادل","عمر حسن","دعاء عبد العزيز",
-  "طارق عبد السلام","هالة مصطفى","حسن محمود","آية محمد","عمرو سامي",
-  "نورهان خالد","أسماء عبد الله","كريم طارق","يمنى سمير","عبد الرحمن أحمد",
-  "ميادة محمد","مصطفى حسين","سعاد علي","حسام عادل","بسمه يوسف",
-  "وليد فتحي","شيرين عمر","مروى محمود","عادل عبد الحليم","منى جمال",
-  "محمود زكي","داليا سامي","علاء الدين محمد","رجاء مصطفى","إسلام طارق",
-  "شيرين عادل","إسراء حسن","محمد كمال","نهى عماد","رضا سعيد",
-  "مروة أحمد","نجلاء سمير","صفاء مصطفى","أحلام عادل","بدر عبد الله",
-  "ربيع أحمد","طارق عبد الله","منى محسن","ياسر فؤاد","خديجة محمد",
-  "هاجر محمود","إيمان سامي","هدى علي","حورية عمر","نسرين فؤاد",
-  "ندى محمود","أماني علي","جيهان سعيد","وفاء محمد","مها حسين",
-  "مي أحمد","إيمان عبد الحليم","نورا محمود","ليلى عبد العزيز","سلمى أحمد",
-  "إيناس سمير","صفاء عبد الرحمن","جميلة طارق","لمياء عادل","غادة فتحي",
-  "نجلاء عبد الله","سارة كمال","رانيا محمد","خلود سامي","عفاف أحمد",
-  "مريم حسن","شيماء محمود","هالة عبد الحميد","جمال عبد العزيز","سناء فؤاد",
-  "هناء محمد","عائشة علي","زينب عمر","فدوى عبد الله","حورية طارق",
-  "نور الهدى","يمنى عبد العزيز","آمال سعيد","هيام مصطفى","هند محمود",
-  "شذى عمر","ضحى محمد","فرح خالد","هايدي محمود","جودي سمير",
-  "جنى علي","لارا أحمد","تالين خالد","رحمة طارق","بيان عادل",
-  "وسام محمود","حلا محمد","ملك فؤاد","سندس أحمد","ماريا علي",
-  "ريهام مصطفى","أروى سعيد","بشرى عبد الله","ميساء طارق","رغد خالد",
-  "سمر عادل","دانية محمود","لين أحمد","حور علي","تقى فؤاد",
-  "أريج سامي","لميس محمود","هبة طارق","شهد خالد","بسملة أحمد",
-  "أميرة جمال","ابتسام محمد","لبنى عادل","أسماء حسن","نور طارق",
-  "سلوى محمود","ولاء علي","منى سعيد","عليا سامي","هدير محمود",
-  "ميار فؤاد","ألاء عبد الرحمن","خولة عمر","فاطمة الزهراء","سجى خالد",
-  "سيرين علي","صفاء عادل","إيناس محمود","آلاء طارق","هيا فؤاد",
-  "زيد خالد","حمزة عمر","أنس فؤاد","معاذ عبد الله","راشد محمد",
-  "مهند سامي","مصعب علي","إياد أحمد","جمال طارق","بلال محمود",
-  "أوس خالد","فراس عادل","سيف الدين حسن","براء فؤاد","يحيى محمد",
-  "صهيب عبد العزيز","حذيفة سامي","أيمن محمود","رامي خالد","إسلام أحمد"
-];
 
+const NAMES = ["أحمد علي","سارة محمود","محمود جمال","ليلى سمير","هشام عمر","نورا حسين","مروان خالد","منى إبراهيم","خالد حسن","ريم عبد الله"];
 const TEMPLATES = [
-  "خدمة ممتازة وسهلة الاستخدام، وفرّت علينا وقت ومجهود كبير.",
-  "التطبيق عملي ومفيد، دعم العملاء كان متعاوناً جداً.",
-  "نظام متكامل، المبيعات والمخزن صاروا أسهل بكتيير.",
-  "واجهات بسيطة وواضحة، أنصح به لأي شركة صغيرة.",
-  "فيه بعض التحسينات المطلوبة لكن بشكل عام تجربة ممتازة.",
-  "حل رائع لإدارة الصيانة والمتابعة الدورية.",
-  "خصائص مفيدة خصوصاً تقارير الأرباح والمصروفات.",
-  "روعة — السرعة والدقة في الحسابات مش طبيعية.",
-  "التسعير مناسب، والدعم الفني استجاب بسرعة.",
-  "من أفضل الأنظمة اللي جربناها لإدارة الفواتير."
+  "خدمة ممتازة وسهلة الاستخدام.",
+  "التطبيق عملي ومفيد جداً.",
+  "النظام ساعدنا نوفر وقت ومجهود.",
+  "واجهة بسيطة وسهلة.",
+  "تجربة ممتازة بشكل عام."
 ];
 
 function deterministicBetween(seed, min, max) {
   const x = Math.abs(Math.sin(seed * 9301 + 49297));
-  const frac = x - Math.floor(x);
-  return Math.floor(min + frac * (max - min + 1));
+  return Math.floor(min + (x - Math.floor(x)) * (max - min + 1));
 }
 
 function generateReviewForIndex(index) {
@@ -766,19 +728,17 @@ function generateReviewForIndex(index) {
   const template = TEMPLATES[ deterministicBetween(index + 7, 0, TEMPLATES.length - 1) ];
   const rating = deterministicBetween(index + 13, 3, 5);
   const ts = new Date( START_DATE.getTime() + (index * MINUTES_PER_REVIEW * 60 * 1000) );
-  return { id: 'rev-' + index, name, text: template, rating, date: ts, source: 'fake' };
+  return { id: 'fake-' + index, name, text: template, rating, date: ts, source: 'fake' };
 }
 
 function computeReviewsNow() {
   const now = new Date();
-  const minutesPassed = Math.floor((now.getTime() - START_DATE.getTime()) / (1000 * 60));
-  if (minutesPassed <= 0) return [];
+  const minutesPassed = Math.floor((now - START_DATE) / 60000);
   const reviewCount = Math.floor(minutesPassed / MINUTES_PER_REVIEW);
-  const reviews = [];
-  for (let i = 1; i <= reviewCount; i++) reviews.push(generateReviewForIndex(i));
-  return reviews.reverse().slice(0, MAX_REVIEWS_SHOWN);
+  return Array.from({length: reviewCount}, (_,i)=>generateReviewForIndex(i+1)).reverse().slice(0, MAX_REVIEWS_SHOWN);
 }
 
+/* ⏳ أدوات مساعدة */
 function timeAgoShort(date) {
   const sec = Math.floor((Date.now() - date.getTime()) / 1000);
   if (sec < 60) return `${sec} ثانية مضت`;
@@ -790,68 +750,65 @@ function timeAgoShort(date) {
   return `${d} يوم${d>1?'ـات':''} مضت`;
 }
 function renderStars(n) {
-  let out = '';
-  for (let i=1;i<=5;i++){
-    out += `<span class="inline-block w-4 h-4 align-middle" style="color:${i<=n?'#f59e0b':'#e5e7eb'}">★</span>`;
-  }
-  return out;
+  return Array.from({length:5},(_,i)=>`<span style="color:${i<n?'#f59e0b':'#e5e7eb'}">★</span>`).join('');
 }
-function escapeHtml(text){
-  return text
-    .replaceAll('&','&amp;')
-    .replaceAll('<','&lt;')
-    .replaceAll('>','&gt;')
-    .replaceAll('"','&quot;')
-    .replaceAll("'", '&#039;');
-}
+function escapeHtml(text){return text.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');}
 
-const reviewsEl = document.getElementById('reviews-list');
-
+/* 🗄️ جلب التعليقات من Supabase */
 async function fetchRealReviews() {
-  if (!supabase) return [];
   try {
     const { data, error } = await supabase
       .from('reviews')
       .select('id, user_name, comment, rating, created_at')
-      .eq('moderated', true) // عرض التعليقات المؤكدة فقط
+      .eq('moderated', true)
       .order('created_at', { ascending: false })
-      .limit(50);
+      .limit(20);
     if (error) {
-      console.error('fetch reviews error', error);
+      console.error("⚠️ fetch error", error);
       return [];
     }
-    return data.map(r => ({ id: 'real-' + r.id, name: r.user_name, text: r.comment, rating: r.rating, date: new Date(r.created_at), source: 'real' }));
-  } catch (e) {
+    return data.map(r => ({
+      id: 'real-' + r.id,
+      name: r.user_name,
+      text: r.comment,
+      rating: r.rating,
+      date: new Date(r.created_at),
+      source: 'real'
+    }));
+  } catch(e) {
     console.error(e);
     return [];
   }
 }
 
+/* 🖼️ عرض التعليقات */
+const reviewsEl = document.getElementById('reviews-list');
+
 async function renderMergedReviews() {
   const real = await fetchRealReviews();
   const fake = computeReviewsNow();
-  const merged = [...real, ...fake].sort((a,b) => b.date - a.date);
+  const merged = [...real, ...fake].sort((a,b)=>b.date-a.date);
+
   if (!merged.length) {
-    reviewsEl.innerHTML = `<div class="glass p-6 rounded-2xl text-center text-gray-600">لا توجد تقييمات حتى الآن — كن أول من يقيّم!</div>`;
+    reviewsEl.innerHTML = `<div class="p-6 text-center text-gray-600">لا توجد تقييمات حتى الآن — كن أول من يقيّم!</div>`;
     return;
   }
-  reviewsEl.innerHTML = merged.slice(0, MAX_REVIEWS_SHOWN).map(r => `
+
+  reviewsEl.innerHTML = merged.map(r=>`
     <div class="glass p-4 rounded-2xl shadow-sm">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 font-bold">${r.name.split(' ')[0].charAt(0)}</div>
-          <div>
-            <div class="font-semibold text-gray-800">${r.name}${r.source === 'real' ? ' <span class="text-xs text-green-600">(مستخدم)</span>' : ''}</div>
-            <div class="text-xs text-gray-500">${timeAgoShort(r.date)}</div>
-          </div>
+      <div class="flex justify-between">
+        <div>
+          <div class="font-semibold">${r.name} ${r.source==='real' ? '<span class="text-xs text-green-600">(مستخدم)</span>' : ''}</div>
+          <div class="text-xs text-gray-500">${timeAgoShort(r.date)}</div>
         </div>
-        <div class="text-right"><div class="text-sm">${renderStars(r.rating)}</div></div>
+        <div>${renderStars(r.rating)}</div>
       </div>
-      <p class="mt-3 text-gray-700 text-sm leading-relaxed">${escapeHtml(r.text)}</p>
+      <p class="mt-2 text-gray-700 text-sm">${escapeHtml(r.text)}</p>
     </div>
   `).join('');
 }
 
+/* 📝 معالجة النموذج */
 (function attachFormHandler(){
   const form = document.getElementById('reviewForm');
   if (!form) return;
@@ -860,65 +817,28 @@ async function renderMergedReviews() {
   const textInput = document.getElementById('rv-text');
   const submitBtn = document.getElementById('rv-submit');
   const msgEl = document.getElementById('rv-message');
-
-  const SUBMIT_COOLDOWN = 60; 
-  const COOLDOWN_KEY = "lv12_last_review_ts";
-
-  function canSubmitNow() {
-    const last = localStorage.getItem(COOLDOWN_KEY);
-    if (!last) return true;
-    const diff = (Date.now() - Number(last)) / 1000;
-    return diff >= SUBMIT_COOLDOWN;
-  }
-  function setCooldownNow() {
-    localStorage.setItem(COOLDOWN_KEY, String(Date.now()));
-  }
-
-  form.addEventListener('submit', async (e) => {
+  form.addEventListener('submit', async e=>{
     e.preventDefault();
-    msgEl.textContent = '';
-    if (!canSubmitNow()) {
-      msgEl.textContent = `من فضلك انتظر ${SUBMIT_COOLDOWN} ثانية بين كل تعليق وآخر.`;
-      return;
-    }
-    const user_name = nameInput.value.trim();
-    const comment = textInput.value.trim();
-    const rating = parseInt(ratingInput.value, 10);
-    if (!user_name || !comment || !rating || rating < 1 || rating > 5) {
-      msgEl.textContent = 'تأكد من ملء جميع الحقول بشكل صحيح.';
-      return;
-    }
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'جاري الإرسال...';
-    try {
-      const { data, error } = await supabase
-        .from('reviews')
-        .insert([{ user_name, comment, rating, moderated: true }])
-        .select();
-      if (error) {
-        console.error(error);
-        msgEl.textContent = 'حصل خطأ أثناء إرسال التقييم. حاول مرة أخرى.';
-      } else {
-        msgEl.textContent = 'تم إرسال تقييمك بنجاح ✅';
-        setCooldownNow();
-        nameInput.value = ''; textInput.value = ''; ratingInput.value = '';
-        await renderMergedReviews();
-      }
-    } catch (err) {
-      console.error(err);
-      msgEl.textContent = 'حصل خطأ. تحقق من الاتصال.';
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'أرسل التقييم';
-    }
+    msgEl.textContent='';
+    const user_name=nameInput.value.trim();
+    const comment=textInput.value.trim();
+    const rating=parseInt(ratingInput.value,10);
+    if(!user_name||!comment||!rating){msgEl.textContent='املأ كل الحقول';return;}
+    submitBtn.disabled=true;submitBtn.textContent='جاري الإرسال...';
+    try{
+      const {error}=await supabase.from('reviews').insert([{user_name,comment,rating,moderated:true}]);
+      if(error){msgEl.textContent='خطأ في الإرسال';console.error(error);}
+      else{msgEl.textContent='✅ تم الإرسال';nameInput.value='';textInput.value='';ratingInput.value='';await renderMergedReviews();}
+    }catch(err){console.error(err);msgEl.textContent='مشكلة في الاتصال';}
+    finally{submitBtn.disabled=false;submitBtn.textContent='أرسل التقييم';}
   });
 })();
 
-(async function init() {
-  await renderMergedReviews();
-  setInterval(renderMergedReviews, 30 * 1000);
-})();
+/* 🚀 تشغيل */
+renderMergedReviews();
+setInterval(renderMergedReviews, 30000);
 </script>
+
 
 
  <div class="container mx-auto px-6">
@@ -1041,6 +961,7 @@ supabase.auth.onAuthStateChange((event, session) => {
   </script>
 </body>
 </html>
+
 
 
 
