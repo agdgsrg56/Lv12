@@ -111,11 +111,10 @@
 
     <div class="flex items-center gap-6">
 
-      <div class="hidden sm:block text-center">
-        <span class="text-sm font-medium text-gray-600">عدد التنزيلات</span>
-        <div class="text-xl font-extrabold text-blue-600" id="downloads">35000</div>
-      </div>
-
+  <div class="hidden sm:block text-center">
+  <span class="text-sm font-medium text-gray-600">عدد التنزيلات</span>
+  <div class="text-xl font-extrabold text-blue-600" id="downloads">0</div>
+</div>
       <a id="create-account-btn" href="signup.html" 
          class="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 transition font-medium shadow-md">
         ✨ إنشاء حساب
@@ -166,6 +165,7 @@
   <script>
 <span id="downloads"></span>
 
+
 <script>
   const downloadsEl = document.getElementById("downloads");
   const START_COUNT = 32000;
@@ -183,7 +183,7 @@
   }
 
   function randomIncrement() {
-    return Math.floor(Math.random() * (10 - 3 + 1)) + 3;
+    return Math.floor(Math.random() * 8) + 3; // 3-10
   }
 
   function renderCount(n) {
@@ -202,6 +202,7 @@
 
   setInterval(increaseOnce, 30 * 1000);
 </script>
+
 
 
   
@@ -765,6 +766,7 @@ supabase.auth.onAuthStateChange((event, session) => {
   </script>
 </body>
 </html>
+
 
 
 
