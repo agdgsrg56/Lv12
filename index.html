@@ -657,11 +657,9 @@
     </p>
   </div>
 </section>
-<!-- ========== قسم عرض التعليقات (حقيقي + وهمي) ========== -->
 <section id="fake-reviews" class="py-16 container mx-auto px-6">
   <h2 class="text-3xl font-extrabold text-center mb-6 text-blue-700">⭐ آراء العملاء</h2>
 
-  <!-- نموذج للمستخدمين الحقيقيين -->
   <section id="real-review-form" class="py-8 max-w-3xl mx-auto px-6">
     <div class="glass p-6 rounded-2xl shadow-md">
       <h3 class="text-xl font-bold mb-4">أضف تقييمك</h3>
@@ -693,25 +691,21 @@
     </div>
   </section>
 
-  <!-- قائمة العروض -->
   <div id="reviews-list" class="space-y-4 max-w-3xl mx-auto mt-6"></div>
 </section>
 
-<!-- ========== سكربت: Supabase + تعليقات وهمية كل 3 دقائق + دمج العرض ========== -->
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script>
-/* ====== إعداد Supabase: ضَع رابط المشروع و ANON KEY هنا ====== */
-const SUPABASE_URL = "https://nszhzfysitppxssplqfb.supabase.co"; // ضع رابط مشروعك هنا
-const SUPABASE_ANON_KEY = "YOUR_ANON_KEY_HERE"; // ضع مفتاح anon هنا (لا تشاركه علنًا)
+const SUPABASE_URL = "https://nszhzfysitppxssplqfb.supabase.co"; 
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemh6ZnlzaXRwcHhzc3BscWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMzA4OTcsImV4cCI6MjA3MzgwNjg5N30.5KvK4bhqkZ_GpIfED4qecIMfeubAJYwSFJslULwOp-w";
 
 const supabase = window.supabase?.createClient
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
   : supabaseJs?.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-/* ====== إعدادات التعليقات الوهمية (تولد كل 3 دقائق) ====== */
-const START_DATE = new Date(Date.UTC(2025, 0, 1, 0, 0, 0)); // نقطة البداية الزمنية
-const MINUTES_PER_REVIEW = 3; // كل 3 دقائق تولِّد تعليق وهمي
-const MAX_REVIEWS_SHOWN = 30;  // أقصى عدد تقييمات للعرض
+const START_DATE = new Date(Date.UTC(2025, 0, 1, 0, 0, 0)); 
+const MINUTES_PER_REVIEW = 3; 
+const MAX_REVIEWS_SHOWN = 30;  
 const NAMES = [
   "أحمد علي","سارة محمود","محمود جمال","ليلى سمير","هشام عمر",
   "نورا حسين","مروان خالد","منى إبراهيم","خالد حسن","ريم عبد الله",
@@ -761,7 +755,6 @@ const TEMPLATES = [
   "من أفضل الأنظمة اللي جربناها لإدارة الفواتير."
 ];
 
-/* ===== دوال مساعدة ===== */
 function deterministicBetween(seed, min, max) {
   const x = Math.abs(Math.sin(seed * 9301 + 49297));
   const frac = x - Math.floor(x);
@@ -812,7 +805,6 @@ function escapeHtml(text){
     .replaceAll("'", '&#039;');
 }
 
-/* ===== عرض ودمج التعليقات الحقيقية + الوهمية ===== */
 const reviewsEl = document.getElementById('reviews-list');
 
 async function fetchRealReviews() {
@@ -860,7 +852,6 @@ async function renderMergedReviews() {
   `).join('');
 }
 
-/* ===== نموذج إدخال التعليقات الحقيقية (مع حماية بسيطة ضد السبام) ===== */
 (function attachFormHandler(){
   const form = document.getElementById('reviewForm');
   if (!form) return;
@@ -870,7 +861,7 @@ async function renderMergedReviews() {
   const submitBtn = document.getElementById('rv-submit');
   const msgEl = document.getElementById('rv-message');
 
-  const SUBMIT_COOLDOWN = 60; // ثواني
+  const SUBMIT_COOLDOWN = 60; 
   const COOLDOWN_KEY = "lv12_last_review_ts";
 
   function canSubmitNow() {
@@ -923,14 +914,9 @@ async function renderMergedReviews() {
   });
 })();
 
-/* ===== تشغيل أولي وتحديث دوري ===== */
 (async function init() {
-  // عرض أولي
   await renderMergedReviews();
-  // تحدث العرض كل 30 ثانية (أو حسب رغبتك)
   setInterval(renderMergedReviews, 30 * 1000);
-  // للتأكد: لو أردت يمكن إعادة حساب التعليقات الوهمية كل 3 دقائق فقط،
-  // لكن بما أننا نُظهرها حسابياً حسب الوقت، التحديث كل 30s كافٍ.
 })();
 </script>
 
@@ -1055,6 +1041,7 @@ supabase.auth.onAuthStateChange((event, session) => {
   </script>
 </body>
 </html>
+
 
 
 
