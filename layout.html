@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <head>
-    <link rel="icon" href="lv12.ico" type="image/x-icon">
-</head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>الرئيسية - المدير</title>
+  <link rel="icon" href="lv12.ico" type="image/x-icon">
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body { font-family: 'Tajawal', sans-serif; }
@@ -18,36 +16,42 @@
 </head>
 <body class="bg-[#F0F3F7] text-gray-800 flex">
 
-  <aside class="w-64 bg-[#1B2631] text-white shadow-xl h-screen fixed left-0 flex flex-col">
-    <div class="p-6 border-b border-gray-700">
+  <button onclick="toggleSidebar()" 
+    class="lg:hidden fixed top-4 right-4 z-50 bg-[#1B2631] text-white p-3 rounded-xl shadow">
+    ☰
+  </button>
+
+  <aside id="sidebar" 
+    class="w-64 bg-[#1B2631] text-white shadow-xl h-screen fixed top-0 right-0 transform translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col z-40">
+    
+    <div class="p-6 border-b border-gray-700 flex justify-between items-center">
       <h1 class="text-3xl font-extrabold">LV12</h1>
-      <p class="text-sm text-gray-400 mt-1">لوحة المدير</p>
+      <button onclick="toggleSidebar()" class="lg:hidden text-gray-300 text-2xl">✖</button>
     </div>
 
-     <nav class="flex-1 p-4 space-y-3">
-      <a href="index.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">🏠 الرئيسية</a>
-      <a href="cv.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">📄 السيرة الذاتية</a>
-      <a href="customers.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">👥 العملاء</a>
-      <a href="maintenance.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">🛠 صيانة العملاء</a>
-      <a href="store.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">📦 المخزن</a>
-      <a href="add-user.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">➕ إضافة مستخدم</a>
-      <a href="salaries.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">💰 رواتب الموظفين</a>
-      <a href="support.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">📞 خدمة العملاء</a>
-      <a href="guide.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">📘 دليل الاستخدام</a>
-      <a href="" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition text-right">⬅ رجوع</a>
-      <a href="" class="nav-link block py-3 px-4 rounded-xl bg-red-600 hover:bg-red-700 transition text-right font-semibold">🚪 تسجيل الخروج</a>
-   </nav>
-
+    <nav class="flex-1 p-4 space-y-3">
+      <a href="index.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition">🏠 الرئيسية</a>
+      <a href="cv.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition">📄 السيرة الذاتية</a>
+      <a href="customers.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition">👥 العملاء</a>
+      <a href="maintenance.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition">🛠 صيانة العملاء</a>
+      <a href="store.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition">📦 المخزن</a>
+      <a href="add-user.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition">➕ إضافة مستخدم</a>
+      <a href="salaries.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition">💰 رواتب الموظفين</a>
+      <a href="support.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition">📞 خدمة العملاء</a>
+      <a href="guide.html" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition">📘 دليل الاستخدام</a>
+      <a href="#" class="nav-link block py-3 px-4 rounded-xl bg-[#2E4053] hover:bg-[#34495E] transition">⬅ رجوع</a>
+      <a href="#" class="nav-link block py-3 px-4 rounded-xl bg-red-600 hover:bg-red-700 transition font-semibold">🚪 تسجيل الخروج</a>
+    </nav>
 
     <div class="p-4 border-t border-gray-700 text-center text-xs text-gray-400">
       © 2025 LV12
     </div>
   </aside>
 
-  <main class="flex-1 ml-64 p-10 space-y-10">
+  <main class="flex-1 lg:mr-64 p-5 lg:p-10 space-y-10">
 
-    <section class="bg-white p-8 rounded-2xl shadow-md">
-      <h2 class="text-3xl font-bold text-gray-800">مرحباً بك 👋</h2>
+    <section class="bg-white p-6 lg:p-8 rounded-2xl shadow-md">
+      <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">مرحباً بك 👋</h2>
       <p class="mt-2 text-gray-600">اختر من القائمة الجانبية لبدء العمل.</p>
       <div class="mt-6 p-5 bg-gradient-to-r from-red-100 to-red-200 border-r-4 border-red-500 rounded-xl shadow">
         <p class="font-semibold text-red-800">⚠️ تنبيه:</p>
@@ -55,11 +59,11 @@
       </div>
     </section>
 
-    <section class="bg-white p-8 rounded-2xl shadow-md">
+    <section class="bg-white p-6 lg:p-8 rounded-2xl shadow-md">
       <h3 class="text-2xl font-bold mb-4 text-gray-800">🎥 فيديو توضيحي</h3>
-      <div class="max-w-3xl mx-auto rounded-xl overflow-hidden shadow-lg aspect-video">
+      <div class="w-full max-w-3xl mx-auto rounded-xl overflow-hidden shadow-lg aspect-video">
         <iframe class="w-full h-full"
-          src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+          src="https://www.youtube.com/shorts/k_RUWeaoKuM"
           title="Demo Video"
           frameborder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -67,18 +71,28 @@
       </div>
     </section>
 
-    <section class="bg-white p-8 rounded-2xl shadow-md">
-  <h3 class="text-2xl font-bold mb-6 text-gray-800">🖼️ صور توضيحية</h3>
-  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4" id="gallery">
-  </div>
-</section>
-<div id="imageModal" class="fixed inset-0 bg-black bg-opacity-70 hidden items-center justify-center z-50">
-  <span id="closeModal" class="absolute top-4 right-6 text-white text-3xl cursor-pointer">&times;</span>
-  <img id="modalImage" class="max-w-[90%] max-h-[90%] rounded-lg shadow-2xl" src="" alt="عرض صورة">
-</div>
+    <section class="bg-white p-6 lg:p-8 rounded-2xl shadow-md">
+      <h3 class="text-2xl font-bold mb-6 text-gray-800">🖼️ صور توضيحية</h3>
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4" id="gallery"></div>
+    </section>
+
+    <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-70 hidden items-center justify-center z-50">
+      <span id="closeModal" class="absolute top-4 right-6 text-white text-3xl cursor-pointer">&times;</span>
+      <img id="modalImage" class="max-w-[90%] max-h-[90%] rounded-lg shadow-2xl" src="" alt="عرض صورة">
+    </div>
+
+    <div class="mt-6 p-4 bg-gradient-to-r from-red-100 to-red-200 border-r-4 border-red-500 rounded-xl shadow">
+      <p class="font-semibold text-red-800">⚠️ تنبيه:</p>
+      <p class="text-red-700">هذه الصفحة محاكاة وليست بيانات حقيقية.</p>
+    </div>
+
   </main>
 
   <script>
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('translate-x-full');
+    }
+
     const links = document.querySelectorAll(".nav-link");
     links.forEach(link => {
       if (window.location.pathname.includes(link.getAttribute("href"))) {
@@ -86,70 +100,51 @@
       }
     });
 
-  const container = document.getElementById('gallery');
-const modal = document.getElementById('imageModal');
-const modalImg = document.getElementById('modalImage');
-const closeBtn = document.getElementById('closeModal');
+    // Gallery
+    const container = document.getElementById('gallery');
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImage');
+    const closeBtn = document.getElementById('closeModal');
 
-const images = [
-  "1.png",
-  "2.png",
-  "3.png",
-  "4.png",
-  "5.png",
-  "6.png",
-  "7.png",
-  "8.png",
-  "9.png",
-  "10.png",
-  "11.png",
-  "12.png",
-  "13.png",
-  "14.png",
-  "15.png",
-  "16.png",
-  "17.png",
-  "18.png"
-];
+    const images = [
+      "1.png","2.png","3.png","4.png","5.png",
+      "6.png","7.png","8.png","9.png","10.png",
+      "11.png","12.png","13.png","14.png","15.png",
+      "16.png","17.png","18.png"
+    ];
 
-images.forEach((name, index) => {
-  const div = document.createElement('div');
-  div.className = "h-32 rounded-xl shadow overflow-hidden hover:scale-105 hover:shadow-xl transition transform cursor-pointer";
-  
-  const img = document.createElement('img');
-img.src = `/${name}`;
-  img.alt = `صورة ${index + 1}`;
-  img.className = "w-full h-full object-cover";
-  
-  img.addEventListener('click', () => {
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-    modalImg.src = img.src;
-  });
+    images.forEach((name, index) => {
+      const div = document.createElement('div');
+      div.className = "h-32 rounded-xl shadow overflow-hidden hover:scale-105 hover:shadow-xl transition transform cursor-pointer";
+      
+      const img = document.createElement('img');
+      img.src = `/${name}`;
+      img.alt = `صورة ${index + 1}`;
+      img.className = "w-full h-full object-cover";
+      
+      img.addEventListener('click', () => {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        modalImg.src = img.src;
+      });
 
-  div.appendChild(img);
-  container.appendChild(div);
-});
+      div.appendChild(img);
+      container.appendChild(div);
+    });
 
-closeBtn.addEventListener('click', () => {
-  modal.classList.add('hidden');
-  modal.classList.remove('flex');
-});
+    closeBtn.addEventListener('click', () => {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    });
 
-modal.addEventListener('click', (e) => {
-  if (e.target === modal) {
-    modal.classList.add('hidden');
-    modal.classList.remove('flex');
-  }
-});
-
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    });
   </script>
- <div class="mt-6 p-4 bg-gradient-to-r from-red-100 to-red-200 border-r-4 border-red-500 rounded-xl shadow">
-      <p class="font-semibold text-red-800">⚠️ تنبيه:</p>
-      <p class="text-red-700">هذه الصفحة محاكاة وليست بيانات حقيقية.</p>
-    </div>
-
-   
 </body>
 </html>
+
 
