@@ -36,6 +36,7 @@
 
     <div class="text-center">
       <button onclick="submitOrder()" class="bg-green-600 text-white px-6 py-3 rounded shadow hover:bg-green-700">
+        ✅ إرسال الطلب
       </button>
     </div>
   </div>
@@ -89,9 +90,9 @@
     }
 
     async function submitOrder() {
-      const name = document.getElementById("cust-name").value;
-      const phone = document.getElementById("cust-phone").value;
-      const address = document.getElementById("cust-address").value;
+      const name = document.getElementById("cust-name").value.trim();
+      const phone = document.getElementById("cust-phone").value.trim();
+      const address = document.getElementById("cust-address").value.trim();
 
       if (!name || !phone || !address) {
         alert("⚠️ من فضلك أدخل جميع بياناتك");
@@ -103,32 +104,34 @@
         return;
       }
 
-      for (let item of cart) {
-        const { error } = await supabase
-          .from("orders")
-          .insert([{
-            name: name,
-            phone: phone,
-            address: address,
-            product_id: item.id,
-            quantity: item.quantity,
-            status: "pending"
-          }]);
+      try {
+        const orderData = cart.map(item => ({
+          name: name,
+          phone: phone,
+          address: address,
+          product_id: item.id,
+          quantity: item.quantity,
+          status: "pending",
+          created_at: new Date().toISOString()
+        }));
 
-        if (error) {
-          console.error(error);
-          alert("❌ خطأ أثناء إرسال الطلب");
-          return;
-        }
+        const { error } = await supabase.from("orders").insert(orderData);
+
+        if (error) throw error;
+
+        alert("✅ تم إرسال طلبك بنجاح! سنتواصل معك قريبًا.");
+        localStorage.removeItem("cart");
+        cart = [];
+        renderCart();
+
+      } catch (err) {
+        console.error("خطأ في الحفظ:", err.message);
+        alert("❌ خطأ أثناء إرسال الطلب، تحقق من الجدول في قاعدة البيانات.");
       }
-
-      alert("✅ تم إرسال طلبك بنجاح! سنتواصل معك قريبًا.");
-      localStorage.removeItem("cart");
-      cart = [];
-      renderCart();
     }
 
     renderCart();
   </script>
 </body>
 </html>
+
