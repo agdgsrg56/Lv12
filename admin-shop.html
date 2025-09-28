@@ -11,7 +11,7 @@
   <div class="container mx-auto py-10">
     <h1 class="text-3xl font-bold mb-6 text-center">لوحة تحكم المتجر 🛠️</h1>
 
-    <!-- ✅ إضافة منتج -->
+
     <form id="add-product-form" class="bg-white p-6 rounded shadow-md mb-10">
       <h2 class="text-xl font-semibold mb-4">➕ إضافة منتج جديد</h2>
       <input type="text" id="product-name" placeholder="اسم المنتج" class="border p-2 rounded w-full mb-3" required>
@@ -22,7 +22,7 @@
       <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">إضافة</button>
     </form>
 
-    <!-- ✅ قائمة المنتجات -->
+  
     <div>
       <h2 class="text-xl font-semibold mb-4">📦 المنتجات الحالية</h2>
       <table class="w-full bg-white rounded shadow-md">
@@ -37,7 +37,7 @@
           </tr>
         </thead>
         <tbody id="products-table">
-          <!-- المنتجات هتظهر هنا -->
+   
         </tbody>
       </table>
     </div>
@@ -45,12 +45,11 @@
 
   <script>
     const SUPABASE_URL = "https://nszhzfysitppxssplqfb.supabase.co";
-    const SUPABASE_ANON_KEY = "YOUR_KEY_HERE";
+    const SUPABASE_ANON_KEY = "YOUR_KEY_HERE"; 
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const ADMIN_EMAIL = "youremail@example.com"; // ✨ غيره لبريدك
+    const ADMIN_EMAIL = "lv12wlv12@gmail.com"; 
 
-    // ✅ تحقق من تسجيل الدخول
     async function checkAuth() {
       const { data } = await supabase.auth.getSession();
       if (!data.session || data.session.user.email !== ADMIN_EMAIL) {
@@ -61,7 +60,6 @@
 
     checkAuth();
 
-    // ✅ إضافة منتج جديد
     document.getElementById("add-product-form").addEventListener("submit", async (e) => {
       e.preventDefault();
 
@@ -88,7 +86,6 @@
       }
     });
 
-    // ✅ عرض المنتجات
     async function loadProducts() {
       const { data: products } = await supabase.from("products").select("*");
       const table = document.getElementById("products-table");
@@ -100,7 +97,7 @@
             <td class="p-2">${prod.name}</td>
             <td class="p-2">${prod.price} ج.م</td>
             <td class="p-2">${prod.stock}</td>
-            <td class="p-2">${prod.sold}</td>
+            <td class="p-2">${prod.sold || 0}</td>
             <td class="p-2">
               <button onclick="deleteProduct(${prod.id})" class="bg-red-500 text-white px-3 py-1 rounded">🗑️ حذف</button>
             </td>
@@ -109,7 +106,6 @@
       });
     }
 
-    // ✅ حذف منتج
     async function deleteProduct(id) {
       if (confirm("هل تريد حذف هذا المنتج؟")) {
         await supabase.from("products").delete().eq("id", id);
@@ -121,3 +117,4 @@
   </script>
 </body>
 </html>
+
