@@ -12,7 +12,17 @@
   <div class="container mx-auto py-10">
     <h1 class="text-3xl font-bold mb-6 text-center">📋 إدارة الطلبات</h1>
 
-    <table class="w-full bg-white rounded shadow-md">
+    <!-- فلتر التاريخ -->
+    <div class="bg-white p-4 rounded shadow mb-6 flex flex-col md:flex-row gap-4 items-center justify-center">
+      <label>من: <input type="date" id="start-date" class="border rounded p-1"></label>
+      <label>إلى: <input type="date" id="end-date" class="border rounded p-1"></label>
+      <button onclick="applyFilter()" class="bg-blue-600 text-white px-4 py-2 rounded">🔍 فلترة</button>
+      <button onclick="resetFilter()" class="bg-gray-500 text-white px-4 py-2 rounded">♻️ إعادة تعيين</button>
+    </div>
+
+    <!-- جدول الطلبات قيد التوصيل -->
+    <h2 class="text-2xl font-bold mb-3 text-blue-700">🚚 الطلبات قيد التوصيل</h2>
+    <table class="w-full bg-white rounded shadow-md mb-10">
       <thead>
         <tr class="bg-gray-200">
           <th class="p-2">رقم الطلب</th>
@@ -25,8 +35,24 @@
           <th class="p-2">إجراءات</th>
         </tr>
       </thead>
-      <tbody id="orders-table">
-      </tbody>
+      <tbody id="shipped-orders"></tbody>
+    </table>
+
+    <!-- جدول الطلبات تم التسليم -->
+    <h2 class="text-2xl font-bold mb-3 text-green-700">✅ الطلبات التي تم تسليمها</h2>
+    <table class="w-full bg-white rounded shadow-md">
+      <thead>
+        <tr class="bg-gray-200">
+          <th class="p-2">رقم الطلب</th>
+          <th class="p-2">العميل</th>
+          <th class="p-2">الهاتف</th>
+          <th class="p-2">العنوان</th>
+          <th class="p-2">المنتج</th>
+          <th class="p-2">الكمية</th>
+          <th class="p-2">الحالة</th>
+        </tr>
+      </thead>
+      <tbody id="delivered-orders"></tbody>
     </table>
   </div>
 
@@ -37,6 +63,7 @@
 
     const ADMIN_EMAIL = "lv12wlv12@gmail.com"; 
 
+    // السماح للأدمن فقط
     async function checkAuth() {
       const { data } = await supabase.auth.getSession();
       if (!data.session || data.session.user.email !== ADMIN_EMAIL) {
@@ -44,25 +71,37 @@
         window.location.href = "index.html";
       }
     }
-
     checkAuth();
 
+    let filterStart = null;
+    let filterEnd = null;
+
+    // تحميل الطلبات
     async function loadOrders() {
-      const { data: orders, error } = await supabase
+      let query = supabase
         .from("orders")
-        .select("id, name, phone, address, quantity, status, product_id, products(name)")
+        .select("id, name, phone, address, quantity, status, created_at, product_id, products(id, name, stock, sold)")
         .order("id", { ascending: false });
+
+      // تطبيق الفلتر لو متحدد
+      if (filterStart && filterEnd) {
+        query = query.gte("created_at", filterStart).lte("created_at", filterEnd);
+      }
+
+      const { data: orders, error } = await query;
 
       if (error) {
         console.error(error);
         return;
       }
 
-      const table = document.getElementById("orders-table");
-      table.innerHTML = "";
+      const shippedTable = document.getElementById("shipped-orders");
+      const deliveredTable = document.getElementById("delivered-orders");
+      shippedTable.innerHTML = "";
+      deliveredTable.innerHTML = "";
 
       orders.forEach(order => {
-        table.innerHTML += `
+        let row = `
           <tr class="border-b">
             <td class="p-2">${order.id}</td>
             <td class="p-2">${order.name}</td>
@@ -74,20 +113,29 @@
               <span class="px-2 py-1 rounded ${
                 order.status === "delivered" ? "bg-green-200 text-green-800" : 
                 order.status === "shipped" ? "bg-blue-200 text-blue-800" : 
+                order.status === "cancelled" ? "bg-red-200 text-red-800" :
                 "bg-yellow-200 text-yellow-800"
               }">${order.status}</span>
             </td>
-            <td class="p-2">
-              <button onclick="updateStatus(${order.id}, 'shipped')" class="bg-blue-500 text-white px-2 py-1 rounded">🚚 جاري الشحن</button>
-              <button onclick="updateStatus(${order.id}, 'delivered')" class="bg-green-500 text-white px-2 py-1 rounded">✅ تم التسليم</button>
-              <button onclick="updateStatus(${order.id}, 'cancelled')" class="bg-red-500 text-white px-2 py-1 rounded">❌ إلغاء</button>
-            </td>
-          </tr>
         `;
+
+        if (order.status === "shipped") {
+          row += `
+            <td class="p-2 flex gap-1">
+              <button onclick="updateStatus(${order.id}, '${order.product_id}', ${order.quantity}, 'delivered')" class="bg-green-500 text-white px-2 py-1 rounded">✅ تم التسليم</button>
+              <button onclick="updateStatus(${order.id}, '${order.product_id}', ${order.quantity}, 'cancelled')" class="bg-red-500 text-white px-2 py-1 rounded">❌ إلغاء</button>
+            </td>
+          </tr>`;
+          shippedTable.innerHTML += row;
+        } else if (order.status === "delivered") {
+          row += "</tr>";
+          deliveredTable.innerHTML += row;
+        }
       });
     }
 
-    async function updateStatus(orderId, newStatus) {
+    // تحديث حالة الطلب
+    async function updateStatus(orderId, productId, qty, newStatus) {
       const { error } = await supabase
         .from("orders")
         .update({ status: newStatus })
@@ -96,13 +144,51 @@
       if (error) {
         alert("❌ حصل خطأ أثناء تحديث الطلب");
         console.error(error);
-      } else {
-        alert("✅ تم تحديث حالة الطلب");
-        loadOrders();
+        return;
       }
+
+      if (newStatus === "delivered") {
+        const { data: product } = await supabase
+          .from("products")
+          .select("stock, sold")
+          .eq("id", productId)
+          .single();
+
+        if (product) {
+          await supabase
+            .from("products")
+            .update({
+              stock: product.stock - qty,
+              sold: (product.sold || 0) + qty
+            })
+            .eq("id", productId);
+        }
+      }
+
+      alert("✅ تم تحديث حالة الطلب");
+      loadOrders();
+    }
+
+    function applyFilter() {
+      filterStart = document.getElementById("start-date").value;
+      filterEnd = document.getElementById("end-date").value;
+      if (filterStart && filterEnd) {
+        filterStart += "T00:00:00";
+        filterEnd += "T23:59:59";
+      }
+      loadOrders();
+    }
+
+    function resetFilter() {
+      document.getElementById("start-date").value = "";
+      document.getElementById("end-date").value = "";
+      filterStart = null;
+      filterEnd = null;
+      loadOrders();
     }
 
     loadOrders();
   </script>
 </body>
 </html>
+
