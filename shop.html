@@ -104,26 +104,35 @@
       });
     }
 
-    function addToCart(productId) {
-      const qty = document.getElementById(`qty-${productId}`).value;
-      let cart = JSON.parse(localStorage.getItem("cart")) || [];
-      cart.push({ productId, qty });
-      localStorage.setItem("cart", JSON.stringify(cart));
-      alert("✅ تمت الإضافة للسلة");
-    }
+ function addToCart(productId) {
+  const qty = parseInt(document.getElementById(`qty-${productId}`).value) || 1;
 
-    async function buyNow(productId) {
-      const session = await checkLogin();
-      if (!session) {
-        window.location.href = "login.html";
-        return;
-      }
-      const qty = document.getElementById(`qty-${productId}`).value;
-      document.getElementById("selectedProductId").value = productId;
-      document.getElementById("selectedQty").value = qty;
-      document.getElementById("buyModal").classList.remove("hidden");
-      document.getElementById("buyModal").classList.add("flex");
-    }
+  const productCard = document.getElementById(`qty-${productId}`).closest("div.p-6");
+  const name = productCard.querySelector("h3").textContent;
+  const priceText = productCard.querySelector("p.font-semibold").textContent;
+  const price = parseFloat(priceText.replace(/[^\d.]/g, "")); // يستخرج السعر كرقم
+
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+  cart.push({ id: productId, name, price, quantity: qty });
+  localStorage.setItem("cart", JSON.stringify(cart));
+
+  alert("✅ تمت الإضافة للسلة");
+}
+
+async function buyNow(productId) {
+  const qty = parseInt(document.getElementById(`qty-${productId}`).value) || 1;
+
+  const productCard = document.getElementById(`qty-${productId}`).closest("div.p-6");
+  const name = productCard.querySelector("h3").textContent;
+  const priceText = productCard.querySelector("p.font-semibold").textContent;
+  const price = parseFloat(priceText.replace(/[^\d.]/g, ""));
+
+  document.getElementById("selectedProductId").value = productId;
+  document.getElementById("selectedQty").value = qty;
+  document.getElementById("buyModal").classList.remove("hidden");
+  document.getElementById("buyModal").classList.add("flex");
+}
+
 
     function closeModal() {
       document.getElementById("buyModal").classList.add("hidden");
@@ -164,6 +173,7 @@
   </script>
 </body>
 </html>
+
 
 
 
