@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>لوحة تحكم المتجر</title>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+  <div class="container mx-auto py-10">
+    <h1 class="text-3xl font-bold mb-6 text-center">لوحة تحكم المتجر 🛠️</h1>
+
+    <!-- ✅ إضافة منتج -->
+    <form id="add-product-form" class="bg-white p-6 rounded shadow-md mb-10">
+      <h2 class="text-xl font-semibold mb-4">➕ إضافة منتج جديد</h2>
+      <input type="text" id="product-name" placeholder="اسم المنتج" class="border p-2 rounded w-full mb-3" required>
+      <textarea id="product-description" placeholder="وصف المنتج" class="border p-2 rounded w-full mb-3"></textarea>
+      <input type="number" id="product-price" placeholder="السعر" class="border p-2 rounded w-full mb-3" required>
+      <input type="number" id="product-stock" placeholder="الكمية" class="border p-2 rounded w-full mb-3" required>
+      <input type="file" id="product-image" class="mb-3">
+      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">إضافة</button>
+    </form>
+
+    <!-- ✅ قائمة المنتجات -->
+    <div>
+      <h2 class="text-xl font-semibold mb-4">📦 المنتجات الحالية</h2>
+      <table class="w-full bg-white rounded shadow-md">
+        <thead>
+          <tr class="bg-gray-200">
+            <th class="p-2">الصورة</th>
+            <th class="p-2">الاسم</th>
+            <th class="p-2">السعر</th>
+            <th class="p-2">الكمية</th>
+            <th class="p-2">تم البيع</th>
+            <th class="p-2">إجراءات</th>
+          </tr>
+        </thead>
+        <tbody id="products-table">
+          <!-- المنتجات هتظهر هنا -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://nszhzfysitppxssplqfb.supabase.co";
+    const SUPABASE_ANON_KEY = "YOUR_KEY_HERE";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const ADMIN_EMAIL = "youremail@example.com"; // ✨ غيره لبريدك
+
+    // ✅ تحقق من تسجيل الدخول
+    async function checkAuth() {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session || data.session.user.email !== ADMIN_EMAIL) {
+        alert("🚫 غير مسموح لك بالدخول");
+        window.location.href = "index.html";
+      }
+    }
+
+    checkAuth();
+
+    // ✅ إضافة منتج جديد
+    document.getElementById("add-product-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById("product-name").value;
+      const description = document.getElementById("product-description").value;
+      const price = document.getElementById("product-price").value;
+      const stock = document.getElementById("product-stock").value;
+      const imageFile = document.getElementById("product-image").files[0];
+
+      let imageUrl = null;
+      if (imageFile) {
+        const { data, error } = await supabase.storage.from("products").upload(Date.now() + "-" + imageFile.name, imageFile);
+        if (!error) {
+          imageUrl = `${SUPABASE_URL}/storage/v1/object/public/products/${data.path}`;
+        }
+      }
+
+      const { error } = await supabase.from("products").insert([{ name, description, price, stock, image_url: imageUrl }]);
+      if (error) {
+        alert("❌ خطأ في الإضافة");
+      } else {
+        alert("✅ تم إضافة المنتج بنجاح");
+        loadProducts();
+      }
+    });
+
+    // ✅ عرض المنتجات
+    async function loadProducts() {
+      const { data: products } = await supabase.from("products").select("*");
+      const table = document.getElementById("products-table");
+      table.innerHTML = "";
+      products.forEach(prod => {
+        table.innerHTML += `
+          <tr class="border-b">
+            <td class="p-2"><img src="${prod.image_url || ''}" class="w-16 h-16 object-cover rounded"></td>
+            <td class="p-2">${prod.name}</td>
+            <td class="p-2">${prod.price} ج.م</td>
+            <td class="p-2">${prod.stock}</td>
+            <td class="p-2">${prod.sold}</td>
+            <td class="p-2">
+              <button onclick="deleteProduct(${prod.id})" class="bg-red-500 text-white px-3 py-1 rounded">🗑️ حذف</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    // ✅ حذف منتج
+    async function deleteProduct(id) {
+      if (confirm("هل تريد حذف هذا المنتج؟")) {
+        await supabase.from("products").delete().eq("id", id);
+        loadProducts();
+      }
+    }
+
+    loadProducts();
+  </script>
+</body>
+</html>
