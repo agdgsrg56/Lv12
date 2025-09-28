@@ -56,7 +56,6 @@
     // --- السلة من localStorage ---
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-    // ضمان أن كل عنصر في السلة له quantity كرقم صالح
     function normalizeCart() {
       cart = cart.map((it) => {
         const qty = Number(it.quantity);
@@ -119,7 +118,6 @@
       renderCart();
     }
 
-    // تفادي XSS في أسماء المنتجات
     function escapeHtml(text) {
       return String(text)
         .replace(/&/g, "&amp;")
@@ -129,7 +127,6 @@
         .replace(/'/g, "&#039;");
     }
 
-    // ================== إرسال الطلب ==================
     async function submitOrder() {
       normalizeCart();
 
@@ -146,29 +143,33 @@
         return;
       }
 
-      // تحضير بيانات الطلب (bulk)
-      const orderRows = [];
-      for (const it of cart) {
-        if (!it.id) {
-          alert("❌ خطأ: منتج بدون معرف (id). لا يمكن إكمال الطلب.");
-          console.error("Cart item missing id:", it);
-          return;
-        }
-        const qty = Number(it.quantity) || 1;
-        if (!Number.isInteger(qty) || qty <= 0) {
-          alert("⚠️ هناك كمية غير صحيحة في السلة. سيتم تحويلها إلى 1 تلقائيًا.");
-        }
-        orderRows.push({
-          name,
-          phone,
-          address,
-          product_id: Number(it.id),   // تأكد أن product_id رقم
-          quantity: Math.trunc(qty),
-          status: "pending"            // أو 'pending' حسب جدولك
-        });
-      }
+const orderRows = [];
+for (const it of cart) {
+  if (!it.id) {
+    alert("❌ خطأ: منتج بدون معرف (id). لا يمكن إكمال الطلب.");
+    console.error("Cart item missing id:", it);
+    return;
+  }
+  const qty = Number(it.quantity) || 1;
+  if (!Number.isInteger(qty) || qty <= 0) {
+    alert("⚠️ هناك كمية غير صحيحة في السلة. سيتم تحويلها إلى 1 تلقائيًا.");
+  }
 
-      // DEBUG: اطبع بيانات الإرسال في الكونسول
+  const price = Number(it.price) || 0;
+
+  orderRows.push({
+    name,
+    phone,
+    address,
+    product_id: Number(it.id),
+    quantity: Math.trunc(qty),
+    price: price,
+    total: price * Math.trunc(qty),
+    status: "pending"
+  });
+}
+
+
       console.log("Will insert orders:", orderRows);
 
       try {
@@ -176,12 +177,11 @@
         const { data, error } = await supabase
           .from("orders")
           .insert(orderRows)
-          .select(); // نطلب التمثيل المراد إرجاعه
+          .select(); 
 
         console.log("Supabase insert response:", { data, error });
 
         if (error) {
-          // عرض تفصيل الخطأ للمطور (في الكونسول) ومستخدم بسيط للمستخدم
           console.error("Supabase insert error:", error);
           alert("❌ حدث خطأ أثناء إرسال الطلب. افتح الكونسول لرؤية التفاصيل.");
           return;
