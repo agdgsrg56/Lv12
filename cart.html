@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>🛒 سلة المشتريات</title>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" href="lv12.ico" type="image/x-icon">
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+  <div class="container mx-auto py-10">
+    <h1 class="text-3xl font-bold mb-6 text-center">🛒 سلة المشتريات</h1>
+
+    <div class="bg-white rounded shadow p-4 mb-6">
+      <table class="w-full text-center">
+        <thead class="bg-gray-200">
+          <tr>
+            <th class="p-2">المنتج</th>
+            <th class="p-2">الكمية</th>
+            <th class="p-2">السعر</th>
+            <th class="p-2">الإجمالي</th>
+            <th class="p-2">إجراءات</th>
+          </tr>
+        </thead>
+        <tbody id="cart-items"></tbody>
+      </table>
+    </div>
+
+    <div class="bg-white rounded shadow p-6 mb-6">
+      <h2 class="text-xl font-bold mb-4">👤 بيانات العميل</h2>
+      <input type="text" id="cust-name" placeholder="الاسم" class="border p-2 w-full mb-3 rounded">
+      <input type="text" id="cust-phone" placeholder="رقم الهاتف" class="border p-2 w-full mb-3 rounded">
+      <input type="text" id="cust-address" placeholder="العنوان" class="border p-2 w-full mb-3 rounded">
+    </div>
+
+    <div class="text-center">
+      <button onclick="submitOrder()" class="bg-green-600 text-white px-6 py-3 rounded shadow hover:bg-green-700">
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://nszhzfysitppxssplqfb.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemh6ZnlzaXRwcHhzc3BscWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMzA4OTcsImV4cCI6MjA3MzgwNjg5N30.5KvK4bhqkZ_GpIfED4qecIMfeubAJYwSFJslULwOp-w";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+    function renderCart() {
+      const table = document.getElementById("cart-items");
+      table.innerHTML = "";
+
+      if (cart.length === 0) {
+        table.innerHTML = `<tr><td colspan="5" class="p-4 text-gray-500">السلة فارغة 🛒</td></tr>`;
+        return;
+      }
+
+      cart.forEach((item, index) => {
+        let total = item.price * item.quantity;
+        table.innerHTML += `
+          <tr class="border-b">
+            <td class="p-2">${item.name}</td>
+            <td class="p-2">
+              <input type="number" min="1" value="${item.quantity}" 
+                     onchange="updateQuantity(${index}, this.value)" 
+                     class="w-16 border rounded p-1 text-center">
+            </td>
+            <td class="p-2">${item.price} ج.م</td>
+            <td class="p-2">${total} ج.م</td>
+            <td class="p-2">
+              <button onclick="removeItem(${index})" class="bg-red-500 text-white px-2 py-1 rounded">❌ حذف</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function updateQuantity(index, newQty) {
+      cart[index].quantity = parseInt(newQty);
+      localStorage.setItem("cart", JSON.stringify(cart));
+      renderCart();
+    }
+
+    function removeItem(index) {
+      cart.splice(index, 1);
+      localStorage.setItem("cart", JSON.stringify(cart));
+      renderCart();
+    }
+
+    async function submitOrder() {
+      const name = document.getElementById("cust-name").value;
+      const phone = document.getElementById("cust-phone").value;
+      const address = document.getElementById("cust-address").value;
+
+      if (!name || !phone || !address) {
+        alert("⚠️ من فضلك أدخل جميع بياناتك");
+        return;
+      }
+
+      if (cart.length === 0) {
+        alert("🛒 السلة فارغة");
+        return;
+      }
+
+      for (let item of cart) {
+        const { error } = await supabase
+          .from("orders")
+          .insert([{
+            name: name,
+            phone: phone,
+            address: address,
+            product_id: item.id,
+            quantity: item.quantity,
+            status: "pending"
+          }]);
+
+        if (error) {
+          console.error(error);
+          alert("❌ خطأ أثناء إرسال الطلب");
+          return;
+        }
+      }
+
+      alert("✅ تم إرسال طلبك بنجاح! سنتواصل معك قريبًا.");
+      localStorage.removeItem("cart");
+      cart = [];
+      renderCart();
+    }
+
+    renderCart();
+  </script>
+</body>
+</html>
