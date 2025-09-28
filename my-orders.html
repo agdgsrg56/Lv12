@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>طلباتي</title>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" href="lv12.ico" type="image/x-icon">
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+  <div class="container mx-auto py-10">
+    <h1 class="text-3xl font-bold mb-6 text-center">🛍️ طلباتي</h1>
+
+    <div id="orders-list" class="space-y-4">
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://nszhzfysitppxssplqfb.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemh6ZnlzaXRwcHhzc3BscWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMzA4OTcsImV4cCI6MjA3MzgwNjg5N30.5KvK4bhqkZ_GpIfED4qecIMfeubAJYwSFJslULwOp-w";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    async function loadMyOrders() {
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData.session) {
+        alert("من فضلك سجل الدخول أولا");
+        window.location.href = "login.html";
+        return;
+      }
+
+      const user = sessionData.session.user;
+
+      const { data: orders, error } = await supabase
+        .from("orders")
+        .select("id, quantity, status, products(name, price, image_url)")
+        .eq("user_id", user.id)
+        .order("id", { ascending: false });
+
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      const ordersList = document.getElementById("orders-list");
+      ordersList.innerHTML = "";
+
+      if (!orders || orders.length === 0) {
+        ordersList.innerHTML = `<p class="text-center text-gray-600">لا توجد طلبات بعد</p>`;
+        return;
+      }
+
+      orders.forEach(order => {
+        let statusColor = "bg-yellow-200 text-yellow-800";
+        if (order.status === "shipped") statusColor = "bg-blue-200 text-blue-800";
+        if (order.status === "delivered") statusColor = "bg-green-200 text-green-800";
+        if (order.status === "cancelled") statusColor = "bg-red-200 text-red-800";
+
+        ordersList.innerHTML += `
+          <div class="bg-white p-4 rounded shadow flex items-center gap-4">
+            <img src="${order.products?.image_url || 'default.png'}" class="w-20 h-20 object-cover rounded">
+            <div class="flex-1">
+              <h2 class="text-lg font-semibold">${order.products?.name || "منتج محذوف"}</h2>
+              <p>الكمية: ${order.quantity}</p>
+              <p>السعر: ${order.products?.price} ج.م</p>
+            </div>
+            <span class="px-3 py-1 rounded ${statusColor}">${order.status}</span>
+          </div>
+        `;
+      });
+    }
+
+    loadMyOrders();
+  </script>
+</body>
+</html>
