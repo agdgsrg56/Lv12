@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>المتجر | LV12 WarerWeb</title>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+  <!-- الهيدر -->
+  <header class="bg-white shadow-md sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+      <h1 class="text-2xl font-bold text-blue-600">🛒 متجرنا</h1>
+      <input id="searchInput" type="text" placeholder="ابحث عن منتج..."
+             class="border rounded-full px-4 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-blue-400">
+    </div>
+  </header>
+
+  <!-- المنتجات -->
+  <main class="max-w-6xl mx-auto px-6 py-12">
+    <div id="productsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <!-- المنتجات هتظهر هنا -->
+    </div>
+  </main>
+
+  <!-- JS -->
+  <script>
+    const SUPABASE_URL = "https://nszhzfysitppxssplqfb.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemh6ZnlzaXRwcHhzc3BscWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMzA4OTcsImV4cCI6MjA3MzgwNjg5N30.5KvK4bhqkZ_GpIfED4qecIMfeubAJYwSFJslULwOp-w";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const productsGrid = document.getElementById("productsGrid");
+    const searchInput = document.getElementById("searchInput");
+
+    // جلب المنتجات
+    async function fetchProducts(searchTerm = "") {
+      let query = supabase.from("products").select("*");
+
+      if (searchTerm) {
+        query = query.ilike("name", `%${searchTerm}%`);
+      }
+
+      const { data: products, error } = await query;
+      if (error) {
+        console.error("خطأ في جلب المنتجات:", error.message);
+        return;
+      }
+
+      renderProducts(products);
+    }
+
+    // عرض المنتجات
+    function renderProducts(products) {
+      productsGrid.innerHTML = "";
+
+      if (!products || products.length === 0) {
+        productsGrid.innerHTML = `<p class="text-center col-span-3 text-gray-600">لا توجد منتجات متاحة حالياً</p>`;
+        return;
+      }
+
+      products.forEach(product => {
+        const card = document.createElement("div");
+        card.className = "bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition";
+
+        card.innerHTML = `
+          <img src="${product.image_url || 'https://via.placeholder.com/300'}" alt="${product.name}" class="w-full h-48 object-cover">
+          <div class="p-6">
+            <h3 class="text-xl font-bold mb-2">${product.name}</h3>
+            <p class="text-gray-600 text-sm mb-3">${product.description || "منتج بدون وصف"}</p>
+            <p class="font-semibold text-blue-600 mb-2">💰 ${product.price} ج.م</p>
+            <p class="text-sm text-gray-500 mb-3">المتوفر: ${product.stock} | المبيعات: ${product.sold || 0}</p>
+            <div class="flex items-center gap-2">
+              <input type="number" value="1" min="1" max="${product.stock}" class="w-16 border rounded px-2 py-1 text-center" id="qty-${product.id}">
+              <button onclick="addToCart(${product.id})"
+                class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+                🛍️ أضف للسلة
+              </button>
+            </div>
+          </div>
+        `;
+
+        productsGrid.appendChild(card);
+      });
+    }
+
+    function addToCart(productId) {
+      const qty = document.getElementById(`qty-${productId}`).value;
+      alert(`تمت إضافة المنتج رقم ${productId} بكمية ${qty} للسلة ✅`);
+    }
+
+    searchInput.addEventListener("input", (e) => {
+      fetchProducts(e.target.value);
+    });
+
+    fetchProducts();
+  </script>
+</body>
+</html>
