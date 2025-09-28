@@ -9,23 +9,45 @@
 </head>
 <body class="bg-gray-50 text-gray-800">
 
-  <!-- الهيدر -->
   <header class="bg-white shadow-md sticky top-0 z-50">
     <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
       <h1 class="text-2xl font-bold text-blue-600">🛒 متجرنا</h1>
-      <input id="searchInput" type="text" placeholder="ابحث عن منتج..."
-             class="border rounded-full px-4 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-blue-400">
+      <div class="flex items-center gap-4">
+        <input id="searchInput" type="text" placeholder="ابحث عن منتج..."
+               class="border rounded-full px-4 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-blue-400">
+        <span id="userName" class="text-gray-700 font-medium"></span>
+        <a href="cart.html" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">🛍️ السلة</a>
+      </div>
     </div>
   </header>
 
-  <!-- المنتجات -->
   <main class="max-w-6xl mx-auto px-6 py-12">
     <div id="productsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      <!-- المنتجات هتظهر هنا -->
     </div>
   </main>
 
-  <!-- JS -->
+  <div id="buyModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+      <h2 class="text-xl font-bold mb-4">🛍️ إتمام الشراء</h2>
+      <form id="buyForm" class="space-y-3">
+        <input type="text" id="custName" placeholder="الاسم الكامل" class="border w-full p-2 rounded" required>
+        <input type="text" id="custAddress" placeholder="العنوان" class="border w-full p-2 rounded" required>
+        <input type="tel" id="custPhone" placeholder="رقم الهاتف" class="border w-full p-2 rounded" required>
+        <select id="custPayment" class="border w-full p-2 rounded" required>
+          <option value="">اختر طريقة الدفع</option>
+          <option value="cash">💵 عند الاستلام</option>
+          <option value="card">💳 بطاقة بنكية</option>
+        </select>
+        <input type="hidden" id="selectedProductId">
+        <input type="hidden" id="selectedQty">
+        <div class="flex justify-between mt-4">
+          <button type="button" onclick="closeModal()" class="bg-gray-400 text-white px-4 py-2 rounded">إلغاء</button>
+          <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded">✅ تأكيد الطلب</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script>
     const SUPABASE_URL = "https://nszhzfysitppxssplqfb.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemh6ZnlzaXRwcHhzc3BscWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMzA4OTcsImV4cCI6MjA3MzgwNjg5N30.5KvK4bhqkZ_GpIfED4qecIMfeubAJYwSFJslULwOp-w";
@@ -33,39 +55,38 @@
 
     const productsGrid = document.getElementById("productsGrid");
     const searchInput = document.getElementById("searchInput");
+    const userNameEl = document.getElementById("userName");
 
-    // جلب المنتجات
+    // ✅ تحقق من تسجيل الدخول
+    async function checkLogin() {
+      const { data } = await supabase.auth.getSession();
+      if (data.session) {
+        userNameEl.textContent = "👤 " + data.session.user.email;
+      } else {
+        userNameEl.innerHTML = `<a href="login.html" class="text-blue-600 underline">تسجيل الدخول</a>`;
+      }
+      return data.session;
+    }
+
     async function fetchProducts(searchTerm = "") {
       let query = supabase.from("products").select("*");
-
-      if (searchTerm) {
-        query = query.ilike("name", `%${searchTerm}%`);
-      }
-
+      if (searchTerm) query = query.ilike("name", `%${searchTerm}%`);
       const { data: products, error } = await query;
-      if (error) {
-        console.error("خطأ في جلب المنتجات:", error.message);
-        return;
-      }
-
+      if (error) { console.error(error.message); return; }
       renderProducts(products);
     }
 
-    // عرض المنتجات
     function renderProducts(products) {
       productsGrid.innerHTML = "";
-
       if (!products || products.length === 0) {
         productsGrid.innerHTML = `<p class="text-center col-span-3 text-gray-600">لا توجد منتجات متاحة حالياً</p>`;
         return;
       }
-
       products.forEach(product => {
         const card = document.createElement("div");
         card.className = "bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition";
-
         card.innerHTML = `
-          <img src="${product.image_url || 'https://via.placeholder.com/300'}" alt="${product.name}" class="w-full h-48 object-cover">
+          <img src="${product.image_url || 'https://via.placeholder.com/300'}" class="w-full h-48 object-cover">
           <div class="p-6">
             <h3 class="text-xl font-bold mb-2">${product.name}</h3>
             <p class="text-gray-600 text-sm mb-3">${product.description || "منتج بدون وصف"}</p>
@@ -73,28 +94,74 @@
             <p class="text-sm text-gray-500 mb-3">المتوفر: ${product.stock} | المبيعات: ${product.sold || 0}</p>
             <div class="flex items-center gap-2">
               <input type="number" value="1" min="1" max="${product.stock}" class="w-16 border rounded px-2 py-1 text-center" id="qty-${product.id}">
-              <button onclick="addToCart(${product.id})"
-                class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
-                🛍️ أضف للسلة
-              </button>
+              <button onclick="addToCart(${product.id})" class="bg-blue-600 text-white px-3 py-1 rounded">➕ للسلة</button>
+              <button onclick="buyNow(${product.id})" class="bg-green-600 text-white px-3 py-1 rounded">💳 اشترِ الآن</button>
             </div>
           </div>
         `;
-
         productsGrid.appendChild(card);
       });
     }
 
     function addToCart(productId) {
       const qty = document.getElementById(`qty-${productId}`).value;
-      alert(`تمت إضافة المنتج رقم ${productId} بكمية ${qty} للسلة ✅`);
+      let cart = JSON.parse(localStorage.getItem("cart")) || [];
+      cart.push({ productId, qty });
+      localStorage.setItem("cart", JSON.stringify(cart));
+      alert("✅ تمت الإضافة للسلة");
     }
 
-    searchInput.addEventListener("input", (e) => {
-      fetchProducts(e.target.value);
+    async function buyNow(productId) {
+      const session = await checkLogin();
+      if (!session) {
+        window.location.href = "login.html";
+        return;
+      }
+      const qty = document.getElementById(`qty-${productId}`).value;
+      document.getElementById("selectedProductId").value = productId;
+      document.getElementById("selectedQty").value = qty;
+      document.getElementById("buyModal").classList.remove("hidden");
+      document.getElementById("buyModal").classList.add("flex");
+    }
+
+    function closeModal() {
+      document.getElementById("buyModal").classList.add("hidden");
+    }
+
+    document.getElementById("buyForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const session = await checkLogin();
+      if (!session) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      const name = document.getElementById("custName").value;
+      const address = document.getElementById("custAddress").value;
+      const phone = document.getElementById("custPhone").value;
+      const payment = document.getElementById("custPayment").value;
+      const productId = document.getElementById("selectedProductId").value;
+      const qty = document.getElementById("selectedQty").value;
+
+      const { error } = await supabase.from("orders").insert([
+        { user_id: session.user.id, name, address, phone, payment, product_id: productId, quantity: qty }
+      ]);
+      if (error) {
+        alert("❌ خطأ في إنشاء الطلب");
+        console.error(error);
+      } else {
+        alert("✅ تم إرسال طلبك بنجاح");
+        closeModal();
+      }
     });
 
+    searchInput.addEventListener("input", (e) => fetchProducts(e.target.value));
+
+    // تحميل أول مرة
+    checkLogin();
     fetchProducts();
   </script>
 </body>
 </html>
+
+
