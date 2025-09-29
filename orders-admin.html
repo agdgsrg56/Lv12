@@ -110,77 +110,96 @@
   let filterStart = null;
   let filterEnd = null;
 
-  // ✅ تحميل الطلبات
-  async function loadOrders() {
-    let query = supabase
-      .from("orders")
-      .select("id, name, phone, address, quantity, status, created_at, product_id, products(id, name, stock, sold)")
-      .order("id", { ascending: false });
+ 
 
-    if (filterStart) query = query.gte("created_at", filterStart + "T00:00:00");
-    if (filterEnd) query = query.lte("created_at", filterEnd + "T23:59:59");
 
-    const { data: orders, error } = await query;
-    if (error) {
-      console.error(error);
-      alert("❌ خطأ في تحميل الطلبات");
-      return;
+  
+// ✅ تحميل الطلبات (نسخة بدون علاقات مباشرة)
+async function loadOrders() {
+  let query = supabase
+    .from("orders")
+    .select("id, name, phone, address, quantity, status, created_at, product_id")
+    .order("id", { ascending: false });
+
+  if (filterStart) query = query.gte("created_at", filterStart + "T00:00:00");
+  if (filterEnd) query = query.lte("created_at", filterEnd + "T23:59:59");
+
+  const { data: orders, error } = await query;
+  if (error) {
+    console.error(error);
+    alert("❌ خطأ في تحميل الطلبات: " + error.message);
+    return;
+  }
+
+  const pendingTable = document.getElementById("pending-orders");
+  const shippedTable = document.getElementById("shipped-orders");
+  const deliveredTable = document.getElementById("delivered-orders");
+  const cancelledTable = document.getElementById("cancelled-orders");
+
+  pendingTable.innerHTML = "";
+  shippedTable.innerHTML = "";
+  deliveredTable.innerHTML = "";
+  cancelledTable.innerHTML = "";
+
+  for (const order of orders) {
+    // ✅ جلب بيانات المنتج (استعلام منفصل)
+    let productName = "❌ منتج محذوف";
+    try {
+      const { data: product } = await supabase
+        .from("products")
+        .select("name")
+        .eq("id", order.product_id)
+        .single();
+
+      if (product) productName = product.name;
+    } catch (e) {
+      console.warn("Product not found for order", order.id);
     }
 
-    const pendingTable = document.getElementById("pending-orders");
-    const shippedTable = document.getElementById("shipped-orders");
-    const deliveredTable = document.getElementById("delivered-orders");
-    const cancelledTable = document.getElementById("cancelled-orders");
+    let row = `
+      <tr class="border-b">
+        <td class="p-2">${order.id}</td>
+        <td class="p-2">${order.name}</td>
+        <td class="p-2">${order.phone}</td>
+        <td class="p-2">${order.address}</td>
+        <td class="p-2">${productName}</td>
+        <td class="p-2">${order.quantity}</td>
+        <td class="p-2">
+          <span class="px-2 py-1 rounded ${
+            order.status === "delivered" ? "bg-green-200 text-green-800" : 
+            order.status === "shipped" ? "bg-blue-200 text-blue-800" : 
+            order.status === "cancelled" ? "bg-red-200 text-red-800" :
+            "bg-yellow-200 text-yellow-800"
+          }">${order.status}</span>
+        </td>
+    `;
 
-    pendingTable.innerHTML = "";
-    shippedTable.innerHTML = "";
-    deliveredTable.innerHTML = "";
-    cancelledTable.innerHTML = "";
-
-    orders.forEach(order => {
-      let row = `
-        <tr class="border-b">
-          <td class="p-2">${order.id}</td>
-          <td class="p-2">${order.name}</td>
-          <td class="p-2">${order.phone}</td>
-          <td class="p-2">${order.address}</td>
-          <td class="p-2">${order.products?.name || "❌ منتج محذوف"}</td>
-          <td class="p-2">${order.quantity}</td>
-          <td class="p-2">
-            <span class="px-2 py-1 rounded ${
-              order.status === "delivered" ? "bg-green-200 text-green-800" : 
-              order.status === "shipped" ? "bg-blue-200 text-blue-800" : 
-              order.status === "cancelled" ? "bg-red-200 text-red-800" :
-              "bg-yellow-200 text-yellow-800"
-            }">${order.status}</span>
-          </td>
-      `;
-
-      if (order.status === "pending") {
-        row += `
-          <td class="p-2 flex gap-1">
-            <button onclick="updateStatus(${order.id}, '${order.product_id}', ${order.quantity}, 'shipped')" class="bg-blue-500 text-white px-2 py-1 rounded">🚚 شحن</button>
-            <button onclick="updateStatus(${order.id}, '${order.product_id}', ${order.quantity}, 'cancelled')" class="bg-red-500 text-white px-2 py-1 rounded">❌ إلغاء</button>
-          </td>
-        </tr>`;
-        pendingTable.innerHTML += row;
-      } else if (order.status === "shipped") {
-        row += `
-          <td class="p-2 flex gap-1">
-            <button onclick="updateStatus(${order.id}, '${order.product_id}', ${order.quantity}, 'delivered')" class="bg-green-500 text-white px-2 py-1 rounded">✅ تم التسليم</button>
-            <button onclick="updateStatus(${order.id}, '${order.product_id}', ${order.quantity}, 'cancelled')" class="bg-red-500 text-white px-2 py-1 rounded">❌ إلغاء</button>
-          </td>
-        </tr>`;
-        shippedTable.innerHTML += row;
-      } else if (order.status === "delivered") {
-        row += "</tr>";
-        deliveredTable.innerHTML += row;
-      } else if (order.status === "cancelled") {
-        row += "</tr>";
-        cancelledTable.innerHTML += row;
-      }
-    });
+    // ✅ الإجراءات حسب الحالة
+    if (order.status === "pending") {
+      row += `
+        <td class="p-2 flex gap-1">
+          <button onclick="updateStatus(${order.id}, '${order.product_id}', ${order.quantity}, 'shipped')" class="bg-blue-500 text-white px-2 py-1 rounded">🚚 شحن</button>
+          <button onclick="updateStatus(${order.id}, '${order.product_id}', ${order.quantity}, 'cancelled')" class="bg-red-500 text-white px-2 py-1 rounded">❌ إلغاء</button>
+        </td>
+      </tr>`;
+      pendingTable.innerHTML += row;
+    } else if (order.status === "shipped") {
+      row += `
+        <td class="p-2 flex gap-1">
+          <button onclick="updateStatus(${order.id}, '${order.product_id}', ${order.quantity}, 'delivered')" class="bg-green-500 text-white px-2 py-1 rounded">✅ تم التسليم</button>
+          <button onclick="updateStatus(${order.id}, '${order.product_id}', ${order.quantity}, 'cancelled')" class="bg-red-500 text-white px-2 py-1 rounded">❌ إلغاء</button>
+        </td>
+      </tr>`;
+      shippedTable.innerHTML += row;
+    } else if (order.status === "delivered") {
+      row += "</tr>";
+      deliveredTable.innerHTML += row;
+    } else if (order.status === "cancelled") {
+      row += "</tr>";
+      cancelledTable.innerHTML += row;
+    }
   }
+}
 
   // ✅ تحديث حالة الطلب
   async function updateStatus(orderId, productId, qty, newStatus) {
