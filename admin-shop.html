@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+
+
+ <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
@@ -12,26 +14,30 @@
   <div class="container mx-auto py-10">
     <h1 class="text-3xl font-bold mb-6 text-center">لوحة تحكم المتجر 🛠️</h1>
 
-    <!-- ✅ نموذج إضافة منتج -->
-    <form id="add-product-form" class="bg-white p-6 rounded shadow-md mb-10">
-      <h2 class="text-xl font-semibold mb-4">➕ إضافة منتج جديد</h2>
+    <form id="product-form" class="bg-white p-6 rounded shadow-md mb-10">
+      <h2 id="form-title" class="text-xl font-semibold mb-4">➕ إضافة منتج جديد</h2>
+
+      <input type="hidden" id="product-id">
+
       <input type="text" id="product-name" placeholder="اسم المنتج" class="border p-2 rounded w-full mb-3" required>
       <textarea id="product-description" placeholder="وصف المنتج" class="border p-2 rounded w-full mb-3"></textarea>
       <input type="number" id="product-price" placeholder="السعر" class="border p-2 rounded w-full mb-3" required>
       <input type="number" id="product-stock" placeholder="الكمية" class="border p-2 rounded w-full mb-3" required>
       <input type="file" id="product-image" class="mb-3">
 
-      <!-- ✅ اختيار القسم -->
+      <img id="current-image" src="" data-url="" class="w-24 h-24 object-cover rounded mb-3 hidden">
+      <button type="button" id="remove-image" class="hidden bg-red-500 text-white px-3 py-1 rounded mb-3">🗑️ إزالة الصورة</button>
+
       <label class="block mb-2 font-semibold">القسم:</label>
       <select id="product-category" class="border p-2 rounded w-full mb-3">
         <option value="">اختر قسماً...</option>
       </select>
       <input type="text" id="new-category" placeholder="➕ إضافة قسم جديد" class="border p-2 rounded w-full mb-3">
 
-      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">➕ إضافة المنتج</button>
+      <button type="submit" id="submit-btn" class="bg-blue-600 text-white px-4 py-2 rounded">➕ إضافة المنتج</button>
+      <button type="button" id="cancel-edit" class="hidden bg-gray-500 text-white px-4 py-2 rounded">❌ إلغاء</button>
     </form>
 
-    <!-- ✅ جدول المنتجات -->
     <div>
       <h2 class="text-xl font-semibold mb-4">📦 المنتجات الحالية</h2>
       <table class="w-full bg-white rounded shadow-md">
@@ -46,64 +52,77 @@
             <th class="p-2">إجراءات</th>
           </tr>
         </thead>
-        <tbody id="products-table">
-          <!-- المنتجات هتظهر هنا -->
-        </tbody>
+        <tbody id="products-table"></tbody>
       </table>
     </div>
   </div>
 
-  <script>
-    const SUPABASE_URL = "https://nszhzfysitppxssplqfb.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemh6ZnlzaXRwcHhzc3BscWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMzA4OTcsImV4cCI6MjA3MzgwNjg5N30.5KvK4bhqkZ_GpIfED4qecIMfeubAJYwSFJslULwOp-w";
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+<script>
+  const SUPABASE_URL = "https://nszhzfysitppxssplqfb.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemh6ZnlzaXRwcHhzc3BscWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMzA4OTcsImV4cCI6MjA3MzgwNjg5N30.5KvK4bhqkZ_GpIfED4qecIMfeubAJYwSFJslULwOp-w";
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const ADMIN_EMAIL = "lv12wlv12@gmail.com"; 
-    async function checkAuth() {
-      const { data } = await supabase.auth.getSession();
-      if (!data.session || data.session.user.email !== ADMIN_EMAIL) {
-        alert("🚫 غير مسموح لك بالدخول");
-        window.location.href = "index.html";
+  const ADMIN_EMAIL = "lv12wlv12@gmail.com"; 
+
+  async function checkAuth() {
+    const { data } = await supabase.auth.getSession();
+    if (!data.session || data.session.user.email !== ADMIN_EMAIL) {
+      alert("🚫 غير مسموح لك بالدخول");
+      window.location.href = "index.html";
+    }
+  }
+  checkAuth();
+
+  async function loadCategories() {
+    const { data: products } = await supabase.from("products").select("category");
+    const select = document.getElementById("product-category");
+    select.innerHTML = `<option value="">اختر قسماً...</option>`;
+    const categories = [...new Set(products.map(p => p.category).filter(Boolean))];
+    categories.forEach(cat => {
+      select.innerHTML += `<option value="${cat}">${cat}</option>`;
+    });
+  }
+
+  document.getElementById("product-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const id = document.getElementById("product-id").value;
+    const name = document.getElementById("product-name").value;
+    const description = document.getElementById("product-description").value;
+    const price = document.getElementById("product-price").value;
+    const stock = document.getElementById("product-stock").value;
+    const imageFile = document.getElementById("product-image").files[0];
+
+    let category = document.getElementById("new-category").value.trim();
+    if (!category) {
+      category = document.getElementById("product-category").value;
+    }
+
+    let imageUrl = document.getElementById("current-image").dataset.url || null;
+
+    if (imageFile) {
+      const { data, error } = await supabase.storage
+        .from("products")
+        .upload(Date.now() + "-" + imageFile.name, imageFile, { upsert: true });
+      if (!error) {
+        imageUrl = `${SUPABASE_URL}/storage/v1/object/public/products/${data.path}`;
       }
     }
-    checkAuth();
 
-    // ✅ تحميل الأقسام الموجودة من المنتجات
-    async function loadCategories() {
-      const { data: products } = await supabase.from("products").select("category");
-      const select = document.getElementById("product-category");
-      select.innerHTML = `<option value="">اختر قسماً...</option>`;
-      const categories = [...new Set(products.map(p => p.category).filter(Boolean))];
-      categories.forEach(cat => {
-        select.innerHTML += `<option value="${cat}">${cat}</option>`;
-      });
-    }
+    if (id) {
+      const updateData = { name, description, price, stock, category };
+      if (imageUrl) updateData.image_url = imageUrl;
 
-    document.getElementById("add-product-form").addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const name = document.getElementById("product-name").value;
-      const description = document.getElementById("product-description").value;
-      const price = document.getElementById("product-price").value;
-      const stock = document.getElementById("product-stock").value;
-      const imageFile = document.getElementById("product-image").files[0];
-
-      // ✅ القسم
-      let category = document.getElementById("new-category").value.trim();
-      if (!category) {
-        category = document.getElementById("product-category").value;
+      const { error } = await supabase.from("products").update(updateData).eq("id", id);
+      if (error) {
+        alert("❌ خطأ في التعديل: " + error.message);
+      } else {
+        alert("✅ تم تعديل المنتج بنجاح");
+        resetForm();
+        loadProducts();
+        loadCategories();
       }
-
-      let imageUrl = null;
-      if (imageFile) {
-        const { data, error } = await supabase.storage
-          .from("products")
-          .upload(Date.now() + "-" + imageFile.name, imageFile);
-        if (!error) {
-          imageUrl = `${SUPABASE_URL}/storage/v1/object/public/products/${data.path}`;
-        }
-      }
-
+    } else {
       const { error } = await supabase.from("products").insert([{ 
         name, description, price, stock, category, image_url: imageUrl 
       }]);
@@ -111,45 +130,95 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
         alert("❌ خطأ في الإضافة: " + error.message);
       } else {
         alert("✅ تم إضافة المنتج بنجاح");
+        resetForm();
         loadProducts();
         loadCategories();
-        e.target.reset();
       }
+    }
+  });
+
+  async function loadProducts() {
+    const { data: products } = await supabase.from("products").select("*");
+    const table = document.getElementById("products-table");
+    table.innerHTML = "";
+
+    products.forEach(prod => {
+      const row = document.createElement("tr");
+      row.className = "border-b";
+      row.innerHTML = `
+        <td class="p-2"><img src="${prod.image_url || ''}" class="w-16 h-16 object-cover rounded"></td>
+        <td class="p-2">${prod.name}</td>
+        <td class="p-2">${prod.category || '-'}</td>
+        <td class="p-2">${prod.price} ج.م</td>
+        <td class="p-2">${prod.stock}</td>
+        <td class="p-2">${prod.sold || 0}</td>
+        <td class="p-2 flex gap-1">
+          <button 
+            class="bg-yellow-500 text-white px-3 py-1 rounded edit-btn"
+            data-id="${prod.id}"
+            data-name="${prod.name}"
+            data-description="${prod.description || ''}"
+            data-price="${prod.price}"
+            data-stock="${prod.stock}"
+            data-category="${prod.category || ''}"
+            data-image="${prod.image_url || ''}"
+          >✏️ تعديل</button>
+          <button onclick="deleteProduct(${prod.id})" class="bg-red-500 text-white px-3 py-1 rounded">🗑️ حذف</button>
+        </td>
+      `;
+      table.appendChild(row);
     });
 
-    async function loadProducts() {
-      const { data: products } = await supabase.from("products").select("*");
-      const table = document.getElementById("products-table");
-      table.innerHTML = "";
-      products.forEach(prod => {
-        table.innerHTML += `
-          <tr class="border-b">
-            <td class="p-2"><img src="${prod.image_url || ''}" class="w-16 h-16 object-cover rounded"></td>
-            <td class="p-2">${prod.name}</td>
-            <td class="p-2">${prod.category || '-'}</td>
-            <td class="p-2">${prod.price} ج.م</td>
-            <td class="p-2">${prod.stock}</td>
-            <td class="p-2">${prod.sold || 0}</td>
-            <td class="p-2">
-              <button onclick="deleteProduct(${prod.id})" class="bg-red-500 text-white px-3 py-1 rounded">🗑️ حذف</button>
-            </td>
-          </tr>
-        `;
+    document.querySelectorAll(".edit-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        editProduct(btn.dataset);
       });
-    }
+    });
+  }
 
-    async function deleteProduct(id) {
-      if (confirm("هل تريد حذف هذا المنتج؟")) {
-        await supabase.from("products").delete().eq("id", id);
-        loadProducts();
-        loadCategories();
-      }
-    }
+  function editProduct(data) {
+    document.getElementById("product-id").value = data.id;
+    document.getElementById("product-name").value = data.name;
+    document.getElementById("product-description").value = data.description;
+    document.getElementById("product-price").value = data.price;
+    document.getElementById("product-stock").value = data.stock;
+    document.getElementById("product-category").value = data.category;
 
-    // ✅ تحميل عند فتح الصفحة
-    loadProducts();
-    loadCategories();
-  </script>
+    const imgPreview = document.getElementById("current-image");
+    imgPreview.src = data.image || "";
+    imgPreview.dataset.url = data.image || "";
+
+    document.getElementById("form-title").textContent = "✏️ تعديل منتج";
+    document.getElementById("submit-btn").textContent = "💾 حفظ التغييرات";
+    document.getElementById("cancel-edit").classList.remove("hidden");
+  }
+
+  document.getElementById("cancel-edit").addEventListener("click", resetForm);
+
+  function resetForm() {
+    document.getElementById("product-form").reset();
+    document.getElementById("product-id").value = "";
+    document.getElementById("form-title").textContent = "➕ إضافة منتج جديد";
+    document.getElementById("submit-btn").textContent = "➕ إضافة المنتج";
+    document.getElementById("cancel-edit").classList.add("hidden");
+
+    const imgPreview = document.getElementById("current-image");
+    imgPreview.src = "";
+    imgPreview.dataset.url = "";
+  }
+
+  async function deleteProduct(id) {
+    if (confirm("هل تريد حذف هذا المنتج؟")) {
+      await supabase.from("products").delete().eq("id", id);
+      loadProducts();
+      loadCategories();
+    }
+  }
+
+  loadProducts();
+  loadCategories();
+</script>
+
+
 </body>
 </html>
-
