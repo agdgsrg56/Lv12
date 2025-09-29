@@ -30,6 +30,8 @@
         <th class="p-2">الكمية</th>
         <th class="p-2">الحالة</th>
         <th class="p-2">إجراءات</th>
+        <th class="p-2">ميعاد التوصيل</th>
+
       </tr>
     </thead>
     <tbody id="pending-orders"></tbody>
@@ -165,6 +167,12 @@ async function loadOrders() {
             "bg-yellow-200 text-yellow-800"
           }">${order.status}</span>
         </td>
+        <td class="p-2">
+  ${order.delivery_date 
+    ? new Date(order.delivery_date).toLocaleString("ar-EG") 
+    : `<input type="datetime-local" id="delivery-${order.id}" class="border p-1 rounded">`}
+</td>
+
     `;
 
     if (order.status === "pending") {
