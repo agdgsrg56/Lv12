@@ -49,141 +49,193 @@
     </div>
   </div>
 
-  <script>
-    const SUPABASE_URL = "https://nszhzfysitppxssplqfb.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemh6ZnlzaXRwcHhzc3BscWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMzA4OTcsImV4cCI6MjA3MzgwNjg5N30.5KvK4bhqkZ_GpIfED4qecIMfeubAJYwSFJslULwOp-w";
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+ <script>
+  const SUPABASE_URL = "https://nszhzfysitppxssplqfb.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemh6ZnlzaXRwcHhzc3BscWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMzA4OTcsImV4cCI6MjA3MzgwNjg5N30.5KvK4bhqkZ_GpIfED4qecIMfeubAJYwSFJslULwOp-w";
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const productsGrid = document.getElementById("productsGrid");
-    const searchInput = document.getElementById("searchInput");
-    const userNameEl = document.getElementById("userName");
+  const productsGrid = document.getElementById("productsGrid");
+  const searchInput = document.getElementById("searchInput");
+  const userNameEl = document.getElementById("userName");
 
-    // ✅ تحقق من تسجيل الدخول
-    async function checkLogin() {
-      const { data } = await supabase.auth.getSession();
-      if (data.session) {
-        userNameEl.textContent = "👤 " + data.session.user.email;
-      } else {
-        userNameEl.innerHTML = `<a href="login.html" class="text-blue-600 underline">تسجيل الدخول</a>`;
-      }
-      return data.session;
+  // ✅ تحقق من تسجيل الدخول
+  async function checkLogin() {
+    const { data } = await supabase.auth.getSession();
+    if (data.session) {
+      userNameEl.textContent = "👤 " + data.session.user.email;
+    } else {
+      userNameEl.innerHTML = `<a href="login.html" class="text-blue-600 underline">تسجيل الدخول</a>`;
     }
+    return data.session;
+  }
 
-    async function fetchProducts(searchTerm = "") {
-      let query = supabase.from("products").select("*");
-      if (searchTerm) query = query.ilike("name", `%${searchTerm}%`);
-      const { data: products, error } = await query;
-      if (error) { console.error(error.message); return; }
-      renderProducts(products);
+  // ✅ تحميل المنتجات
+  async function fetchProducts(searchTerm = "") {
+    let query = supabase.from("products").select("*");
+    if (searchTerm) query = query.ilike("name", `%${searchTerm}%`);
+    const { data: products, error } = await query;
+    if (error) { 
+      console.error(error.message); 
+      alert("❌ خطأ في تحميل المنتجات"); 
+      return; 
     }
+    renderProducts(products);
+  }
 
-    function renderProducts(products) {
-      productsGrid.innerHTML = "";
-      if (!products || products.length === 0) {
-        productsGrid.innerHTML = `<p class="text-center col-span-3 text-gray-600">لا توجد منتجات متاحة حالياً</p>`;
-        return;
-      }
-      products.forEach(product => {
-        const card = document.createElement("div");
-        card.className = "bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition";
-        card.innerHTML = `
-          <img src="${product.image_url || 'https://via.placeholder.com/300'}" class="w-full h-48 object-cover">
-          <div class="p-6">
-            <h3 class="text-xl font-bold mb-2">${product.name}</h3>
-            <p class="text-gray-600 text-sm mb-3">${product.description || "منتج بدون وصف"}</p>
-            <p class="font-semibold text-blue-600 mb-2">💰 ${product.price} ج.م</p>
-            <p class="text-sm text-gray-500 mb-3">المتوفر: ${product.stock} | المبيعات: ${product.sold || 0}</p>
-            <div class="flex items-center gap-2">
-              <input type="number" value="1" min="1" max="${product.stock}" class="w-16 border rounded px-2 py-1 text-center" id="qty-${product.id}">
-              <button onclick="addToCart(${product.id})" class="bg-blue-600 text-white px-3 py-1 rounded">➕ للسلة</button>
-              <button onclick="buyNow(${product.id})" class="bg-green-600 text-white px-3 py-1 rounded">💳 اشترِ الآن</button>
-            </div>
+  // ✅ عرض المنتجات
+  function renderProducts(products) {
+    productsGrid.innerHTML = "";
+    if (!products || products.length === 0) {
+      productsGrid.innerHTML = `<p class="text-center col-span-3 text-gray-600">لا توجد منتجات متاحة حالياً</p>`;
+      return;
+    }
+    products.forEach(product => {
+      const card = document.createElement("div");
+      card.className = "bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition";
+      card.innerHTML = `
+        <img src="${product.image_url || 'https://via.placeholder.com/300'}" class="w-full h-48 object-cover">
+        <div class="p-6">
+          <h3 class="text-xl font-bold mb-2">${product.name}</h3>
+          <p class="text-gray-600 text-sm mb-3">${product.description || "منتج بدون وصف"}</p>
+          <p class="font-semibold text-blue-600 mb-2">💰 ${product.price} ج.م</p>
+          <p class="text-sm text-gray-500 mb-3">المتوفر: ${product.stock} | المبيعات: ${product.sold || 0}</p>
+          <div class="flex items-center gap-2">
+            <input type="number" value="1" min="1" max="${product.stock}" 
+                   class="w-16 border rounded px-2 py-1 text-center" id="qty-${product.id}">
+            <button onclick="addToCart(${product.id})" class="bg-blue-600 text-white px-3 py-1 rounded">➕ للسلة</button>
+            <button onclick="buyNow(${product.id})" class="bg-green-600 text-white px-3 py-1 rounded">💳 اشترِ الآن</button>
           </div>
-        `;
-        productsGrid.appendChild(card);
-      });
+        </div>
+      `;
+      productsGrid.appendChild(card);
+    });
+  }
+
+  // ✅ إضافة للسلة (localStorage)
+  function addToCart(productId) {
+    const qty = parseInt(document.getElementById(`qty-${productId}`).value) || 1;
+    if (qty <= 0) {
+      alert("⚠️ الكمية غير صحيحة"); 
+      return;
     }
 
- function addToCart(productId) {
-  const qty = parseInt(document.getElementById(`qty-${productId}`).value) || 1;
+    const productCard = document.getElementById(`qty-${productId}`).closest("div.p-6");
+    const name = productCard.querySelector("h3").textContent;
+    const priceText = productCard.querySelector("p.font-semibold").textContent;
+    const price = parseFloat(priceText.replace(/[^\d.]/g, "")) || 0;
 
-  const productCard = document.getElementById(`qty-${productId}`).closest("div.p-6");
-  const name = productCard.querySelector("h3").textContent;
-  const priceText = productCard.querySelector("p.font-semibold").textContent;
-  const price = parseFloat(priceText.replace(/[^\d.]/g, "")); // يستخرج السعر كرقم
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    cart.push({ id: productId, name, price, quantity: qty });
+    localStorage.setItem("cart", JSON.stringify(cart));
 
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
-  cart.push({ id: productId, name, price, quantity: qty });
-  localStorage.setItem("cart", JSON.stringify(cart));
+    alert("✅ تمت الإضافة للسلة");
+  }
 
-  alert("✅ تمت الإضافة للسلة");
-}
-
-async function buyNow(productId) {
-  const qty = parseInt(document.getElementById(`qty-${productId}`).value) || 1;
-
-  const productCard = document.getElementById(`qty-${productId}`).closest("div.p-6");
-  const name = productCard.querySelector("h3").textContent;
-  const priceText = productCard.querySelector("p.font-semibold").textContent;
-  const price = parseFloat(priceText.replace(/[^\d.]/g, ""));
-
-  document.getElementById("selectedProductId").value = productId;
-  document.getElementById("selectedQty").value = qty;
-  document.getElementById("buyModal").classList.remove("hidden");
-  document.getElementById("buyModal").classList.add("flex");
-}
-
-
-    function closeModal() {
-      document.getElementById("buyModal").classList.add("hidden");
+  // ✅ شراء الآن
+  async function buyNow(productId) {
+    const qty = parseInt(document.getElementById(`qty-${productId}`).value) || 1;
+    if (qty <= 0) {
+      alert("⚠️ الكمية غير صحيحة");
+      return;
     }
 
+    // التحقق من المخزون قبل فتح النافذة
+    const { data: product } = await supabase
+      .from("products")
+      .select("stock")
+      .eq("id", productId)
+      .single();
+
+    if (!product || product.stock < qty) {
+      alert("❌ الكمية غير متوفرة في المخزون");
+      return;
+    }
+
+    document.getElementById("selectedProductId").value = productId;
+    document.getElementById("selectedQty").value = qty;
+    document.getElementById("buyModal").classList.remove("hidden");
+    document.getElementById("buyModal").classList.add("flex");
+  }
+
+  // ✅ إغلاق نافذة الشراء
+  function closeModal() {
+    document.getElementById("buyModal").classList.add("hidden");
+  }
+
+  // ✅ إتمام عملية الشراء
   document.getElementById("buyForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const sessionData = await supabase.auth.getSession();
-  if (!sessionData.data.session) {
-    window.location.href = "login.html";
-    return;
-  }
+    e.preventDefault();
+    const sessionData = await supabase.auth.getSession();
+    if (!sessionData.data.session) {
+      window.location.href = "login.html";
+      return;
+    }
 
-  const session = sessionData.data.session;
-  const user = session.user;
+    const user = sessionData.data.session.user;
+    const name = document.getElementById("custName").value.trim();
+    const address = document.getElementById("custAddress").value.trim();
+    const phone = document.getElementById("custPhone").value.trim();
+    const payment = document.getElementById("custPayment").value;
+    const productId = parseInt(document.getElementById("selectedProductId").value);
+    const qty = parseInt(document.getElementById("selectedQty").value);
 
-  const name = document.getElementById("custName").value;
-  const address = document.getElementById("custAddress").value;
-  const phone = document.getElementById("custPhone").value;
-  const payment = document.getElementById("custPayment").value;
-  const productId = parseInt(document.getElementById("selectedProductId").value);
-  const qty = parseInt(document.getElementById("selectedQty").value);
+    if (!name || !address || !phone || !payment) {
+      alert("⚠️ من فضلك أدخل جميع البيانات المطلوبة");
+      return;
+    }
 
-  const { error } = await supabase.from("orders").insert([{
-    user_id: user.id, 
-    name,
-    address,
-    phone,
-    payment,
-    product_id: productId,
-    quantity: qty,
-    status: "pending"
-  }]);
+    // جلب السعر من قاعدة البيانات للتأكد
+    const { data: product, error: productError } = await supabase
+      .from("products")
+      .select("price, stock")
+      .eq("id", productId)
+      .single();
 
-  if (error) {
-    alert("❌ خطأ في إنشاء الطلب: " + error.message);
-    console.error(error);
-  } else {
-    alert("✅ تم إرسال طلبك بنجاح");
-    closeModal();
-  }
-});
+    if (productError || !product) {
+      alert("❌ لم يتم العثور على المنتج");
+      return;
+    }
+    if (qty > product.stock) {
+      alert("❌ الكمية المطلوبة غير متوفرة");
+      return;
+    }
 
-    searchInput.addEventListener("input", (e) => fetchProducts(e.target.value));
+    const total = product.price * qty;
 
-    // تحميل أول مرة
-    checkLogin();
-    fetchProducts();
-  </script>
+    // إدخال الطلب
+    const { error } = await supabase.from("orders").insert([{
+      user_id: user.id,
+      name,
+      address,
+      phone,
+      payment,
+      product_id: productId,
+      quantity: qty,
+      price: product.price,
+      total,
+      status: "pending"
+    }]);
+
+    if (error) {
+      alert("❌ خطأ في إنشاء الطلب: " + error.message);
+      console.error(error);
+    } else {
+      alert("✅ تم إرسال طلبك بنجاح");
+      closeModal();
+    }
+  });
+
+  // ✅ البحث عن منتج
+  searchInput.addEventListener("input", (e) => fetchProducts(e.target.value));
+
+  // ✅ تحميل أول مرة
+  checkLogin();
+  fetchProducts();
+</script>
+
 </body>
 </html>
+
 
 
 
