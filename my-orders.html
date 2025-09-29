@@ -12,8 +12,7 @@
   <div class="container mx-auto py-10">
     <h1 class="text-3xl font-bold mb-6 text-center">🛍️ طلباتي</h1>
 
-    <div id="orders-list" class="space-y-4">
-    </div>
+    <div id="orders-list" class="space-y-4"></div>
   </div>
 
   <script>
@@ -33,7 +32,7 @@
 
       const { data: orders, error } = await supabase
         .from("orders")
-        .select("id, quantity, status, products(name, price, image_url)")
+        .select("id, quantity, status, created_at, products(name, price, image_url)")
         .eq("user_id", user.id)
         .order("id", { ascending: false });
 
@@ -52,9 +51,13 @@
 
       orders.forEach(order => {
         let statusColor = "bg-yellow-200 text-yellow-800";
-        if (order.status === "shipped") statusColor = "bg-blue-200 text-blue-800";
-        if (order.status === "delivered") statusColor = "bg-green-200 text-green-800";
-        if (order.status === "cancelled") statusColor = "bg-red-200 text-red-800";
+        let statusText = "⏳ قيد الانتظار";
+        if (order.status === "shipped") { statusColor = "bg-blue-200 text-blue-800"; statusText = "🚚 جاري الشحن"; }
+        if (order.status === "delivered") { statusColor = "bg-green-200 text-green-800"; statusText = "✅ تم التسليم"; }
+        if (order.status === "cancelled") { statusColor = "bg-red-200 text-red-800"; statusText = "❌ ملغي"; }
+
+        const price = order.products?.price || 0;
+        const total = price * order.quantity;
 
         ordersList.innerHTML += `
           <div class="bg-white p-4 rounded shadow flex items-center gap-4">
@@ -62,9 +65,11 @@
             <div class="flex-1">
               <h2 class="text-lg font-semibold">${order.products?.name || "منتج محذوف"}</h2>
               <p>الكمية: ${order.quantity}</p>
-              <p>السعر: ${order.products?.price} ج.م</p>
+              <p>السعر: ${price} ج.م</p>
+              <p class="font-bold">الإجمالي: ${total} ج.م</p>
+              <p class="text-sm text-gray-500">📅 ${new Date(order.created_at).toLocaleString("ar-EG")}</p>
             </div>
-            <span class="px-3 py-1 rounded ${statusColor}">${order.status}</span>
+            <span class="px-3 py-1 rounded ${statusColor}">${statusText}</span>
           </div>
         `;
       });
