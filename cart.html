@@ -35,13 +35,20 @@
       </table>
     </div>
 
+    <!-- بيانات العميل -->
     <div class="bg-white rounded shadow p-6 mb-6">
       <h2 class="text-xl font-bold mb-4">👤 بيانات العميل</h2>
       <input type="text" id="cust-name" placeholder="الاسم" class="border p-2 w-full mb-3 rounded">
       <input type="text" id="cust-phone" placeholder="رقم الهاتف" class="border p-2 w-full mb-3 rounded">
       <input type="text" id="cust-address" placeholder="العنوان" class="border p-2 w-full mb-3 rounded">
+
+      <!-- ميعاد التوصيل -->
+      <h2 class="text-xl font-bold mb-4 mt-6">🚚 ميعاد التوصيل</h2>
+      <input type="date" id="delivery-date" class="border p-2 w-full mb-3 rounded">
+      <input type="time" id="delivery-time" class="border p-2 w-full mb-3 rounded">
     </div>
 
+    <!-- زر إرسال -->
     <div class="text-center">
       <button id="submitBtn" onclick="submitOrder()" class="bg-green-600 text-white px-6 py-3 rounded shadow hover:bg-green-700">
         ✅ إرسال الطلب
@@ -59,10 +66,7 @@
     function normalizeCart() {
       cart = cart.map((it) => {
         const qty = Number(it.quantity);
-        return {
-          ...it,
-          quantity: Number.isFinite(qty) && qty > 0 ? Math.trunc(qty) : 1
-        };
+        return { ...it, quantity: Number.isFinite(qty) && qty > 0 ? Math.trunc(qty) : 1 };
       });
       localStorage.setItem("cart", JSON.stringify(cart));
     }
@@ -89,9 +93,7 @@
           <tr class="border-b">
             <td class="p-2">${escapeHtml(item.name || 'منتج')}</td>
             <td class="p-2">
-              <input type="number" min="1" value="${qty}" 
-                     onchange="updateQuantity(${index}, this.value)" 
-                     class="w-16 border rounded p-1 text-center">
+              <input type="number" min="1" value="${qty}" onchange="updateQuantity(${index}, this.value)" class="w-16 border rounded p-1 text-center">
             </td>
             <td class="p-2">${price} ج.م</td>
             <td class="p-2">${total} ج.م</td>
@@ -127,12 +129,7 @@
     }
 
     function escapeHtml(text) {
-      return String(text)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+      return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
 
     async function submitOrder() {
@@ -141,6 +138,8 @@
       const name = document.getElementById("cust-name").value.trim();
       const phone = document.getElementById("cust-phone").value.trim();
       const address = document.getElementById("cust-address").value.trim();
+      const date = document.getElementById("delivery-date").value;
+      const time = document.getElementById("delivery-time").value;
 
       if (!name || !phone || !address) {
         alert("⚠️ من فضلك أدخل الاسم، رقم الهاتف، والعنوان.");
@@ -155,50 +154,35 @@
         return;
       }
 
+      let deliveryDate = null;
+      if (date && time) deliveryDate = new Date(date + "T" + time).toISOString();
+
       const { data: sessionData } = await supabase.auth.getSession();
       const userId = sessionData?.session?.user?.id || null;
 
-      const orderRows = [];
-      for (const it of cart) {
-        if (!it.id) {
-          alert("❌ خطأ: منتج بدون معرف (id).");
-          return;
-        }
-        const qty = Math.max(1, Math.trunc(Number(it.quantity) || 1));
-        const price = Number(it.price) || 0;
+      const orderRows = cart.map(it => ({
+        user_id: userId,
+        name,
+        phone,
+        address,
+        product_id: Number(it.id),
+        quantity: Math.max(1, Math.trunc(it.quantity)),
+        price: Number(it.price) || 0,
+        total: (Number(it.price) || 0) * Math.max(1, Math.trunc(it.quantity)),
+        status: "pending",
+        delivery_date: deliveryDate,
+        created_at: new Date().toISOString()
+      }));
 
-        orderRows.push({
-          user_id: userId,
-          name,
-          phone,
-          address,
-          product_id: Number(it.id),
-          quantity: qty,
-          price: price,
-          total: price * qty,
-          status: "pending"
-        });
+      const { data, error } = await supabase.from("orders").insert(orderRows).select();
+      if (error) {
+        console.error("Supabase insert error:", error);
+        alert("❌ حدث خطأ أثناء إرسال الطلب.");
+        return;
       }
 
-      try {
-        const { data, error } = await supabase
-          .from("orders")
-          .insert(orderRows)
-          .select();
-
-        if (error) {
-          console.error("Supabase insert error:", error);
-          alert("❌ حدث خطأ أثناء إرسال الطلب.");
-          return;
-        }
-
-        alert("✅ تم إرسال طلبك بنجاح! (" + data.length + " عنصر/عناصر)");
-        clearCart();
-
-      } catch (err) {
-        console.error("Unexpected error:", err);
-        alert("❌ خطأ غير متوقع.");
-      }
+      alert("✅ تم إرسال طلبك بنجاح! (" + data.length + " عنصر/عناصر)");
+      clearCart();
     }
 
     renderCart();
