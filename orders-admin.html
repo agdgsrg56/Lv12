@@ -8,53 +8,87 @@
   <link rel="icon" href="lv12.ico" type="image/x-icon">
 </head>
 <body class="bg-gray-100 min-h-screen">
+<div class="container mx-auto py-10">
+  <h1 class="text-3xl font-bold mb-6 text-center">📋 إدارة الطلبات</h1>
 
-  <div class="container mx-auto py-10">
-    <h1 class="text-3xl font-bold mb-6 text-center">📋 إدارة الطلبات</h1>
-
-    <!-- فلتر التاريخ -->
-    <div class="bg-white p-4 rounded shadow mb-6 flex flex-col md:flex-row gap-4 items-center justify-center">
-      <label>من: <input type="date" id="start-date" class="border rounded p-1"></label>
-      <label>إلى: <input type="date" id="end-date" class="border rounded p-1"></label>
-      <button onclick="applyFilter()" class="bg-blue-600 text-white px-4 py-2 rounded">🔍 فلترة</button>
-      <button onclick="resetFilter()" class="bg-gray-500 text-white px-4 py-2 rounded">♻️ إعادة تعيين</button>
-    </div>
-
-    <!-- جدول الطلبات قيد التوصيل -->
-    <h2 class="text-2xl font-bold mb-3 text-blue-700">🚚 الطلبات قيد التوصيل</h2>
-    <table class="w-full bg-white rounded shadow-md mb-10">
-      <thead>
-        <tr class="bg-gray-200">
-          <th class="p-2">رقم الطلب</th>
-          <th class="p-2">العميل</th>
-          <th class="p-2">الهاتف</th>
-          <th class="p-2">العنوان</th>
-          <th class="p-2">المنتج</th>
-          <th class="p-2">الكمية</th>
-          <th class="p-2">الحالة</th>
-          <th class="p-2">إجراءات</th>
-        </tr>
-      </thead>
-      <tbody id="shipped-orders"></tbody>
-    </table>
-
-    <!-- جدول الطلبات تم التسليم -->
-    <h2 class="text-2xl font-bold mb-3 text-green-700">✅ الطلبات التي تم تسليمها</h2>
-    <table class="w-full bg-white rounded shadow-md">
-      <thead>
-        <tr class="bg-gray-200">
-          <th class="p-2">رقم الطلب</th>
-          <th class="p-2">العميل</th>
-          <th class="p-2">الهاتف</th>
-          <th class="p-2">العنوان</th>
-          <th class="p-2">المنتج</th>
-          <th class="p-2">الكمية</th>
-          <th class="p-2">الحالة</th>
-        </tr>
-      </thead>
-      <tbody id="delivered-orders"></tbody>
-    </table>
+  <!-- فلتر التاريخ -->
+  <div class="bg-white p-4 rounded shadow mb-6 flex flex-col md:flex-row gap-4 items-center justify-center">
+    <label>من: <input type="date" id="start-date" class="border rounded p-1"></label>
+    <label>إلى: <input type="date" id="end-date" class="border rounded p-1"></label>
+    <button onclick="applyFilter()" class="bg-blue-600 text-white px-4 py-2 rounded">🔍 فلترة</button>
+    <button onclick="resetFilter()" class="bg-gray-500 text-white px-4 py-2 rounded">♻️ إعادة تعيين</button>
   </div>
+
+  <!-- الطلبات المعلقة -->
+  <h2 class="text-2xl font-bold mb-3 text-yellow-700">🕒 الطلبات المعلقة</h2>
+  <table class="w-full bg-white rounded shadow-md mb-10">
+    <thead>
+      <tr class="bg-gray-200">
+        <th class="p-2">رقم الطلب</th>
+        <th class="p-2">العميل</th>
+        <th class="p-2">الهاتف</th>
+        <th class="p-2">العنوان</th>
+        <th class="p-2">المنتج</th>
+        <th class="p-2">الكمية</th>
+        <th class="p-2">الحالة</th>
+        <th class="p-2">إجراءات</th>
+      </tr>
+    </thead>
+    <tbody id="pending-orders"></tbody>
+  </table>
+
+  <!-- الطلبات قيد التوصيل -->
+  <h2 class="text-2xl font-bold mb-3 text-blue-700">🚚 الطلبات قيد التوصيل</h2>
+  <table class="w-full bg-white rounded shadow-md mb-10">
+    <thead>
+      <tr class="bg-gray-200">
+        <th class="p-2">رقم الطلب</th>
+        <th class="p-2">العميل</th>
+        <th class="p-2">الهاتف</th>
+        <th class="p-2">العنوان</th>
+        <th class="p-2">المنتج</th>
+        <th class="p-2">الكمية</th>
+        <th class="p-2">الحالة</th>
+        <th class="p-2">إجراءات</th>
+      </tr>
+    </thead>
+    <tbody id="shipped-orders"></tbody>
+  </table>
+
+  <!-- الطلبات التي تم تسليمها -->
+  <h2 class="text-2xl font-bold mb-3 text-green-700">✅ الطلبات التي تم تسليمها</h2>
+  <table class="w-full bg-white rounded shadow-md mb-10">
+    <thead>
+      <tr class="bg-gray-200">
+        <th class="p-2">رقم الطلب</th>
+        <th class="p-2">العميل</th>
+        <th class="p-2">الهاتف</th>
+        <th class="p-2">العنوان</th>
+        <th class="p-2">المنتج</th>
+        <th class="p-2">الكمية</th>
+        <th class="p-2">الحالة</th>
+      </tr>
+    </thead>
+    <tbody id="delivered-orders"></tbody>
+  </table>
+
+  <!-- الطلبات الملغاة -->
+  <h2 class="text-2xl font-bold mb-3 text-red-700">❌ الطلبات الملغاة</h2>
+  <table class="w-full bg-white rounded shadow-md">
+    <thead>
+      <tr class="bg-gray-200">
+        <th class="p-2">رقم الطلب</th>
+        <th class="p-2">العميل</th>
+        <th class="p-2">الهاتف</th>
+        <th class="p-2">العنوان</th>
+        <th class="p-2">المنتج</th>
+        <th class="p-2">الكمية</th>
+        <th class="p-2">الحالة</th>
+      </tr>
+    </thead>
+    <tbody id="cancelled-orders"></tbody>
+  </table>
+</div>
 
 <script>
   const SUPABASE_URL = "https://nszhzfysitppxssplqfb.supabase.co";
