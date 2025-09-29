@@ -82,6 +82,9 @@
         <th class="p-2">الكمية</th>
         <th class="p-2">الحالة</th>
       </tr>
+      <button onclick="setDeliveryDate(${order.id})" 
+  class="bg-purple-500 text-white px-2 py-1 rounded">📅 تحديد الميعاد</button>
+
     </thead>
     <tbody id="cancelled-orders"></tbody>
   </table>
@@ -110,7 +113,29 @@
  
 
 
-  
+  async function setDeliveryDate(orderId) {
+  const input = document.getElementById(`delivery-${orderId}`);
+  if (!input || !input.value) {
+    alert("⚠️ اختر ميعاد التوصيل أولاً");
+    return;
+  }
+
+  const deliveryDate = new Date(input.value);
+
+  const { error } = await supabase
+    .from("orders")
+    .update({ delivery_date: deliveryDate.toISOString() })
+    .eq("id", orderId);
+
+  if (error) {
+    alert("❌ فشل تحديد ميعاد التوصيل: " + error.message);
+    return;
+  }
+
+  alert("✅ تم تحديد ميعاد التوصيل بنجاح");
+  loadOrders();
+}
+
 async function loadOrders() {
   let query = supabase
     .from("orders")
