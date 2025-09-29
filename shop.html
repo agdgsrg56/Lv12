@@ -138,32 +138,43 @@ async function buyNow(productId) {
       document.getElementById("buyModal").classList.add("hidden");
     }
 
-    document.getElementById("buyForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const session = await checkLogin();
-      if (!session) {
-        window.location.href = "login.html";
-        return;
-      }
+  document.getElementById("buyForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const sessionData = await supabase.auth.getSession();
+  if (!sessionData.data.session) {
+    window.location.href = "login.html";
+    return;
+  }
 
-      const name = document.getElementById("custName").value;
-      const address = document.getElementById("custAddress").value;
-      const phone = document.getElementById("custPhone").value;
-      const payment = document.getElementById("custPayment").value;
-      const productId = document.getElementById("selectedProductId").value;
-      const qty = document.getElementById("selectedQty").value;
+  const session = sessionData.data.session;
+  const user = session.user;
 
-      const { error } = await supabase.from("orders").insert([
-        { user_id: session.user.id, name, address, phone, payment, product_id: productId, quantity: qty }
-      ]);
-      if (error) {
-        alert("❌ خطأ في إنشاء الطلب");
-        console.error(error);
-      } else {
-        alert("✅ تم إرسال طلبك بنجاح");
-        closeModal();
-      }
-    });
+  const name = document.getElementById("custName").value;
+  const address = document.getElementById("custAddress").value;
+  const phone = document.getElementById("custPhone").value;
+  const payment = document.getElementById("custPayment").value;
+  const productId = parseInt(document.getElementById("selectedProductId").value);
+  const qty = parseInt(document.getElementById("selectedQty").value);
+
+  const { error } = await supabase.from("orders").insert([{
+    user_id: user.id, 
+    name,
+    address,
+    phone,
+    payment,
+    product_id: productId,
+    quantity: qty,
+    status: "pending"
+  }]);
+
+  if (error) {
+    alert("❌ خطأ في إنشاء الطلب: " + error.message);
+    console.error(error);
+  } else {
+    alert("✅ تم إرسال طلبك بنجاح");
+    closeModal();
+  }
+});
 
     searchInput.addEventListener("input", (e) => fetchProducts(e.target.value));
 
@@ -173,6 +184,7 @@ async function buyNow(productId) {
   </script>
 </body>
 </html>
+
 
 
 
