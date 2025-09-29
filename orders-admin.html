@@ -141,10 +141,11 @@
       .eq("id", orderId);
 
     if (error) {
-      alert("❌ حصل خطأ أثناء تحديث الطلب");
-      console.error(error);
-      return;
-    }
+  console.error("Supabase error:", error);
+  alert("❌ خطأ في تحميل الطلبات: " + error.message);
+  return;
+}
+
 
     if (newStatus === "delivered") {
       const { data: product } = await supabase
