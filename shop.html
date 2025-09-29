@@ -17,7 +17,7 @@
                class="border rounded-full px-4 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-blue-400">
         <span id="userName" class="text-gray-700 font-medium"></span>
         <a href="cart.html" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">🛍️ السلة</a>
-         <a href="my-orders.html" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">الطلبات</a>
+        <a href="my-orders.html" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">📦 طلباتي</a>
       </div>
     </div>
   </header>
@@ -39,8 +39,14 @@
           <option value="cash">💵 عند الاستلام</option>
           <option value="card">💳 بطاقة بنكية</option>
         </select>
+
+        <label class="block text-sm font-semibold mt-3">📅 ميعاد التوصيل</label>
+        <input type="date" id="deliveryDate" class="border w-full p-2 rounded" required>
+        <input type="time" id="deliveryTime" class="border w-full p-2 rounded" required>
+
         <input type="hidden" id="selectedProductId">
         <input type="hidden" id="selectedQty">
+
         <div class="flex justify-between mt-4">
           <button type="button" onclick="closeModal()" class="bg-gray-400 text-white px-4 py-2 rounded">إلغاء</button>
           <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded">✅ تأكيد الطلب</button>
@@ -48,56 +54,115 @@
       </form>
     </div>
   </div>
+
 <script>
   const SUPABASE_URL = "https://nszhzfysitppxssplqfb.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemh6ZnlzaXRwcHhzc3BscWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMzA4OTcsImV4cCI6MjA3MzgwNjg5N30.5KvK4bhqkZ_GpIfED4qecIMfeubAJYwSFJslULwOp-w";
   const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  // ✅ عند إرسال نموذج الشراء
+  const productsGrid = document.getElementById("productsGrid");
+  const searchInput = document.getElementById("searchInput");
+  const userNameEl = document.getElementById("userName");
+
+  async function checkLogin() {
+    const { data } = await supabase.auth.getSession();
+    if (data.session) {
+      userNameEl.textContent = "👤 " + data.session.user.email;
+    } else {
+      userNameEl.innerHTML = `<a href="login.html" class="text-blue-600 underline">تسجيل الدخول</a>`;
+    }
+    return data.session;
+  }
+
+  async function fetchProducts(searchTerm = "") {
+    let query = supabase.from("products").select("*");
+    if (searchTerm) query = query.ilike("name", `%${searchTerm}%`);
+    const { data: products, error } = await query;
+    if (error) { console.error(error.message); return; }
+    renderProducts(products);
+  }
+
+  function renderProducts(products) {
+    productsGrid.innerHTML = "";
+    if (!products || products.length === 0) {
+      productsGrid.innerHTML = `<p class="text-center col-span-3 text-gray-600">لا توجد منتجات متاحة حالياً</p>`;
+      return;
+    }
+    products.forEach(product => {
+      const card = document.createElement("div");
+      card.className = "bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition flex flex-col";
+      card.innerHTML = `
+        <img src="${product.image_url || 'https://via.placeholder.com/300'}" class="w-full h-48 object-cover">
+        <div class="p-6 flex flex-col flex-1">
+          <h3 class="text-xl font-bold mb-2">${product.name}</h3>
+          <p class="text-gray-600 text-sm mb-3">${product.description || "منتج بدون وصف"}</p>
+          <p class="font-semibold text-blue-600 mb-2">💰 ${product.price} ج.م</p>
+          <p class="text-sm text-gray-500 mb-3">المتوفر: ${product.stock} | المبيعات: ${product.sold || 0}</p>
+          <div class="mt-auto flex items-center gap-2">
+            <input type="number" value="1" min="1" max="${product.stock}" class="w-16 border rounded px-2 py-1 text-center" id="qty-${product.id}">
+            <button onclick="addToCart(${product.id})" class="bg-blue-600 text-white px-3 py-1 rounded">➕ للسلة</button>
+            <button onclick="buyNow(${product.id})" class="bg-green-600 text-white px-3 py-1 rounded">💳 اشترِ الآن</button>
+          </div>
+        </div>
+      `;
+      productsGrid.appendChild(card);
+    });
+  }
+
+  function addToCart(productId) {
+    const qty = parseInt(document.getElementById(`qty-${productId}`).value) || 1;
+    const productCard = document.getElementById(`qty-${productId}`).closest("div.p-6");
+    const name = productCard.querySelector("h3").textContent;
+    const priceText = productCard.querySelector("p.font-semibold").textContent;
+    const price = parseFloat(priceText.replace(/[^\d.]/g, ""));
+
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    cart.push({ id: productId, name, price, quantity: qty });
+    localStorage.setItem("cart", JSON.stringify(cart));
+
+    alert("✅ تمت الإضافة للسلة");
+  }
+
+  async function buyNow(productId) {
+    const qty = parseInt(document.getElementById(`qty-${productId}`).value) || 1;
+    document.getElementById("selectedProductId").value = productId;
+    document.getElementById("selectedQty").value = qty;
+    document.getElementById("buyModal").classList.remove("hidden");
+    document.getElementById("buyModal").classList.add("flex");
+  }
+
+  function closeModal() {
+    document.getElementById("buyModal").classList.add("hidden");
+  }
+
   document.getElementById("buyForm").addEventListener("submit", async (e) => {
     e.preventDefault();
-
-    const sessionResp = await supabase.auth.getSession();
-    const session = sessionResp.data?.session;
-    if (!session) {
+    const sessionData = await supabase.auth.getSession();
+    if (!sessionData.data.session) {
       window.location.href = "login.html";
       return;
     }
-    const user = session.user;
+    const user = sessionData.data.session.user;
 
-    // بيانات العميل
-    const name = document.getElementById("custName").value.trim();
-    const address = document.getElementById("custAddress").value.trim();
-    const phone = document.getElementById("custPhone").value.trim();
+    const name = document.getElementById("custName").value;
+    const address = document.getElementById("custAddress").value;
+    const phone = document.getElementById("custPhone").value;
     const payment = document.getElementById("custPayment").value;
-    const productId = Number(document.getElementById("selectedProductId").value);
-    const qty = Math.max(1, Number(document.getElementById("selectedQty").value) || 1);
+    const productId = parseInt(document.getElementById("selectedProductId").value);
+    const qty = parseInt(document.getElementById("selectedQty").value);
 
-    if (!name || !address || !phone || !payment) {
-      alert("⚠️ من فضلك أدخل جميع البيانات المطلوبة");
-      return;
-    }
+    const date = document.getElementById("deliveryDate").value;
+    const time = document.getElementById("deliveryTime").value;
+    let deliveryDate = null;
+    if (date && time) deliveryDate = new Date(date + "T" + time);
 
-    // ✅ Upsert user في public.users
-    const { error: upsertErr } = await supabase.from("users").upsert({
-      id: user.id,
-      email: user.email,
-      full_name: user.user_metadata?.full_name || null
-    });
-    if (upsertErr) {
-      console.error("upsert user error:", upsertErr);
-      alert("❌ حدث خطأ في تسجيل المستخدم");
-      return;
-    }
-
-    // ✅ جلب السعر والتأكد من المخزون
-    const { data: product, error: prodErr } = await supabase
+    const { data: product, error } = await supabase
       .from("products")
-      .select("id, price, stock")
+      .select("price, stock")
       .eq("id", productId)
       .single();
 
-    if (prodErr || !product) {
+    if (error || !product) {
       alert("❌ المنتج غير موجود");
       return;
     }
@@ -108,7 +173,6 @@
 
     const total = product.price * qty;
 
-    // ✅ إدخال الطلب
     const { error: insertErr } = await supabase.from("orders").insert([{
       user_id: user.id,
       name,
@@ -119,11 +183,11 @@
       quantity: qty,
       price: product.price,
       total,
-      status: "pending"
+      status: "pending",
+      delivery_date: deliveryDate ? deliveryDate.toISOString() : null
     }]);
 
     if (insertErr) {
-      console.error("order insert error:", insertErr);
       alert("❌ خطأ في إنشاء الطلب: " + insertErr.message);
       return;
     }
@@ -131,14 +195,13 @@
     alert("✅ تم إرسال طلبك بنجاح");
     closeModal();
   });
+
+  checkLogin();
+  fetchProducts();
+  searchInput.addEventListener("input", (e) => fetchProducts(e.target.value));
 </script>
-
-
 </body>
 </html>
-
-
-
 
 
 
