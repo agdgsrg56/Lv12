@@ -17,13 +17,16 @@
     <form id="product-form" class="bg-white p-6 rounded shadow-md mb-10">
       <h2 id="form-title" class="text-xl font-semibold mb-4">➕ إضافة منتج جديد</h2>
 
-      <input type="hidden" id="product-id"> <!-- لتخزين id المنتج عند التعديل -->
+      <input type="hidden" id="product-id">
 
       <input type="text" id="product-name" placeholder="اسم المنتج" class="border p-2 rounded w-full mb-3" required>
       <textarea id="product-description" placeholder="وصف المنتج" class="border p-2 rounded w-full mb-3"></textarea>
       <input type="number" id="product-price" placeholder="السعر" class="border p-2 rounded w-full mb-3" required>
       <input type="number" id="product-stock" placeholder="الكمية" class="border p-2 rounded w-full mb-3" required>
       <input type="file" id="product-image" class="mb-3">
+
+      <img id="current-image" src="" data-url="" class="w-24 h-24 object-cover rounded mb-3 hidden">
+      <button type="button" id="remove-image" class="hidden bg-red-500 text-white px-3 py-1 rounded mb-3">🗑️ إزالة الصورة</button>
 
       <label class="block mb-2 font-semibold">القسم:</label>
       <select id="product-category" class="border p-2 rounded w-full mb-3">
@@ -49,11 +52,11 @@
             <th class="p-2">إجراءات</th>
           </tr>
         </thead>
-        <tbody id="products-table">
-        </tbody>
+        <tbody id="products-table"></tbody>
       </table>
     </div>
   </div>
+
 <script>
   const SUPABASE_URL = "https://nszhzfysitppxssplqfb.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemh6ZnlzaXRwcHhzc3BscWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMzA4OTcsImV4cCI6MjA3MzgwNjg5N30.5KvK4bhqkZ_GpIfED4qecIMfeubAJYwSFJslULwOp-w";
