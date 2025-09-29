@@ -1,235 +1,194 @@
 
-<!DOCTYPE html>
+
+ <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>📋 إدارة الطلبات</title>
+  <title>لوحة تحكم المتجر</title>
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="icon" href="lv12.ico" type="image/x-icon">
 </head>
 <body class="bg-gray-100 min-h-screen">
 
-  <div class="container mx-auto py-8 px-4">
-    <h1 class="text-3xl font-bold mb-6 text-center text-blue-700">📋 إدارة الطلبات</h1>
+  <div class="container mx-auto py-10">
+    <h1 class="text-3xl font-bold mb-6 text-center">لوحة تحكم المتجر 🛠️</h1>
 
-    <div class="bg-white p-4 rounded shadow mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
-      <div class="flex gap-2 flex-wrap">
-        <button onclick="filterStatus('all')" class="status-btn bg-blue-100 text-blue-700 px-3 py-1 rounded">الكل</button>
-        <button onclick="filterStatus('pending')" class="status-btn bg-yellow-100 text-yellow-700 px-3 py-1 rounded">🕒 معلقة</button>
-        <button onclick="filterStatus('shipped')" class="status-btn bg-blue-100 text-blue-700 px-3 py-1 rounded">🚚 قيد التوصيل</button>
-        <button onclick="filterStatus('delivered')" class="status-btn bg-green-100 text-green-700 px-3 py-1 rounded">✅ تم التسليم</button>
-        <button onclick="filterStatus('cancelled')" class="status-btn bg-red-100 text-red-700 px-3 py-1 rounded">❌ ملغاة</button>
-      </div>
+    <form id="product-form" class="bg-white p-6 rounded shadow-md mb-10">
+      <h2 id="form-title" class="text-xl font-semibold mb-4">➕ إضافة منتج جديد</h2>
 
-      <div class="flex gap-2 items-center">
-        <input type="date" id="start-date" class="border rounded p-1">
-        <span>إلى</span>
-        <input type="date" id="end-date" class="border rounded p-1">
-        <button onclick="applyFilter()" class="bg-blue-600 text-white px-3 py-1 rounded">🔍 بحث</button>
-        <button onclick="resetFilter()" class="bg-gray-500 text-white px-3 py-1 rounded">♻️ إعادة</button>
-      </div>
-    </div>
+      <input type="hidden" id="product-id"> <!-- لتخزين id المنتج عند التعديل -->
 
-    <div class="bg-white rounded shadow overflow-x-auto">
-      <table class="w-full text-center">
-        <thead class="bg-gray-200">
-          <tr>
-            <th class="p-2">#</th>
-            <th class="p-2">👤 العميل</th>
-            <th class="p-2">📞 الهاتف</th>
-            <th class="p-2">🏠 العنوان</th>
-            <th class="p-2">📦 المنتج</th>
-            <th class="p-2">🔢 الكمية</th>
-            <th class="p-2">📅 ميعاد التوصيل</th>
-            <th class="p-2">الحالة</th>
+      <input type="text" id="product-name" placeholder="اسم المنتج" class="border p-2 rounded w-full mb-3" required>
+      <textarea id="product-description" placeholder="وصف المنتج" class="border p-2 rounded w-full mb-3"></textarea>
+      <input type="number" id="product-price" placeholder="السعر" class="border p-2 rounded w-full mb-3" required>
+      <input type="number" id="product-stock" placeholder="الكمية" class="border p-2 rounded w-full mb-3" required>
+      <input type="file" id="product-image" class="mb-3">
+
+      <label class="block mb-2 font-semibold">القسم:</label>
+      <select id="product-category" class="border p-2 rounded w-full mb-3">
+        <option value="">اختر قسماً...</option>
+      </select>
+      <input type="text" id="new-category" placeholder="➕ إضافة قسم جديد" class="border p-2 rounded w-full mb-3">
+
+      <button type="submit" id="submit-btn" class="bg-blue-600 text-white px-4 py-2 rounded">➕ إضافة المنتج</button>
+      <button type="button" id="cancel-edit" class="hidden bg-gray-500 text-white px-4 py-2 rounded">❌ إلغاء</button>
+    </form>
+
+    <div>
+      <h2 class="text-xl font-semibold mb-4">📦 المنتجات الحالية</h2>
+      <table class="w-full bg-white rounded shadow-md">
+        <thead>
+          <tr class="bg-gray-200">
+            <th class="p-2">الصورة</th>
+            <th class="p-2">الاسم</th>
+            <th class="p-2">القسم</th>
+            <th class="p-2">السعر</th>
+            <th class="p-2">الكمية</th>
+            <th class="p-2">تم البيع</th>
             <th class="p-2">إجراءات</th>
           </tr>
         </thead>
-        <tbody id="orders-table"></tbody>
+        <tbody id="products-table">
+        </tbody>
       </table>
     </div>
   </div>
 
-  <div id="toast" class="fixed bottom-5 right-5 hidden px-4 py-2 rounded shadow text-white"></div>
-
-<script>
- const SUPABASE_URL = "https://nszhzfysitppxssplqfb.supabase.co";
+  <script>
+    const SUPABASE_URL = "https://nszhzfysitppxssplqfb.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemh6ZnlzaXRwcHhzc3BscWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMzA4OTcsImV4cCI6MjA3MzgwNjg5N30.5KvK4bhqkZ_GpIfED4qecIMfeubAJYwSFJslULwOp-w";
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  const ADMIN_EMAIL = "lv12wlv12@gmail.com";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  let allOrders = [];
-  let filterStart = null;
-  let filterEnd = null;
-  let currentStatus = "all";
-
-  async function checkAuth() {
-    const { data } = await supabase.auth.getSession();
-    if (!data.session || data.session.user.email !== ADMIN_EMAIL) {
-      showToast("🚫 غير مسموح لك بالدخول", "bg-red-600");
-      window.location.href = "index.html";
-      return false;
+    const ADMIN_EMAIL = "lv12wlv12@gmail.com"; 
+    async function checkAuth() {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session || data.session.user.email !== ADMIN_EMAIL) {
+        alert("🚫 غير مسموح لك بالدخول");
+        window.location.href = "index.html";
+      }
     }
-    return true;
-  }
+    checkAuth();
 
-  function showToast(msg, color="bg-green-600") {
-    const toast = document.getElementById("toast");
-    toast.textContent = msg;
-    toast.className = `fixed bottom-5 right-5 ${color} text-white px-4 py-2 rounded shadow`;
-    toast.style.display = "block";
-    setTimeout(() => toast.style.display = "none", 3000);
-  }
-
-  async function setDeliveryDate(orderId) {
-    const input = document.getElementById(`delivery-${orderId}`);
-    if (!input || !input.value) {
-      showToast("⚠️ اختر ميعاد التوصيل", "bg-yellow-500");
-      return;
+    async function loadCategories() {
+      const { data: products } = await supabase.from("products").select("category");
+      const select = document.getElementById("product-category");
+      select.innerHTML = `<option value="">اختر قسماً...</option>`;
+      const categories = [...new Set(products.map(p => p.category).filter(Boolean))];
+      categories.forEach(cat => {
+        select.innerHTML += `<option value="${cat}">${cat}</option>`;
+      });
     }
 
-    const deliveryDate = new Date(input.value);
-    const { error } = await supabase
-      .from("orders")
-      .update({ delivery_date: deliveryDate.toISOString() })
-      .eq("id", orderId);
+    document.getElementById("product-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
 
-    if (error) {
-      showToast("❌ خطأ: " + error.message, "bg-red-600");
-      return;
-    }
+      const id = document.getElementById("product-id").value;
+      const name = document.getElementById("product-name").value;
+      const description = document.getElementById("product-description").value;
+      const price = document.getElementById("product-price").value;
+      const stock = document.getElementById("product-stock").value;
+      const imageFile = document.getElementById("product-image").files[0];
 
-    showToast("✅ تم تحديد ميعاد التوصيل");
-    loadOrders();
-  }
+      let category = document.getElementById("new-category").value.trim();
+      if (!category) {
+        category = document.getElementById("product-category").value;
+      }
 
-  async function updateStatus(orderId, productId, qty, newStatus) {
-    const { error } = await supabase
-      .from("orders")
-      .update({ status: newStatus })
-      .eq("id", orderId);
-
-    if (error) {
-      showToast("❌ خطأ في تحديث الطلب", "bg-red-600");
-      return;
-    }
-
-    if (newStatus === "delivered") {
-      const { data: product } = await supabase
-        .from("products")
-        .select("stock, sold")
-        .eq("id", productId)
-        .single();
-
-      if (product) {
-        const newStock = Math.max(0, product.stock - qty);
-        await supabase
+      let imageUrl = null;
+      if (imageFile) {
+        const { data, error } = await supabase.storage
           .from("products")
-          .update({
-            stock: newStock,
-            sold: (product.sold || 0) + qty
-          })
-          .eq("id", productId);
-      }
-    }
-
-    showToast("✅ تم تحديث حالة الطلب");
-    loadOrders();
-  }
-
-  async function loadOrders() {
- let query = supabase
-  .from("orders")
-  .select("id, name, phone, address, quantity, status, created_at, delivery_date, product_id, products(name)")
-  .order("id", { ascending: false });
-
-    if (filterStart) query = query.gte("created_at", filterStart + "T00:00:00");
-    if (filterEnd) query = query.lte("created_at", filterEnd + "T23:59:59");
-
-    const { data: orders, error } = await query;
-    if (error) {
-      showToast("❌ خطأ في تحميل الطلبات", "bg-red-600");
-      return;
-    }
-
-    allOrders = orders || [];
-    renderOrders();
-  }
-
-  function renderOrders() {
-    const table = document.getElementById("orders-table");
-    table.innerHTML = "";
-
-    let filtered = allOrders.filter(o => currentStatus === "all" || o.status === currentStatus);
-
-    if (filtered.length === 0) {
-      table.innerHTML = `<tr><td colspan="9" class="p-4 text-gray-500">🚫 لا توجد طلبات</td></tr>`;
-      return;
-    }
-
-    filtered.forEach(order => {
-      let statusBadge = `<span class="px-2 py-1 rounded bg-yellow-200 text-yellow-800">🕒 معلقة</span>`;
-      if (order.status === "shipped") statusBadge = `<span class="px-2 py-1 rounded bg-blue-200 text-blue-800">🚚 قيد التوصيل</span>`;
-      if (order.status === "delivered") statusBadge = `<span class="px-2 py-1 rounded bg-green-200 text-green-800">✅ تم التسليم</span>`;
-      if (order.status === "cancelled") statusBadge = `<span class="px-2 py-1 rounded bg-red-200 text-red-800">❌ ملغاة</span>`;
-
-      const deliveryField = order.delivery_date
-        ? new Date(order.delivery_date).toLocaleString("ar-EG")
-        : `<input type="datetime-local" id="delivery-${order.id}" class="border p-1 rounded text-sm">
-           <button onclick="setDeliveryDate(${order.id})" class="bg-purple-500 text-white px-2 py-1 rounded mt-1">📅 حفظ</button>`;
-
-      let actions = "";
-      if (order.status === "pending") {
-        actions = `
-          <button onclick="updateStatus(${order.id}, '${order.product_id}', ${order.quantity}, 'shipped')" class="bg-blue-500 text-white px-2 py-1 rounded">🚚 شحن</button>
-          <button onclick="updateStatus(${order.id}, '${order.product_id}', ${order.quantity}, 'cancelled')" class="bg-red-500 text-white px-2 py-1 rounded">❌ إلغاء</button>`;
-      } else if (order.status === "shipped") {
-        actions = `
-          <button onclick="updateStatus(${order.id}, '${order.product_id}', ${order.quantity}, 'delivered')" class="bg-green-500 text-white px-2 py-1 rounded">✅ تم التسليم</button>
-          <button onclick="updateStatus(${order.id}, '${order.product_id}', ${order.quantity}, 'cancelled')" class="bg-red-500 text-white px-2 py-1 rounded">❌ إلغاء</button>`;
+          .upload(Date.now() + "-" + imageFile.name, imageFile, { upsert: true });
+        if (!error) {
+          imageUrl = `${SUPABASE_URL}/storage/v1/object/public/products/${data.path}`;
+        }
       }
 
-      table.innerHTML += `
-        <tr class="border-b">
-          <td class="p-2">${order.id}</td>
-          <td class="p-2">${order.name}</td>
-          <td class="p-2">${order.phone}</td>
-          <td class="p-2">${order.address}</td>
-          <td class="p-2">${order.product_id}</td>
-          <td class="p-2">${order.quantity}</td>
-          <td class="p-2">${deliveryField}</td>
-          <td class="p-2">${statusBadge}</td>
-          <td class="p-2 flex gap-1">${actions}</td>
-        </tr>`;
+      if (id) {
+        const updateData = { name, description, price, stock, category };
+        if (imageUrl) updateData.image_url = imageUrl;
+
+        const { error } = await supabase.from("products").update(updateData).eq("id", id);
+        if (error) {
+          alert("❌ خطأ في التعديل: " + error.message);
+        } else {
+          alert("✅ تم تعديل المنتج بنجاح");
+          resetForm();
+          loadProducts();
+          loadCategories();
+        }
+      } else {
+        const { error } = await supabase.from("products").insert([{ 
+          name, description, price, stock, category, image_url: imageUrl 
+        }]);
+        if (error) {
+          alert("❌ خطأ في الإضافة: " + error.message);
+        } else {
+          alert("✅ تم إضافة المنتج بنجاح");
+          resetForm();
+          loadProducts();
+          loadCategories();
+        }
+      }
     });
-  }
 
-  function filterStatus(status) {
-    currentStatus = status;
-    renderOrders();
-  }
-
-  function applyFilter() {
-    filterStart = document.getElementById("start-date").value;
-    filterEnd = document.getElementById("end-date").value;
-    loadOrders();
-  }
-
-  function resetFilter() {
-    document.getElementById("start-date").value = "";
-    document.getElementById("end-date").value = "";
-    filterStart = null;
-    filterEnd = null;
-    loadOrders();
-  }
-
-  (async () => {
-    if (await checkAuth()) {
-      loadOrders();
+    async function loadProducts() {
+      const { data: products } = await supabase.from("products").select("*");
+      const table = document.getElementById("products-table");
+      table.innerHTML = "";
+      products.forEach(prod => {
+        table.innerHTML += `
+          <tr class="border-b">
+            <td class="p-2"><img src="${prod.image_url || ''}" class="w-16 h-16 object-cover rounded"></td>
+            <td class="p-2">${prod.name}</td>
+            <td class="p-2">${prod.category || '-'}</td>
+            <td class="p-2">${prod.price} ج.م</td>
+            <td class="p-2">${prod.stock}</td>
+            <td class="p-2">${prod.sold || 0}</td>
+            <td class="p-2 flex gap-1">
+              <button onclick="editProduct(${prod.id}, '${prod.name}', '${prod.description || ''}', ${prod.price}, ${prod.stock}, '${prod.category || ''}')" class="bg-yellow-500 text-white px-3 py-1 rounded">✏️ تعديل</button>
+              <button onclick="deleteProduct(${prod.id})" class="bg-red-500 text-white px-3 py-1 rounded">🗑️ حذف</button>
+            </td>
+          </tr>
+        `;
+      });
     }
-  })();
-</script>
 
+    function editProduct(id, name, description, price, stock, category) {
+      document.getElementById("product-id").value = id;
+      document.getElementById("product-name").value = name;
+      document.getElementById("product-description").value = description;
+      document.getElementById("product-price").value = price;
+      document.getElementById("product-stock").value = stock;
+      document.getElementById("product-category").value = category;
+
+      document.getElementById("form-title").textContent = "✏️ تعديل منتج";
+      document.getElementById("submit-btn").textContent = "💾 حفظ التغييرات";
+      document.getElementById("cancel-edit").classList.remove("hidden");
+    }
+
+    document.getElementById("cancel-edit").addEventListener("click", resetForm);
+
+    function resetForm() {
+      document.getElementById("product-form").reset();
+      document.getElementById("product-id").value = "";
+      document.getElementById("form-title").textContent = "➕ إضافة منتج جديد";
+      document.getElementById("submit-btn").textContent = "➕ إضافة المنتج";
+      document.getElementById("cancel-edit").classList.add("hidden");
+    }
+
+    async function deleteProduct(id) {
+      if (confirm("هل تريد حذف هذا المنتج؟")) {
+        await supabase.from("products").delete().eq("id", id);
+        loadProducts();
+        loadCategories();
+      }
+    }
+
+    loadProducts();
+    loadCategories();
+  </script>
 </body>
-</html> 
+</html>
+
