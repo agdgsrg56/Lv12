@@ -21,9 +21,31 @@
     </div>
   </header>
 
-  <!-- تفاصيل المنتج -->
   <main class="max-w-6xl mx-auto p-6">
     <div id="productDetails" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+
+    <section class="mt-10">
+      <h2 class="text-xl font-bold mb-4">⭐ تقييمات العملاء</h2>
+      <div id="averageRating" class="text-lg font-semibold text-yellow-600 mb-3"></div>
+
+      <div id="reviewsList" class="space-y-3 mb-6"></div>
+
+      <div id="reviewFormContainer" class="bg-white shadow p-4 rounded-lg hidden">
+        <h3 class="font-bold mb-2">أضف تقييمك</h3>
+        <form id="reviewForm" class="space-y-3">
+          <select id="rating" class="border w-full p-2 rounded" required>
+            <option value="">اختر التقييم</option>
+            <option value="5">⭐⭐⭐⭐⭐ (5)</option>
+            <option value="4">⭐⭐⭐⭐ (4)</option>
+            <option value="3">⭐⭐⭐ (3)</option>
+            <option value="2">⭐⭐ (2)</option>
+            <option value="1">⭐ (1)</option>
+          </select>
+          <textarea id="comment" placeholder="اكتب رأيك..." class="border w-full p-2 rounded" required></textarea>
+          <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded">إرسال التقييم</button>
+        </form>
+      </div>
+    </section>
 
     <h2 class="text-xl font-bold mt-10 mb-4">منتجات مشابهة</h2>
     <div id="relatedProducts" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6"></div>
@@ -44,9 +66,14 @@
   const relatedProducts = document.getElementById("relatedProducts");
   const toast = document.getElementById("toast");
   const userNameEl = document.getElementById("userName");
+  const reviewsList = document.getElementById("reviewsList");
+  const averageRating = document.getElementById("averageRating");
+  const reviewFormContainer = document.getElementById("reviewFormContainer");
 
   const urlParams = new URLSearchParams(window.location.search);
   const productId = urlParams.get("id");
+
+  let currentUser = null;
 
   function showToast(msg, success = true) {
     toast.textContent = msg;
@@ -58,7 +85,9 @@
   async function checkLogin() {
     const { data } = await supabase.auth.getSession();
     if (data.session) {
+      currentUser = data.session.user;
       userNameEl.textContent = "👤 " + data.session.user.email;
+      reviewFormContainer.classList.remove("hidden");
     } else {
       userNameEl.innerHTML = `<a href="login.html" class="text-blue-600 underline">تسجيل الدخول</a>`;
     }
@@ -85,7 +114,64 @@
       </div>
     `;
 
-    // المنتجات المشابهة
+    loadReviews();
+    loadRelated(product);
+  }
+
+  async function loadReviews() {
+    const { data: reviews } = await supabase
+      .from("reviews")
+      .select("*, users(email)")
+      .eq("product_id", productId)
+      .order("created_at", { ascending: false });
+
+    if (!reviews || reviews.length === 0) {
+      reviewsList.innerHTML = `<p class="text-gray-500">لا توجد تقييمات بعد</p>`;
+      averageRating.textContent = "";
+      return;
+    }
+
+    const avg = (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1);
+    averageRating.textContent = `متوسط التقييم: ⭐ ${avg} من 5 (${reviews.length} مراجعة)`;
+
+    reviewsList.innerHTML = reviews.map(r => `
+      <div class="border p-3 rounded bg-white shadow-sm">
+        <div class="flex items-center gap-2 mb-1">
+          <span class="text-yellow-500">${"⭐".repeat(r.rating)}</span>
+          <span class="text-sm text-gray-500">${r.users?.email || "مستخدم"}</span>
+        </div>
+        <p class="text-gray-700">${r.comment}</p>
+      </div>
+    `).join("");
+  }
+
+  document.getElementById("reviewForm")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (!currentUser) {
+      showToast("❌ يجب تسجيل الدخول لإضافة تقييم", false);
+      return;
+    }
+
+    const rating = parseInt(document.getElementById("rating").value);
+    const comment = document.getElementById("comment").value;
+
+    const { error } = await supabase.from("reviews").insert([{
+      product_id: productId,
+      user_id: currentUser.id,
+      rating,
+      comment
+    }]);
+
+    if (error) {
+      showToast("❌ خطأ في إضافة التقييم", false);
+    } else {
+      showToast("✅ تم إضافة تقييمك");
+      document.getElementById("reviewForm").reset();
+      loadReviews();
+    }
+  });
+
+  async function loadRelated(product) {
     const { data: related } = await supabase.from("products")
       .select("*")
       .eq("category", product.category)
@@ -113,7 +199,7 @@
   }
 
   function buyNow(id) {
-    window.location.href = `index.html?buy=${id}`; // بيرجع للصفحة الرئيسية ويفتح الشراء
+    window.location.href = `index.html?buy=${id}`;
   }
 
   checkLogin();
