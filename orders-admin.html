@@ -56,139 +56,141 @@
     </table>
   </div>
 
-  <script>
-    const SUPABASE_URL = "https://nszhzfysitppxssplqfb.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemh6ZnlzaXRwcHhzc3BscWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMzA4OTcsImV4cCI6MjA3MzgwNjg5N30.5KvK4bhqkZ_GpIfED4qecIMfeubAJYwSFJslULwOp-w";
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+<script>
+  const SUPABASE_URL = "https://nszhzfysitppxssplqfb.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemh6ZnlzaXRwcHhzc3BscWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMzA4OTcsImV4cCI6MjA3MzgwNjg5N30.5KvK4bhqkZ_GpIfED4qecIMfeubAJYwSFJslULwOp-w";
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const ADMIN_EMAIL = "lv12wlv12@gmail.com"; 
+  const ADMIN_EMAIL = "lv12wlv12@gmail.com"; 
 
-    // السماح للأدمن فقط
-    async function checkAuth() {
-      const { data } = await supabase.auth.getSession();
-      if (!data.session || data.session.user.email !== ADMIN_EMAIL) {
-        alert("🚫 غير مسموح لك بالدخول");
-        window.location.href = "index.html";
-      }
+  // ✅ تأمين الدخول
+  async function checkAuth() {
+    const { data } = await supabase.auth.getSession();
+    if (!data.session || data.session.user.email !== ADMIN_EMAIL) {
+      alert("🚫 غير مسموح لك بالدخول");
+      window.location.href = "index.html";
+      return false;
     }
-    checkAuth();
+    return true;
+  }
 
-    let filterStart = null;
-    let filterEnd = null;
+  let filterStart = null;
+  let filterEnd = null;
 
-    // تحميل الطلبات
-    async function loadOrders() {
-      let query = supabase
-        .from("orders")
-        .select("id, name, phone, address, quantity, status, created_at, product_id, products(id, name, stock, sold)")
-        .order("id", { ascending: false });
+  // ✅ تحميل الطلبات
+  async function loadOrders() {
+    let query = supabase
+      .from("orders")
+      .select("id, name, phone, address, quantity, status, created_at, product_id, products(id, name, stock, sold)")
+      .order("id", { ascending: false });
 
-      // تطبيق الفلتر لو متحدد
-      if (filterStart && filterEnd) {
-        query = query.gte("created_at", filterStart).lte("created_at", filterEnd);
-      }
+    if (filterStart) query = query.gte("created_at", filterStart + "T00:00:00");
+    if (filterEnd) query = query.lte("created_at", filterEnd + "T23:59:59");
 
-      const { data: orders, error } = await query;
-
-      if (error) {
-        console.error(error);
-        return;
-      }
-
-      const shippedTable = document.getElementById("shipped-orders");
-      const deliveredTable = document.getElementById("delivered-orders");
-      shippedTable.innerHTML = "";
-      deliveredTable.innerHTML = "";
-
-      orders.forEach(order => {
-        let row = `
-          <tr class="border-b">
-            <td class="p-2">${order.id}</td>
-            <td class="p-2">${order.name}</td>
-            <td class="p-2">${order.phone}</td>
-            <td class="p-2">${order.address}</td>
-            <td class="p-2">${order.products?.name || "منتج محذوف"}</td>
-            <td class="p-2">${order.quantity}</td>
-            <td class="p-2">
-              <span class="px-2 py-1 rounded ${
-                order.status === "delivered" ? "bg-green-200 text-green-800" : 
-                order.status === "shipped" ? "bg-blue-200 text-blue-800" : 
-                order.status === "cancelled" ? "bg-red-200 text-red-800" :
-                "bg-yellow-200 text-yellow-800"
-              }">${order.status}</span>
-            </td>
-        `;
-
-        if (order.status === "shipped") {
-          row += `
-            <td class="p-2 flex gap-1">
-              <button onclick="updateStatus(${order.id}, '${order.product_id}', ${order.quantity}, 'delivered')" class="bg-green-500 text-white px-2 py-1 rounded">✅ تم التسليم</button>
-              <button onclick="updateStatus(${order.id}, '${order.product_id}', ${order.quantity}, 'cancelled')" class="bg-red-500 text-white px-2 py-1 rounded">❌ إلغاء</button>
-            </td>
-          </tr>`;
-          shippedTable.innerHTML += row;
-        } else if (order.status === "delivered") {
-          row += "</tr>";
-          deliveredTable.innerHTML += row;
-        }
-      });
+    const { data: orders, error } = await query;
+    if (error) {
+      console.error(error);
+      alert("❌ خطأ في تحميل الطلبات");
+      return;
     }
 
-    // تحديث حالة الطلب
-    async function updateStatus(orderId, productId, qty, newStatus) {
-      const { error } = await supabase
-        .from("orders")
-        .update({ status: newStatus })
-        .eq("id", orderId);
+    const shippedTable = document.getElementById("shipped-orders");
+    const deliveredTable = document.getElementById("delivered-orders");
+    shippedTable.innerHTML = "";
+    deliveredTable.innerHTML = "";
 
-      if (error) {
-        alert("❌ حصل خطأ أثناء تحديث الطلب");
-        console.error(error);
-        return;
+    orders.forEach(order => {
+      let row = `
+        <tr class="border-b">
+          <td class="p-2">${order.id}</td>
+          <td class="p-2">${order.name}</td>
+          <td class="p-2">${order.phone}</td>
+          <td class="p-2">${order.address}</td>
+          <td class="p-2">${order.products?.name || "❌ منتج محذوف"}</td>
+          <td class="p-2">${order.quantity}</td>
+          <td class="p-2">
+            <span class="px-2 py-1 rounded ${
+              order.status === "delivered" ? "bg-green-200 text-green-800" : 
+              order.status === "shipped" ? "bg-blue-200 text-blue-800" : 
+              order.status === "cancelled" ? "bg-red-200 text-red-800" :
+              "bg-yellow-200 text-yellow-800"
+            }">${order.status}</span>
+          </td>
+      `;
+
+      if (order.status === "shipped") {
+        row += `
+          <td class="p-2 flex gap-1">
+            <button onclick="updateStatus(${order.id}, '${order.product_id}', ${order.quantity}, 'delivered')" class="bg-green-500 text-white px-2 py-1 rounded">✅ تم التسليم</button>
+            <button onclick="updateStatus(${order.id}, '${order.product_id}', ${order.quantity}, 'cancelled')" class="bg-red-500 text-white px-2 py-1 rounded">❌ إلغاء</button>
+          </td>
+        </tr>`;
+        shippedTable.innerHTML += row;
+      } else if (order.status === "delivered") {
+        row += "</tr>";
+        deliveredTable.innerHTML += row;
       }
+    });
+  }
 
-      if (newStatus === "delivered") {
-        const { data: product } = await supabase
+  // ✅ تحديث حالة الطلب
+  async function updateStatus(orderId, productId, qty, newStatus) {
+    const { error } = await supabase
+      .from("orders")
+      .update({ status: newStatus })
+      .eq("id", orderId);
+
+    if (error) {
+      alert("❌ حصل خطأ أثناء تحديث الطلب");
+      console.error(error);
+      return;
+    }
+
+    if (newStatus === "delivered") {
+      const { data: product } = await supabase
+        .from("products")
+        .select("stock, sold")
+        .eq("id", productId)
+        .single();
+
+      if (product) {
+        const newStock = Math.max(0, product.stock - qty); // ✅ حماية من القيم السالبة
+        await supabase
           .from("products")
-          .select("stock, sold")
-          .eq("id", productId)
-          .single();
-
-        if (product) {
-          await supabase
-            .from("products")
-            .update({
-              stock: product.stock - qty,
-              sold: (product.sold || 0) + qty
-            })
-            .eq("id", productId);
-        }
+          .update({
+            stock: newStock,
+            sold: (product.sold || 0) + qty
+          })
+          .eq("id", productId);
       }
-
-      alert("✅ تم تحديث حالة الطلب");
-      loadOrders();
     }
 
-    function applyFilter() {
-      filterStart = document.getElementById("start-date").value;
-      filterEnd = document.getElementById("end-date").value;
-      if (filterStart && filterEnd) {
-        filterStart += "T00:00:00";
-        filterEnd += "T23:59:59";
-      }
-      loadOrders();
-    }
-
-    function resetFilter() {
-      document.getElementById("start-date").value = "";
-      document.getElementById("end-date").value = "";
-      filterStart = null;
-      filterEnd = null;
-      loadOrders();
-    }
-
+    alert("✅ تم تحديث حالة الطلب");
     loadOrders();
-  </script>
+  }
+
+  function applyFilter() {
+    filterStart = document.getElementById("start-date").value;
+    filterEnd = document.getElementById("end-date").value;
+    loadOrders();
+  }
+
+  function resetFilter() {
+    document.getElementById("start-date").value = "";
+    document.getElementById("end-date").value = "";
+    filterStart = null;
+    filterEnd = null;
+    loadOrders();
+  }
+
+  // ✅ تشغيل بعد التأكد من الأذن
+  (async () => {
+    if (await checkAuth()) {
+      loadOrders();
+    }
+  })();
+</script>
+
 </body>
 </html>
 
