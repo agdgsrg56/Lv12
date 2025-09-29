@@ -63,7 +63,6 @@
 
   const ADMIN_EMAIL = "lv12wlv12@gmail.com"; 
 
-  // ✅ تأمين الدخول
   async function checkAuth() {
     const { data } = await supabase.auth.getSession();
     if (!data.session || data.session.user.email !== ADMIN_EMAIL) {
@@ -94,10 +93,15 @@
       return;
     }
 
+    const pendingTable = document.getElementById("pending-orders");
     const shippedTable = document.getElementById("shipped-orders");
     const deliveredTable = document.getElementById("delivered-orders");
+    const cancelledTable = document.getElementById("cancelled-orders");
+
+    pendingTable.innerHTML = "";
     shippedTable.innerHTML = "";
     deliveredTable.innerHTML = "";
+    cancelledTable.innerHTML = "";
 
     orders.forEach(order => {
       let row = `
@@ -118,7 +122,15 @@
           </td>
       `;
 
-      if (order.status === "shipped") {
+      if (order.status === "pending") {
+        row += `
+          <td class="p-2 flex gap-1">
+            <button onclick="updateStatus(${order.id}, '${order.product_id}', ${order.quantity}, 'shipped')" class="bg-blue-500 text-white px-2 py-1 rounded">🚚 شحن</button>
+            <button onclick="updateStatus(${order.id}, '${order.product_id}', ${order.quantity}, 'cancelled')" class="bg-red-500 text-white px-2 py-1 rounded">❌ إلغاء</button>
+          </td>
+        </tr>`;
+        pendingTable.innerHTML += row;
+      } else if (order.status === "shipped") {
         row += `
           <td class="p-2 flex gap-1">
             <button onclick="updateStatus(${order.id}, '${order.product_id}', ${order.quantity}, 'delivered')" class="bg-green-500 text-white px-2 py-1 rounded">✅ تم التسليم</button>
@@ -129,6 +141,9 @@
       } else if (order.status === "delivered") {
         row += "</tr>";
         deliveredTable.innerHTML += row;
+      } else if (order.status === "cancelled") {
+        row += "</tr>";
+        cancelledTable.innerHTML += row;
       }
     });
   }
@@ -141,13 +156,12 @@
       .eq("id", orderId);
 
     if (error) {
-  alert("❌ خطأ في تحميل الطلبات: " + error.message);
-console.error("تفاصيل الخطأ من Supabase:", error);
+      alert("❌ خطأ في تحديث الطلب: " + error.message);
+      console.error(error);
+      return;
+    }
 
-  return;
-}
-
-
+    // خصم من المخزون + تحديث المبيعات لو تم التسليم
     if (newStatus === "delivered") {
       const { data: product } = await supabase
         .from("products")
@@ -156,7 +170,7 @@ console.error("تفاصيل الخطأ من Supabase:", error);
         .single();
 
       if (product) {
-        const newStock = Math.max(0, product.stock - qty); // ✅ حماية من القيم السالبة
+        const newStock = Math.max(0, product.stock - qty);
         await supabase
           .from("products")
           .update({
@@ -185,7 +199,6 @@ console.error("تفاصيل الخطأ من Supabase:", error);
     loadOrders();
   }
 
-  // ✅ تشغيل بعد التأكد من الأذن
   (async () => {
     if (await checkAuth()) {
       loadOrders();
