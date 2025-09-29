@@ -67,7 +67,12 @@
               <p>الكمية: ${order.quantity}</p>
               <p>السعر: ${price} ج.م</p>
               <p class="font-bold">الإجمالي: ${total} ج.م</p>
-              <p class="text-sm text-gray-500">📅 ${new Date(order.created_at).toLocaleString("ar-EG")}</p>
+         <p class="text-sm text-gray-600">📦 ميعاد التوصيل: ${
+  order.delivery_date 
+    ? new Date(order.delivery_date).toLocaleString("ar-EG") 
+    : "لم يحدد بعد"
+}</p>
+
             </div>
             <span class="px-3 py-1 rounded ${statusColor}">${statusText}</span>
           </div>
