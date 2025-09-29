@@ -11,7 +11,7 @@
   <div class="container mx-auto py-10">
     <h1 class="text-3xl font-bold mb-6 text-center">🛒 سلة المشتريات</h1>
 
-    <div class="bg-white rounded shadow p-4 mb-6">
+    <div class="bg-white rounded shadow p-4 mb-6 overflow-x-auto">
       <table class="w-full text-center">
         <thead class="bg-gray-200">
           <tr>
@@ -24,10 +24,12 @@
         </thead>
         <tbody id="cart-items"></tbody>
         <tfoot>
-          <tr>
-            <td colspan="3" class="text-right p-3 font-semibold">الإجمالي الكلي:</td>
-            <td id="cart-total" class="p-3 font-bold">0 ج.م</td>
-            <td></td>
+          <tr class="bg-gray-100 font-semibold">
+            <td colspan="3" class="text-right p-3">الإجمالي الكلي:</td>
+            <td id="cart-total" class="p-3 font-bold text-green-700">0 ج.م</td>
+            <td class="p-2">
+              <button onclick="clearCart()" class="bg-red-600 text-white px-3 py-1 rounded">🗑️ تفريغ السلة</button>
+            </td>
           </tr>
         </tfoot>
       </table>
@@ -53,7 +55,6 @@
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemh6ZnlzaXRwcHhzc3BscWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMzA4OTcsImV4cCI6MjA3MzgwNjg5N30.5KvK4bhqkZ_GpIfED4qecIMfeubAJYwSFJslULwOp-w";
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // --- السلة من localStorage ---
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
     function normalizeCart() {
@@ -61,7 +62,7 @@
         const qty = Number(it.quantity);
         return {
           ...it,
-          quantity: Number.isFinite(qty) && qty > 0 ? Math.trunc(qty) : 1  // fallback = 1
+          quantity: Number.isFinite(qty) && qty > 0 ? Math.trunc(qty) : 1
         };
       });
       localStorage.setItem("cart", JSON.stringify(cart));
@@ -118,6 +119,14 @@
       renderCart();
     }
 
+    function clearCart() {
+      if (confirm("⚠️ هل تريد تفريغ السلة بالكامل؟")) {
+        cart = [];
+        localStorage.removeItem("cart");
+        renderCart();
+      }
+    }
+
     function escapeHtml(text) {
       return String(text)
         .replace(/&/g, "&amp;")
@@ -138,70 +147,62 @@
         alert("⚠️ من فضلك أدخل الاسم، رقم الهاتف، والعنوان.");
         return;
       }
+      if (!/^[0-9]{8,15}$/.test(phone)) {
+        alert("⚠️ رقم الهاتف غير صحيح.");
+        return;
+      }
       if (cart.length === 0) {
         alert("🛒 السلة فارغة");
         return;
       }
 
-const orderRows = [];
-for (const it of cart) {
-  if (!it.id) {
-    alert("❌ خطأ: منتج بدون معرف (id). لا يمكن إكمال الطلب.");
-    console.error("Cart item missing id:", it);
-    return;
-  }
-  const qty = Number(it.quantity) || 1;
-  if (!Number.isInteger(qty) || qty <= 0) {
-    alert("⚠️ هناك كمية غير صحيحة في السلة. سيتم تحويلها إلى 1 تلقائيًا.");
-  }
+      const { data: sessionData } = await supabase.auth.getSession();
+      const userId = sessionData?.session?.user?.id || null;
 
-  const price = Number(it.price) || 0;
+      const orderRows = [];
+      for (const it of cart) {
+        if (!it.id) {
+          alert("❌ خطأ: منتج بدون معرف (id).");
+          return;
+        }
+        const qty = Math.max(1, Math.trunc(Number(it.quantity) || 1));
+        const price = Number(it.price) || 0;
 
-  orderRows.push({
-    name,
-    phone,
-    address,
-    product_id: Number(it.id),
-    quantity: Math.trunc(qty),
-    price: price,
-    total: price * Math.trunc(qty),
-    status: "pending"
-  });
-}
-
-
-      console.log("Will insert orders:", orderRows);
+        orderRows.push({
+          user_id: userId,
+          name,
+          phone,
+          address,
+          product_id: Number(it.id),
+          quantity: qty,
+          price: price,
+          total: price * qty,
+          status: "pending"
+        });
+      }
 
       try {
-        // نُدخل دفعة واحدة
         const { data, error } = await supabase
           .from("orders")
           .insert(orderRows)
-          .select(); 
-
-        console.log("Supabase insert response:", { data, error });
+          .select();
 
         if (error) {
           console.error("Supabase insert error:", error);
-          alert("❌ حدث خطأ أثناء إرسال الطلب. افتح الكونسول لرؤية التفاصيل.");
+          alert("❌ حدث خطأ أثناء إرسال الطلب.");
           return;
         }
 
-        alert("✅ تم إرسال طلبك بنجاح! تم تسجيل " + data.length + " عنصر/عناصر.");
-        localStorage.removeItem("cart");
-        cart = [];
-        renderCart();
+        alert("✅ تم إرسال طلبك بنجاح! (" + data.length + " عنصر/عناصر)");
+        clearCart();
 
       } catch (err) {
-        console.error("Unexpected error during submitOrder:", err);
-        alert("❌ خطأ غير متوقع. افتح الكونسول لرؤية التفاصيل.");
+        console.error("Unexpected error:", err);
+        alert("❌ خطأ غير متوقع.");
       }
     }
 
-    // تحميل عند بداية الصفحة
     renderCart();
   </script>
 </body>
 </html>
-
-
