@@ -141,8 +141,9 @@
       .eq("id", orderId);
 
     if (error) {
-  console.error("Supabase error:", error);
   alert("❌ خطأ في تحميل الطلبات: " + error.message);
+console.error("تفاصيل الخطأ من Supabase:", error);
+
   return;
 }
 
