@@ -6,14 +6,12 @@
   <title>المتجر | LV12 WarerWeb</title>
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="icon" href="lv12.ico" type="image/x-icon">
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7770714931220768" crossorigin="anonymous"></script>
+  <link rel="icon" href="lv12.ico" type="image/x-icon">
 </head>
 <body class="bg-gray-50 text-gray-800">
-
   <header class="bg-white shadow-md sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-      <h1 class="text-2xl font-bold text-blue-600">🛒 lv12 متجرنا</h1>
+      <h1 onclick="location.href='index.html'" class="text-2xl font-bold text-blue-600 cursor-pointer">🛒 lv12 متجرنا</h1>
       <div class="flex items-center gap-2">
         <input id="searchInput" type="text" placeholder="ابحث عن منتج..."
                class="border rounded-full px-3 py-2 w-40 md:w-64 focus:outline-none focus:ring-2 focus:ring-blue-400">
@@ -23,22 +21,29 @@
       </div>
     </div>
   </header>
-
   <nav class="bg-gray-100 shadow-sm">
-    <div id="categoriesNav" class="max-w-7xl mx-auto px-4 py-2 flex flex-wrap gap-2 text-sm md:text-base">
+    <div class="max-w-7xl mx-auto px-4 py-2 flex flex-wrap gap-3 text-sm md:text-base items-center">
+      <div id="categoriesNav" class="flex flex-wrap gap-2"></div>
+      <div class="ml-auto flex items-center gap-2">
+        <label for="sortSelect" class="text-gray-600">🔽 فرز:</label>
+        <select id="sortSelect" class="border rounded p-1">
+          <option value="newest">الأحدث</option>
+          <option value="priceLow">السعر: من الأرخص</option>
+          <option value="priceHigh">السعر: من الأغلى</option>
+          <option value="rating">الأعلى تقييمًا</option>
+        </select>
+      </div>
     </div>
   </nav>
-
   <main class="max-w-7xl mx-auto px-4 py-8">
-    <div id="productsGrid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-    </div>
+    <div id="loading" class="text-center text-gray-500">⏳ جاري تحميل المنتجات...</div>
+    <div id="productsGrid" class="hidden grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
   </main>
-
-  <div id="toast" class="fixed bottom-5 right-5 hidden bg-green-600 text-white px-4 py-3 rounded-lg shadow-lg"></div>
-
+  <div id="toast" class="fixed bottom-5 right-5 hidden text-white px-4 py-3 rounded-lg shadow-lg"></div>
   <div id="buyModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
     <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
       <h2 class="text-xl font-bold mb-4">🛍️ إتمام الشراء</h2>
+      <div id="modalSummary" class="mb-4 text-sm text-gray-700"></div>
       <form id="buyForm" class="space-y-3">
         <input type="text" id="custName" placeholder="الاسم الكامل" class="border w-full p-2 rounded" required>
         <input type="text" id="custAddress" placeholder="العنوان" class="border w-full p-2 rounded" required>
@@ -48,14 +53,11 @@
           <option value="cash">💵 عند الاستلام</option>
           <option value="card">💳 بطاقة بنكية</option>
         </select>
-
         <label class="block text-sm font-semibold mt-3">📅 ميعاد التوصيل</label>
         <input type="date" id="deliveryDate" class="border w-full p-2 rounded" required>
         <input type="time" id="deliveryTime" class="border w-full p-2 rounded" required>
-
         <input type="hidden" id="selectedProductId">
         <input type="hidden" id="selectedQty">
-
         <div class="flex justify-between mt-4">
           <button type="button" onclick="closeModal()" class="bg-gray-400 text-white px-4 py-2 rounded">إلغاء</button>
           <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded">✅ تأكيد الطلب</button>
@@ -63,38 +65,28 @@
       </form>
     </div>
   </div>
-  <footer class="bg-gray-900 text-white text-center py-6 text-sm">
+  <footer class="bg-gray-900 text-white text-center py-6 text-sm mt-8">
     <p>© 2025 LV12 - جميع الحقوق محفوظة</p>
-    <div class="flex flex-col items-center mt-4 space-y-2 text-sm">
-      <a href="https://www.facebook.com/people/LV12-WarerWeb/61581029411296/" target="_blank" class="hover:text-blue-500">Facebook</a>
-      <a href="https://www.instagram.com/lv12_waterweb/?igsh=ZWdrZGpzcWJ5djUz#" target="_blank" class="hover:text-pink-500">Instagram</a>
-        <a href="https://www.tiktok.com/@lv12_waterweb" target="_blank" class="hover:text-pink-500">TikTok</a>
-      <a href="https://www.youtube.com/channel/UCACx7DfCVip0ik3bkxJpKlw" target="_blank" class="hover:text-red-500">YouTube</a>
-       <a href="help2.html" class="text-blue-600 hover:underline font-medium">
-      🔒 الأمان والخصوصية + 🛠️ الدعم الفني + 🎁 سياسة الاسترجاع
-    </a>
-    </div>
   </footer>
 <script>
   const SUPABASE_URL = "https://nszhzfysitppxssplqfb.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemh6ZnlzaXRwcHhzc3BscWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMzA4OTcsImV4cCI6MjA3MzgwNjg5N30.5KvK4bhqkZ_GpIfED4qecIMfeubAJYwSFJslULwOp-w";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemh6ZnlzaXRwcHhzc3BscWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMzA4OTcsImV4cCI6MjA3MzgwNjg5N30.5KvK4bhqkZ_GpIfED4qecIMfeubAJYwSFJslULwOp-w";
   const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
   const productsGrid = document.getElementById("productsGrid");
   const searchInput = document.getElementById("searchInput");
   const userNameEl = document.getElementById("userName");
   const toast = document.getElementById("toast");
   const categoriesNav = document.getElementById("categoriesNav");
-
+  const sortSelect = document.getElementById("sortSelect");
+  const loadingEl = document.getElementById("loading");
+  const modalSummary = document.getElementById("modalSummary");
   let allProducts = [];
-
   function showToast(msg, success = true) {
     toast.textContent = msg;
     toast.className = `fixed bottom-5 right-5 ${success ? "bg-green-600" : "bg-red-600"} text-white px-4 py-3 rounded-lg shadow-lg`;
     toast.classList.remove("hidden");
     setTimeout(() => toast.classList.add("hidden"), 3000);
   }
-
   async function checkLogin() {
     const { data } = await supabase.auth.getSession();
     if (data.session) {
@@ -104,18 +96,24 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
     }
     return data.session;
   }
-
   async function fetchProducts(searchTerm = "", category = "") {
-    let query = supabase.from("products").select("*");
+    loadingEl.classList.remove("hidden");
+    productsGrid.classList.add("hidden");
+    let query = supabase.from("products").select("*, reviews(rating)");
     if (searchTerm) query = query.ilike("name", `%${searchTerm}%`);
     if (category) query = query.eq("category", category);
     const { data: products, error } = await query;
     if (error) { console.error(error.message); return; }
-    allProducts = products;
-    renderProducts(products);
+    allProducts = products.map(p => {
+      const ratings = p.reviews?.map(r => r.rating) || [];
+      const avg = ratings.length ? (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(1) : null;
+      return { ...p, avgRating: avg, reviewCount: ratings.length };
+    });
     renderCategories();
+    applySorting();
+    loadingEl.classList.add("hidden");
+    productsGrid.classList.remove("hidden");
   }
-
   function renderCategories() {
     const cats = [...new Set(allProducts.map(p => p.category).filter(Boolean))];
     categoriesNav.innerHTML = `<button onclick="fetchProducts()" class="px-3 py-1 rounded bg-blue-100 hover:bg-blue-200">الكل</button>`;
@@ -123,7 +121,16 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
       categoriesNav.innerHTML += `<button onclick="fetchProducts('', '${cat}')" class="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300">${cat}</button>`;
     });
   }
-
+  function applySorting() {
+    let products = [...allProducts];
+    switch (sortSelect.value) {
+      case "priceLow": products.sort((a,b) => a.price - b.price); break;
+      case "priceHigh": products.sort((a,b) => b.price - a.price); break;
+      case "rating": products.sort((a,b) => (b.avgRating||0) - (a.avgRating||0)); break;
+      default: products.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+    }
+    renderProducts(products);
+  }
   function renderProducts(products) {
     productsGrid.innerHTML = "";
     if (!products || products.length === 0) {
@@ -134,27 +141,24 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
       const card = document.createElement("div");
       card.className = "bg-white rounded-lg shadow hover:shadow-lg transition flex flex-col";
       card.innerHTML = `
-        <img src="${product.image_url || 'https://via.placeholder.com/300'}" class="w-full h-48 object-cover">
+        <img src="${product.image_url || 'https://via.placeholder.com/300'}" class="w-full h-48 object-cover rounded-t">
         <div class="p-4 flex flex-col flex-1">
-  <h3 class="text-lg font-bold mb-1">
-    <a href="product.html?id=${product.id}" class="hover:underline">${product.name}</a>
-  </h3>
-  <p class="text-sm text-gray-600 mb-2">${product.description || "بدون وصف"}</p>
-  <p class="text-blue-600 font-semibold mb-1">💰 ${product.price} ج.م</p>
-  <p class="text-xs text-gray-500 mb-2">المتوفر: ${product.stock} | المبيعات: ${product.sold || 0}</p>
-
-  <div class="mt-auto flex items-center gap-1">
-    <input type="number" value="1" min="1" max="${product.stock}" 
-           class="w-14 border rounded px-1 py-0.5 text-center" id="qty-${product.id}">
-    <button onclick="addToCart(${product.id})" 
-            class="bg-blue-600 text-white px-2 py-1 rounded text-sm">➕ سلة</button>
-    <button onclick="buyNow(${product.id})" 
-            class="bg-green-600 text-white px-2 py-1 rounded text-sm">💳 شراء</button>
-    <a href="product.html?id=${product.id}" 
-       class="text-blue-600 text-sm underline ml-2">🔍 التفاصيل</a>
-  </div>
-</div>
-
+          <h3 class="text-lg font-bold mb-1">
+            <a href="product.html?id=${product.id}" class="hover:underline">${product.name}</a>
+          </h3>
+          <p class="text-sm text-gray-600 mb-2">${product.description || "بدون وصف"}</p>
+          <p class="text-blue-600 font-semibold mb-1">💰 ${product.price} ج.م</p>
+          <p class="text-xs text-gray-500 mb-1">المتوفر: ${product.stock} | المبيعات: ${product.sold || 0}</p>
+          <p class="text-xs text-yellow-600 mb-2">
+            ${product.avgRating ? `⭐ ${product.avgRating} (${product.reviewCount} مراجعة)` : "بدون تقييم"}
+          </p>
+          <div class="mt-auto flex items-center gap-1">
+            <input type="number" value="1" min="1" max="${product.stock}" 
+                  class="w-14 border rounded px-1 py-0.5 text-center" id="qty-${product.id}">
+            <button onclick="addToCart(${product.id})" class="bg-blue-600 text-white px-2 py-1 rounded text-sm">➕ سلة</button>
+            <button onclick="buyNow(${product.id})" class="bg-green-600 text-white px-2 py-1 rounded text-sm">💳 شراء</button>
+          </div>
+        </div>
       `;
       productsGrid.appendChild(card);
     });
@@ -168,19 +172,22 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
     localStorage.setItem("cart", JSON.stringify(cart));
     showToast("✅ تمت الإضافة للسلة");
   }
-
   function buyNow(productId) {
     const qty = parseInt(document.getElementById(`qty-${productId}`).value) || 1;
+    const product = allProducts.find(p => p.id === productId);
     document.getElementById("selectedProductId").value = productId;
     document.getElementById("selectedQty").value = qty;
+    modalSummary.innerHTML = `
+      <p><b>المنتج:</b> ${product.name}</p>
+      <p><b>الكمية:</b> ${qty}</p>
+      <p><b>الإجمالي:</b> ${product.price * qty} ج.م</p>
+    `;
     document.getElementById("buyModal").classList.remove("hidden");
     document.getElementById("buyModal").classList.add("flex");
   }
-
   function closeModal() {
     document.getElementById("buyModal").classList.add("hidden");
   }
-
   document.getElementById("buyForm").addEventListener("submit", async (e) => {
     e.preventDefault();
     const sessionData = await supabase.auth.getSession();
@@ -189,37 +196,21 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
       return;
     }
     const user = sessionData.data.session.user;
-
     const name = document.getElementById("custName").value;
     const address = document.getElementById("custAddress").value;
     const phone = document.getElementById("custPhone").value;
     const payment = document.getElementById("custPayment").value;
     const productId = parseInt(document.getElementById("selectedProductId").value);
     const qty = parseInt(document.getElementById("selectedQty").value);
-
     const date = document.getElementById("deliveryDate").value;
     const time = document.getElementById("deliveryTime").value;
     let deliveryDate = null;
     if (date && time) deliveryDate = new Date(date + "T" + time);
-
-    const { data: product, error } = await supabase
-      .from("products")
-      .select("price, stock")
-      .eq("id", productId)
-      .single();
-
-    if (error || !product) {
-      showToast("❌ المنتج غير موجود", false);
-      return;
-    }
-    if (qty > product.stock) {
-      showToast("❌ الكمية أكبر من المخزون", false);
-      return;
-    }
-
+    const product = allProducts.find(p => p.id === productId);
+    if (!product) return showToast("❌ المنتج غير موجود", false);
+    if (qty > product.stock) return showToast("❌ الكمية أكبر من المخزون", false);
     const total = product.price * qty;
-
-    const { error: insertErr } = await supabase.from("orders").insert([{
+    const { error } = await supabase.from("orders").insert([{
       user_id: user.id,
       name, address, phone, payment,
       product_id: productId,
@@ -229,28 +220,14 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
       status: "pending",
       delivery_date: deliveryDate ? deliveryDate.toISOString() : null
     }]);
-
-    if (insertErr) {
-      showToast("❌ خطأ في إنشاء الطلب", false);
-      return;
-    }
-
+    if (error) return showToast("❌ خطأ في إنشاء الطلب", false);
     showToast("✅ تم إرسال طلبك بنجاح");
     closeModal();
   });
-
+  sortSelect.addEventListener("change", applySorting);
+  searchInput.addEventListener("input", (e) => fetchProducts(e.target.value));
   checkLogin();
   fetchProducts();
-  searchInput.addEventListener("input", (e) => fetchProducts(e.target.value));
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
