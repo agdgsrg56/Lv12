@@ -16,6 +16,7 @@
     <label>إلى: <input type="date" id="end-date" class="border rounded p-1"></label>
     <button onclick="applyFilter()" class="bg-blue-600 text-white px-4 py-2 rounded">🔍 فلترة</button>
     <button onclick="resetFilter()" class="bg-gray-500 text-white px-4 py-2 rounded">♻️ إعادة تعيين</button>
+      class="bg-purple-500 text-white px-2 py-1 rounded">📅 تحديد الميعاد</button>
   </div>
 
   <h2 class="text-2xl font-bold mb-3 text-yellow-700">🕒 الطلبات المعلقة</h2>
@@ -83,7 +84,7 @@
         <th class="p-2">الحالة</th>
       </tr>
       <button onclick="setDeliveryDate(${order.id})" 
-  class="bg-purple-500 text-white px-2 py-1 rounded">📅 تحديد الميعاد</button>
+
 
     </thead>
     <tbody id="cancelled-orders"></tbody>
