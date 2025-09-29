@@ -5,14 +5,14 @@
   <title>لوحة تحكم المتجر</title>
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script src="https://cdn.tailwindcss.com"></script>
-      <link rel="icon" href="lv12.ico" type="image/x-icon">
-
+  <link rel="icon" href="lv12.ico" type="image/x-icon">
 </head>
 <body class="bg-gray-100 min-h-screen">
 
   <div class="container mx-auto py-10">
     <h1 class="text-3xl font-bold mb-6 text-center">لوحة تحكم المتجر 🛠️</h1>
 
+    <!-- ✅ نموذج إضافة منتج -->
     <form id="add-product-form" class="bg-white p-6 rounded shadow-md mb-10">
       <h2 class="text-xl font-semibold mb-4">➕ إضافة منتج جديد</h2>
       <input type="text" id="product-name" placeholder="اسم المنتج" class="border p-2 rounded w-full mb-3" required>
@@ -20,9 +20,18 @@
       <input type="number" id="product-price" placeholder="السعر" class="border p-2 rounded w-full mb-3" required>
       <input type="number" id="product-stock" placeholder="الكمية" class="border p-2 rounded w-full mb-3" required>
       <input type="file" id="product-image" class="mb-3">
-      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">إضافة</button>
+
+      <!-- ✅ اختيار القسم -->
+      <label class="block mb-2 font-semibold">القسم:</label>
+      <select id="product-category" class="border p-2 rounded w-full mb-3">
+        <option value="">اختر قسماً...</option>
+      </select>
+      <input type="text" id="new-category" placeholder="➕ إضافة قسم جديد" class="border p-2 rounded w-full mb-3">
+
+      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">➕ إضافة المنتج</button>
     </form>
 
+    <!-- ✅ جدول المنتجات -->
     <div>
       <h2 class="text-xl font-semibold mb-4">📦 المنتجات الحالية</h2>
       <table class="w-full bg-white rounded shadow-md">
@@ -30,6 +39,7 @@
           <tr class="bg-gray-200">
             <th class="p-2">الصورة</th>
             <th class="p-2">الاسم</th>
+            <th class="p-2">القسم</th>
             <th class="p-2">السعر</th>
             <th class="p-2">الكمية</th>
             <th class="p-2">تم البيع</th>
@@ -45,7 +55,7 @@
 
   <script>
     const SUPABASE_URL = "https://nszhzfysitppxssplqfb.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemh6ZnlzaXRwcHhzc3BscWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMzA4OTcsImV4cCI6MjA3MzgwNjg5N30.5KvK4bhqkZ_GpIfED4qecIMfeubAJYwSFJslULwOp-w"; 
+    const SUPABASE_ANON_KEY = "YOUR_SUPABASE_KEY"; 
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const ADMIN_EMAIL = "lv12wlv12@gmail.com"; 
@@ -56,8 +66,18 @@
         window.location.href = "index.html";
       }
     }
-
     checkAuth();
+
+    // ✅ تحميل الأقسام الموجودة من المنتجات
+    async function loadCategories() {
+      const { data: products } = await supabase.from("products").select("category");
+      const select = document.getElementById("product-category");
+      select.innerHTML = `<option value="">اختر قسماً...</option>`;
+      const categories = [...new Set(products.map(p => p.category).filter(Boolean))];
+      categories.forEach(cat => {
+        select.innerHTML += `<option value="${cat}">${cat}</option>`;
+      });
+    }
 
     document.getElementById("add-product-form").addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -68,20 +88,32 @@
       const stock = document.getElementById("product-stock").value;
       const imageFile = document.getElementById("product-image").files[0];
 
+      // ✅ القسم
+      let category = document.getElementById("new-category").value.trim();
+      if (!category) {
+        category = document.getElementById("product-category").value;
+      }
+
       let imageUrl = null;
       if (imageFile) {
-        const { data, error } = await supabase.storage.from("products").upload(Date.now() + "-" + imageFile.name, imageFile);
+        const { data, error } = await supabase.storage
+          .from("products")
+          .upload(Date.now() + "-" + imageFile.name, imageFile);
         if (!error) {
           imageUrl = `${SUPABASE_URL}/storage/v1/object/public/products/${data.path}`;
         }
       }
 
-      const { error } = await supabase.from("products").insert([{ name, description, price, stock, image_url: imageUrl }]);
+      const { error } = await supabase.from("products").insert([{ 
+        name, description, price, stock, category, image_url: imageUrl 
+      }]);
       if (error) {
-        alert("❌ خطأ في الإضافة");
+        alert("❌ خطأ في الإضافة: " + error.message);
       } else {
         alert("✅ تم إضافة المنتج بنجاح");
         loadProducts();
+        loadCategories();
+        e.target.reset();
       }
     });
 
@@ -94,6 +126,7 @@
           <tr class="border-b">
             <td class="p-2"><img src="${prod.image_url || ''}" class="w-16 h-16 object-cover rounded"></td>
             <td class="p-2">${prod.name}</td>
+            <td class="p-2">${prod.category || '-'}</td>
             <td class="p-2">${prod.price} ج.م</td>
             <td class="p-2">${prod.stock}</td>
             <td class="p-2">${prod.sold || 0}</td>
@@ -109,10 +142,14 @@
       if (confirm("هل تريد حذف هذا المنتج؟")) {
         await supabase.from("products").delete().eq("id", id);
         loadProducts();
+        loadCategories();
       }
     }
 
+    // ✅ تحميل عند فتح الصفحة
     loadProducts();
+    loadCategories();
   </script>
 </body>
 </html>
+
