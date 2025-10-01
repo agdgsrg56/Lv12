@@ -142,7 +142,7 @@
 
   function computeDownloadsNow() {
     const now = new Date();
-    // الفرق بالدقائق (UTC)
+ 
     const minutesPassed = Math.floor((Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),
                                 now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds()) -
                                       START_DATE.getTime()) / (1000 * 60));
@@ -266,73 +266,117 @@
   }
 </style>
 
-</script>
-s<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-</head>
-<body class="antialiased bg-white text-slate-800">
-
-
-<section id="intro-video" class="py-20 bg-gradient-to-r from-indigo-100 via-blue-50 to-cyan-50">
-<div class="container mx-auto px-6 text-center">
-
-
-<h3 class="text-4xl font-extrabold mb-8 text-blue-700 tracking-tight">
-🎥 تعرّف على النظام
-</h3>
-
-
-<p class="max-w-2xl mx-auto mb-8 text-lg text-slate-700">شاهد عرضًا سريعًا يعرّفك على أهم مزايا النظام. يتم تحميل الفيديو فقط عند الضغط لتسريع أداء الصفحة.</p>
-
-
-<div class="relative group max-w-4xl mx-auto">
-<button
-data-video-trigger
-data-video-id="R_XXECSr3gk"
-data-target="#video-modal"
-aria-controls="video-modal"
-class="w-full aspect-[16/9] rounded-3xl overflow-hidden shadow-2xl ring-4 ring-white/70 group-hover:ring-blue-300 transition duration-500 animated focus:outline-none focus:ring-4 focus:ring-blue-200"
-aria-label="تشغيل فيديو: تعرّف على النظام">
-
-
-<!-- poster image: YouTube thumbnail pattern -->
-<img
-src="https://img.youtube.com/vi/R_XXECSr3gk/maxresdefault.jpg"
-alt="صورة معاينة لفيديو: تعرّف على النظام"
-class="w-full h-full object-cover rounded-3xl">
-
-
-<div class="absolute inset-0 rounded-3xl bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition duration-500 flex items-center justify-center">
-<span class="flex items-center gap-3 text-white text-2xl font-bold">
-<svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 22v-20l18 10-18 10z"/></svg>
-شاهد الآن
-</span>
-</div>
-
-
-</button>
-
-
-<noscript>
-<div class="mt-4 text-sm text-slate-600">يجب تفعيل الجافاسكربت لمشاهدة الفيديو ضمن النافذة. أو <a href="https://youtu.be/R_XXECSr3gk" class="text-blue-600 underline">افتح الفيديو في يوتيوب</a>.</div>
-</noscript>
-
-
-</div>
-
-
-<div class="mt-6">
-<a href="#transcript" class="text-sm underline text-slate-700">عرض نصّ الفيديو / الترجمة</a>
-</div>
-
-
-</div>
-</section>
 
 
 
 
 
-<script>
+
+  <section id="intro-video" class="py-20 bg-gradient-to-r from-indigo-100 via-blue-50 to-cyan-50">
+    <div class="container mx-auto px-6 text-center">
+      <h3 class="text-4xl font-extrabold mb-8 text-blue-700 tracking-tight">🎥 تعرّف على النظام</h3>
+      <p class="max-w-2xl mx-auto mb-8 text-lg text-slate-700">شاهد عرضًا سريعًا يعرّفك على أهم مزايا النظام. يتم تحميل الفيديو فقط عند الضغط لتسريع أداء الصفحة.</p>
+
+      <div class="relative group max-w-4xl mx-auto">
+        <button data-video-trigger data-video-id="R_XXECSr3gk" data-target="#video-modal" aria-controls="video-modal"
+          class="w-full aspect-[16/9] rounded-3xl overflow-hidden shadow-2xl ring-4 ring-white/70 group-hover:ring-blue-300 transition duration-500 focus:outline-none focus:ring-4 focus:ring-blue-200"
+          aria-label="تشغيل فيديو: تعرّف على النظام">
+
+          <img src="https://img.youtube.com/vi/R_XXECSr3gk/maxresdefault.jpg" alt="صورة معاينة لفيديو: تعرّف على النظام" class="w-full h-full object-cover rounded-3xl">
+
+          <div class="absolute inset-0 rounded-3xl bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition duration-500 flex items-center justify-center">
+            <span class="flex items-center gap-3 text-white text-2xl font-bold">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" viewBox="0 0 24 24" fill="currentColor"><path d="M3 22v-20l18 10-18 10z"/></svg>
+              شاهد الآن
+            </span>
+          </div>
+        </button>
+        <noscript>
+          <div class="mt-4 text-sm text-slate-600">يجب تفعيل الجافاسكربت لمشاهدة الفيديو ضمن النافذة. أو <a href="https://youtu.be/R_XXECSr3gk" class="text-blue-600 underline">افتح الفيديو في يوتيوب</a>.</div>
+        </noscript>
+      </div>
+    </div>
+  </section>
+
+  <div id="video-modal" data-video-modal aria-hidden="true" class="fixed inset-0 z-50 hidden items-center justify-center p-6 bg-black/70">
+    <div role="dialog" aria-modal="true" aria-label="مشغل الفيديو" class="max-w-5xl w-full mx-auto">
+      <div class="relative bg-transparent rounded-2xl p-4">
+        <div class="aspect-[16/9] rounded-2xl overflow-hidden bg-black shadow-2xl">
+          <div class="js-iframe-wrap w-full h-full"></div>
+        </div>
+        <button data-modal-close class="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 shadow" aria-label="إغلاق نافذة الفيديو">إغلاق</button>
+      </div>
+    </div>
+  </div>
+
+  <section id="transcript" class="max-w-4xl mx-auto px-6 py-14">
+    <h4 class="text-2xl font-semibold mb-4">نصّ الفيديو (مثال)</h4>
+    <p class="text-slate-700 leading-relaxed">هنا يمكنك وضع نسخة نصية أو ترجمة الفيديو لتحسين الوصول وتجربة المستخدم.</p>
+  </section>
+
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    AOS.init();
+
+    function openVideoModal(modal, videoId) {
+      const iframeWrap = modal.querySelector('.js-iframe-wrap');
+      if (!iframeWrap.dataset.loaded) {
+        const iframe = document.createElement('iframe');
+        iframe.setAttribute('title', 'فيديو تعريفي — تشغيل');
+        iframe.setAttribute('frameborder', '0');
+        iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+        iframe.setAttribute('allowfullscreen', '');
+        iframe.setAttribute('loading', 'lazy');
+        iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+        iframe.className = 'w-full h-full rounded-2xl';
+        iframeWrap.appendChild(iframe);
+        iframeWrap.dataset.loaded = 'true';
+      }
+      modal.setAttribute('aria-hidden', 'false');
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeVideoModal(modal) {
+      const iframeWrap = modal.querySelector('.js-iframe-wrap');
+      if (iframeWrap && iframeWrap.dataset.loaded) {
+        iframeWrap.innerHTML = '';
+        delete iframeWrap.dataset.loaded;
+      }
+      modal.setAttribute('aria-hidden', 'true');
+      modal.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('[data-video-trigger]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-video-id');
+          const modal = document.querySelector(btn.getAttribute('data-target'));
+          openVideoModal(modal, id);
+        });
+      });
+      document.querySelectorAll('[data-modal-close]').forEach(btn => {
+        btn.addEventListener('click', () => closeVideoModal(btn.closest('[data-video-modal]')));
+      });
+      document.querySelectorAll('[data-video-modal]').forEach(modal => {
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeVideoModal(modal); });
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          const open = document.querySelector('[data-video-modal][aria-hidden="false"]');
+          if (open) closeVideoModal(open);
+        }
+      });
+    });
+  </script>
+
+
+
+
+
+
+ 
 
 <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
@@ -1067,6 +1111,7 @@ class="w-full h-full object-cover rounded-3xl">
 
 </body>
 </html>
+
 
 
 
