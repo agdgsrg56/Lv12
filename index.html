@@ -242,7 +242,10 @@
         ✨ ابدأ الآن
       </a>
 
-   
+      <a href="#intro-video"
+         class="bg-white text-blue-600 border px-6 py-3 rounded-full shadow hover:bg-gray-100 transition font-semibold">
+        🎥 شاهد الفيديو
+      </a>
     </div>
   </div>
 </section>
@@ -262,32 +265,84 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.08); 
   }
 </style>
-<section id="intro-video" class="py-20 bg-gradient-to-r from-indigo-100 via-blue-50 to-cyan-50">
-  <div class="container mx-auto px-6 text-center">
-    
-    <h3 class="text-4xl font-extrabold mb-10 text-blue-700 tracking-tight">
-      🎥 تعرّف على النظام
-    </h3>
-    
-    <div class="relative group max-w-4xl mx-auto">
-      <div class="aspect-[16/9] rounded-3xl overflow-hidden shadow-2xl ring-4 ring-white/70 group-hover:ring-blue-300 transition duration-500">
-        <iframe class="w-full h-96 rounded-3xl"
-          src="https://www.youtube.com/embed/R_XXECSr3gk"
-          title="LV12 WarerWeb Demo"
-          frameborder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen>
-        </iframe>
-      </div>
-      
-      <div class="absolute inset-0 rounded-3xl bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition duration-500 flex items-center justify-center">
-        <span class="text-white text-2xl font-bold">▶ شاهد الآن</span>
-      </div>
-    </div>
 
-  </div>
+</script>
+s<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="antialiased bg-white text-slate-800">
+
+
+<section id="intro-video" class="py-20 bg-gradient-to-r from-indigo-100 via-blue-50 to-cyan-50">
+<div class="container mx-auto px-6 text-center">
+
+
+<h3 class="text-4xl font-extrabold mb-8 text-blue-700 tracking-tight">
+🎥 تعرّف على النظام
+</h3>
+
+
+<p class="max-w-2xl mx-auto mb-8 text-lg text-slate-700">شاهد عرضًا سريعًا يعرّفك على أهم مزايا النظام. يتم تحميل الفيديو فقط عند الضغط لتسريع أداء الصفحة.</p>
+
+
+<div class="relative group max-w-4xl mx-auto">
+<button
+data-video-trigger
+data-video-id="R_XXECSr3gk"
+data-target="#video-modal"
+aria-controls="video-modal"
+class="w-full aspect-[16/9] rounded-3xl overflow-hidden shadow-2xl ring-4 ring-white/70 group-hover:ring-blue-300 transition duration-500 animated focus:outline-none focus:ring-4 focus:ring-blue-200"
+aria-label="تشغيل فيديو: تعرّف على النظام">
+
+
+<!-- poster image: YouTube thumbnail pattern -->
+<img
+src="https://img.youtube.com/vi/R_XXECSr3gk/maxresdefault.jpg"
+alt="صورة معاينة لفيديو: تعرّف على النظام"
+class="w-full h-full object-cover rounded-3xl">
+
+
+<div class="absolute inset-0 rounded-3xl bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition duration-500 flex items-center justify-center">
+<span class="flex items-center gap-3 text-white text-2xl font-bold">
+<svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 22v-20l18 10-18 10z"/></svg>
+شاهد الآن
+</span>
+</div>
+
+
+</button>
+
+
+<noscript>
+<div class="mt-4 text-sm text-slate-600">يجب تفعيل الجافاسكربت لمشاهدة الفيديو ضمن النافذة. أو <a href="https://youtu.be/R_XXECSr3gk" class="text-blue-600 underline">افتح الفيديو في يوتيوب</a>.</div>
+</noscript>
+
+
+</div>
+
+
+<div class="mt-6">
+<a href="#transcript" class="text-sm underline text-slate-700">عرض نصّ الفيديو / الترجمة</a>
+</div>
+
+
+</div>
 </section>
 
+
+<!-- Lightbox modal (موجود خارج القسم، مُخبّأ افتراضيًا) -->
+<div id="video-modal" data-video-modal aria-hidden="true" class="fixed inset-0 z-50 hidden md:flex items-center justify-center p-6 video-backdrop">
+<div role="dialog" aria-modal="true" aria-label="مشغل الفيديو" class="max-w-5xl w-full mx-auto">
+<div class="relative bg-transparent rounded-2xl p-4">
+<div class="aspect-[16/9] rounded-2xl overflow-hidden bg-black shadow-2xl">
+<div class="js-iframe-wrap w-full h-full"></div>
+</div>
+<button data-modal-close class="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 shadow focus:outline-none" aria-label="إغلاق نافذة الفيديو">إغلاق</button>
+</div>
+</div>
+</div>
+
+
+<script>
 
 <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
