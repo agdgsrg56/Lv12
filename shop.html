@@ -94,7 +94,7 @@ async function checkLogin() {
   if (data.session) {
     userNameEl.textContent = "👤 " + data.session.user.email;
   } else {
-    userNameEl.innerHTML = `<a href="login.html" class="text-blue-600 underline">تسجيل الدخول</a>`;
+    userNameEl.innerHTML = `<a href="shop-login.html" class="text-blue-600 underline">تسجيل الدخول</a>`;
   }
   return data.session;
 }
@@ -249,7 +249,7 @@ document.getElementById("buyForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const sessionData = await supabase.auth.getSession();
   if (!sessionData.data.session) {
-    window.location.href = "login.html";
+    window.location.href = "shop-login.html";
     return;
   }
 
