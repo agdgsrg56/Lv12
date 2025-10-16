@@ -40,34 +40,41 @@
     form.addEventListener("submit", async (e) => {
       e.preventDefault()
 
-      const email = document.getElementById("email").value
-      const password = document.getElementById("password").value
+     
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-      message.textContent = "⏳ جاري تسجيل الدخول..."
-      message.className = "text-center mt-4 text-sm text-gray-600"
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
 
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      })
+    message.textContent = "⏳ جاري تسجيل الدخول...";
+    message.className = "text-center mt-4 text-sm text-gray-600";
 
-      if (error) {
-        message.textContent = "❌ فشل تسجيل الدخول: " + error.message
-        message.className = "text-center mt-4 text-sm text-red-600"
-        return
-      }
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
 
-      message.textContent = "✅ تم تسجيل الدخول بنجاح! جاري تحويلك..."
-      message.className = "text-center mt-4 text-sm text-green-600"
+    if (error) {
+      message.textContent = "❌ فشل تسجيل الدخول: " + error.message;
+      message.className = "text-center mt-4 text-sm text-red-600";
+      return;
+    }
 
-      // تحويل لصفحة رئيسية بعد تسجيل الدخول
-      setTimeout(() => {
-        window.location.href = "index.html"
-      }, 1500)
-    })
-  </script>
+    message.textContent = "✅ تم تسجيل الدخول بنجاح! جاري تحويلك...";
+    message.className = "text-center mt-4 text-sm text-green-600";
+
+    const redirectUrl = localStorage.getItem("redirectAfterLogin") || "index.html";
+    localStorage.removeItem("redirectAfterLogin");
+
+    setTimeout(() => {
+      window.location.href = redirectUrl;
+    }, 1200);
+  });
+</script>
 </body>
 </html>
+
 
 
 
