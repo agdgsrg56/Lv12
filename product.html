@@ -69,103 +69,206 @@
       toast.classList.remove("hidden");
       setTimeout(() => toast.classList.add("hidden"), 3000);
     }
-    async function checkLogin() {
-      const { data } = await supabase.auth.getSession();
-      if (data.session) {
-        currentUser = data.session.user;
-        userNameEl.textContent = "👤 " + currentUser.email;
-        reviewForm.classList.remove("hidden");
-      } else {
-        userNameEl.innerHTML = `<a href="login.html" class="text-blue-600 underline">تسجيل الدخول</a>`;
-      }
-    }
-    async function loadProduct() {
-      const { data: product } = await supabase.from("products").select("*").eq("id", productId).single();
-      if (!product) {
-        productDetailsEl.innerHTML = "<p class='text-red-600'>❌ المنتج غير موجود</p>";
-        return;
-      }
-      productDetailsEl.innerHTML = `
-        <div class="grid md:grid-cols-2 gap-6">
-          <img src="${product.image_url || 'https://via.placeholder.com/500'}" class="w-full h-96 object-cover rounded-lg shadow">
-          <div>
-            <h1 class="text-2xl font-bold mb-2">${product.name}</h1>
-            <p class="text-gray-600 mb-4">${product.description || "لا يوجد وصف"}</p>
-            <p class="text-blue-600 text-xl font-bold mb-4">💰 ${product.price} ج.م</p>
-            <p class="text-sm text-gray-500 mb-4">المتوفر: ${product.stock} | المبيعات: ${product.sold || 0}</p>
-            <button onclick="addToCart(${product.id}, '${product.name}', ${product.price})" class="bg-blue-600 text-white px-4 py-2 rounded">➕ أضف للسلة</button>
-          </div>
+ let currentUser = null;
+const urlParams = new URLSearchParams(window.location.search);
+const productId = parseInt(urlParams.get("id"));
+
+const productDetailsEl = document.getElementById("productDetails");
+const reviewsListEl = document.getElementById("reviewsList");
+const averageRatingEl = document.getElementById("averageRating");
+const reviewForm = document.getElementById("reviewForm");
+const userNameEl = document.getElementById("userName");
+const relatedProductsEl = document.getElementById("relatedProducts");
+
+async function checkLogin() {
+  const { data } = await supabase.auth.getSession();
+  if (data.session) {
+    currentUser = data.session.user;
+    userNameEl.textContent = "👤 " + currentUser.email;
+    reviewForm.classList.remove("hidden");
+  } else {
+    userNameEl.innerHTML = `<a href="login.html" class="text-blue-600 underline">تسجيل الدخول</a>`;
+    reviewForm.classList.add("hidden");
+  }
+}
+
+async function loadProduct() {
+  const { data: product, error } = await supabase
+    .from("products")
+    .select(
+      `id, name, description, price, stock, sold, metadata, created_at,
+       product_images(image_path, is_primary, ordering)`
+    )
+    .eq("id", productId)
+    .single();
+
+  if (error || !product) {
+    productDetailsEl.innerHTML =
+      "<p class='text-red-600'>❌ المنتج غير موجود</p>";
+    return;
+  }
+
+  const images = (product.product_images || []).sort((a, b) => a.ordering - b.ordering);
+  const primary = images.find((i) => i.is_primary) || images[0];
+  const primaryUrl = primary ? primary.image_path : "https://via.placeholder.com/500";
+
+  productDetailsEl.innerHTML = `
+    <div class="grid md:grid-cols-2 gap-6">
+      <div>
+        <img id="mainImage" src="${primaryUrl}" class="w-full h-96 object-cover rounded-lg shadow mb-2">
+        <div class="flex gap-2 overflow-x-auto pb-1">
+          ${images
+            .map(
+              (img) => `
+              <img src="${img.image_path}" 
+                   class="w-20 h-20 object-cover rounded cursor-pointer border hover:border-blue-500"
+                   onclick="document.getElementById('mainImage').src='${img.image_path}'">
+            `
+            )
+            .join("")}
+        </div>
+      </div>
+      <div>
+        <h1 class="text-2xl font-bold mb-2">${product.name}</h1>
+        <p class="text-gray-600 mb-4">${product.description || "لا يوجد وصف"}</p>
+        <p class="text-blue-600 text-xl font-bold mb-4">💰 ${product.price} ج.م</p>
+        <p class="text-sm text-gray-500 mb-4">المتوفر: ${product.stock} | المبيعات: ${product.sold || 0}</p>
+        <button onclick="addToCart(${product.id}, '${product.name}', ${product.price})" 
+                class="bg-blue-600 text-white px-4 py-2 rounded">➕ أضف للسلة</button>
+      </div>
+    </div>
+  `;
+
+  await loadReviews();
+  await loadRelated(product);
+}
+
+async function loadReviews() {
+  const { data: reviews, error } = await supabase
+    .from("product_reviews")
+    .select("*")
+    .eq("product_id", productId)
+    .order("created_at", { ascending: false });
+
+  if (error || !reviews || reviews.length === 0) {
+    reviewsListEl.innerHTML = "<p class='text-gray-500'>لا توجد تقييمات بعد</p>";
+    averageRatingEl.textContent = "";
+    return;
+  }
+
+  const avg = (
+    reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+  ).toFixed(1);
+  averageRatingEl.textContent = `متوسط التقييم: ⭐ ${avg} من 5 (${reviews.length} مراجعة)`;
+
+  reviewsListEl.innerHTML = reviews
+    .map(
+      (r) => `
+      <div class="border p-3 rounded bg-gray-50">
+        <div class="flex items-center justify-between mb-1">
+          <span class="font-semibold">${r.user_name || "مستخدم"}</span>
+          <span class="text-yellow-500">${"⭐".repeat(r.rating)}</span>
+        </div>
+        <p class="text-gray-700">${r.comment}</p>
+        <p class="text-xs text-gray-400 mt-1">${new Date(r.created_at).toLocaleString()}</p>
+      </div>
+    `
+    )
+    .join("");
+}
+
+reviewForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  if (!currentUser) {
+    showToast("❌ يجب تسجيل الدخول لإضافة تقييم", false);
+    return;
+  }
+
+  const rating = parseInt(document.getElementById("reviewRating").value);
+  const comment = document.getElementById("reviewComment").value.trim();
+  if (!rating || !comment) {
+    showToast("❌ يرجى تعبئة كل الحقول", false);
+    return;
+  }
+
+  const { data: existing } = await supabase
+    .from("product_reviews")
+    .select("id")
+    .eq("product_id", productId)
+    .eq("user_id", currentUser.id)
+    .limit(1);
+
+  if (existing && existing.length > 0) {
+    showToast("⚠️ لقد قمت بتقييم هذا المنتج مسبقًا", false);
+    return;
+  }
+
+  const { error } = await supabase.from("product_reviews").insert([
+    {
+      product_id: productId,
+      user_id: currentUser.id,
+      user_name: currentUser.email,
+      rating,
+      comment,
+    },
+  ]);
+
+  if (error) {
+    showToast("❌ خطأ في إضافة التقييم", false);
+  } else {
+    showToast("✅ تم إضافة تقييمك بنجاح");
+    reviewForm.reset();
+    loadReviews();
+  }
+});
+
+async function loadRelated(product) {
+  const category = product.metadata?.category || "";
+  if (!category) {
+    relatedProductsEl.innerHTML = `<p class="text-gray-500">لا توجد منتجات مشابهة</p>`;
+    return;
+  }
+
+  const { data: related, error } = await supabase
+    .from("products")
+    .select("id, name, price, metadata, product_images(image_path, is_primary)")
+    .eq("metadata->>category", category)
+    .neq("id", product.id)
+    .limit(4);
+
+  if (error || !related || related.length === 0) {
+    relatedProductsEl.innerHTML = `<p class="text-gray-500">لا توجد منتجات مشابهة</p>`;
+    return;
+  }
+
+  relatedProductsEl.innerHTML = related
+    .map((r) => {
+      const imgs = (r.product_images || []).sort((a, b) => a.is_primary ? -1 : 1);
+      const img = imgs[0]?.image_path || "https://via.placeholder.com/200";
+      return `
+        <div onclick="location.href='product.html?id=${r.id}'" 
+             class="cursor-pointer bg-white shadow rounded p-3 hover:shadow-lg">
+          <img src="${img}" class="h-32 w-full object-cover rounded mb-2">
+          <h3 class="font-bold text-sm">${r.name}</h3>
+          <p class="text-blue-600 text-sm">💰 ${r.price} ج.م</p>
         </div>
       `;
-      loadReviews();
-      loadRelated(product);
-    }
-    async function loadReviews() {
-      const { data: reviews } = await supabase.from("reviews").select("*").eq("product_id", productId).order("created_at", { ascending: false });
+    })
+    .join("");
+}
 
-      if (!reviews || reviews.length === 0) {
-        reviewsListEl.innerHTML = "<p class='text-gray-500'>لا توجد تقييمات بعد</p>";
-        averageRatingEl.textContent = "";
-        return;
-      }
-      const avg = (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1);
-      averageRatingEl.textContent = `متوسط التقييم: ⭐ ${avg} من 5 (${reviews.length} مراجعة)`;
+function addToCart(id, name, price) {
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+  const existing = cart.find((i) => i.id === id);
+  if (existing) existing.quantity += 1;
+  else cart.push({ id, name, price, quantity: 1 });
+  localStorage.setItem("cart", JSON.stringify(cart));
+  showToast("✅ تمت الإضافة للسلة");
+}
 
-      reviewsListEl.innerHTML = reviews.map(r => `
-        <div class="border p-3 rounded bg-gray-50">
-          <div class="flex items-center justify-between mb-1">
-            <span class="font-semibold">${r.user_name || "مستخدم"}</span>
-            <span class="text-yellow-500">${"⭐".repeat(r.rating)}</span>
-          </div>
-          <p class="text-gray-700">${r.comment}</p>
-          <p class="text-xs text-gray-400 mt-1">${new Date(r.created_at).toLocaleString()}</p>
-        </div>
-      `).join("");
-    }
-    reviewForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      if (!currentUser) {
-        showToast("❌ يجب تسجيل الدخول لإضافة تقييم", false);
-        return;
-      }
-      const rating = parseInt(document.getElementById("reviewRating").value);
-      const comment = document.getElementById("reviewComment").value;
+checkLogin();
+loadProduct();
 
-      const { error } = await supabase.from("reviews").insert([{
-        product_id: productId,
-        user_name: currentUser.email,
-        rating,
-        comment
-      }]);
-
-      if (error) {
-        showToast("❌ خطأ في إضافة التقييم", false);
-      } else {
-        showToast("✅ تم إضافة تقييمك");
-        reviewForm.reset();
-        loadReviews();
-      }
-    });
-    async function loadRelated(product) {
-      const { data: related } = await supabase.from("products").select("*").eq("category", product.category).neq("id", product.id).limit(4);
-      relatedProductsEl.innerHTML = related && related.length > 0
-        ? related.map(r => `
-          <div onclick="location.href='product.html?id=${r.id}'" class="cursor-pointer bg-white shadow rounded p-3 hover:shadow-lg">
-            <img src="${r.image_url || 'https://via.placeholder.com/200'}" class="h-32 w-full object-cover rounded mb-2">
-            <h3 class="font-bold text-sm">${r.name}</h3>
-            <p class="text-blue-600 text-sm">💰 ${r.price} ج.م</p>
-          </div>
-        `).join("")
-        : `<p class="text-gray-500">لا توجد منتجات مشابهة</p>`;
-    }
-    function addToCart(id, name, price) {
-      let cart = JSON.parse(localStorage.getItem("cart")) || [];
-      cart.push({ id, name, price, quantity: 1 });
-      localStorage.setItem("cart", JSON.stringify(cart));
-      showToast("✅ تمت الإضافة للسلة");
-    }
-    checkLogin();
-    loadProduct();
   </script>
 </body>
 
