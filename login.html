@@ -28,24 +28,26 @@
     <p id="message" class="text-center mt-4 text-sm"></p>
   </div>
 
-  <script>
-    const supabase = window.supabase.createClient(
-      "https://nszhzfysitppxssplqfb.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemh6ZnlzaXRwcHhzc3BscWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMzA4OTcsImV4cCI6MjA3MzgwNjg5N30.5KvK4bhqkZ_GpIfED4qecIMfeubAJYwSFJslULwOp-w"
-    )
+<script>
+  const supabase = window.supabase.createClient(
+    "https://nszhzfysitppxssplqfb.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemh6ZnlzaXRwcHhzc3BscWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMzA4OTcsImV4cCI6MjA3MzgwNjg5N30.5KvK4bhqkZ_GpIfED4qecIMfeubAJYwSFJslULwOp-w"
+  );
 
-    const form = document.getElementById("login-form")
-    const message = document.getElementById("message")
+  const form = document.getElementById("login-form");
+  const message = document.getElementById("message");
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault()
-
-     
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
+
+    if (!email || !password) {
+      message.textContent = "❌ الرجاء إدخال البريد وكلمة المرور";
+      message.className = "text-center mt-4 text-sm text-red-600";
+      return;
+    }
 
     message.textContent = "⏳ جاري تسجيل الدخول...";
     message.className = "text-center mt-4 text-sm text-gray-600";
@@ -72,8 +74,10 @@
     }, 1200);
   });
 </script>
+
 </body>
 </html>
+
 
 
 
