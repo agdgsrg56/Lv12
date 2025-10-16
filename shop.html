@@ -89,148 +89,219 @@
     toast.classList.remove("hidden");
     setTimeout(() => toast.classList.add("hidden"), 3000);
   }
-  async function checkLogin() {
-    const { data } = await supabase.auth.getSession();
-    if (data.session) {
-      userNameEl.textContent = "👤 " + data.session.user.email;
-    } else {
-      userNameEl.innerHTML = `<a href="login.html" class="text-blue-600 underline">تسجيل الدخول</a>`;
-    }
-    return data.session;
+async function checkLogin() {
+  const { data } = await supabase.auth.getSession();
+  if (data.session) {
+    userNameEl.textContent = "👤 " + data.session.user.email;
+  } else {
+    userNameEl.innerHTML = `<a href="login.html" class="text-blue-600 underline">تسجيل الدخول</a>`;
   }
-  async function fetchProducts(searchTerm = "", category = "") {
-    loadingEl.classList.remove("hidden");
-    productsGrid.classList.add("hidden");
-    let query = supabase.from("products").select("*, reviews(rating)");
-    if (searchTerm) query = query.ilike("name", `%${searchTerm}%`);
-    if (category) query = query.eq("category", category);
-    const { data: products, error } = await query;
-    if (error) { console.error(error.message); return; }
-    allProducts = products.map(p => {
-      const ratings = p.reviews?.map(r => r.rating) || [];
-      const avg = ratings.length ? (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(1) : null;
-      return { ...p, avgRating: avg, reviewCount: ratings.length };
-    });
-    renderCategories();
-    applySorting();
+  return data.session;
+}
+
+async function fetchProducts(searchTerm = "", category = "") {
+  loadingEl.classList.remove("hidden");
+  productsGrid.classList.add("hidden");
+
+  let query = supabase
+    .from("products")
+    .select(`id, name, description, price, stock, sold, metadata, created_at,
+             product_images(image_path, is_primary, ordering),
+             product_reviews(rating)`);
+
+  if (searchTerm) query = query.ilike("name", `%${searchTerm}%`);
+  if (category) query = query.eq("metadata->>category", category);
+
+  const { data: products, error } = await query;
+  if (error) {
+    console.error(error.message);
     loadingEl.classList.add("hidden");
-    productsGrid.classList.remove("hidden");
-  }
-  function renderCategories() {
-    const cats = [...new Set(allProducts.map(p => p.category).filter(Boolean))];
-    categoriesNav.innerHTML = `<button onclick="fetchProducts()" class="px-3 py-1 rounded bg-blue-100 hover:bg-blue-200">الكل</button>`;
-    cats.forEach(cat => {
-      categoriesNav.innerHTML += `<button onclick="fetchProducts('', '${cat}')" class="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300">${cat}</button>`;
-    });
-  }
-  function applySorting() {
-    let products = [...allProducts];
-    switch (sortSelect.value) {
-      case "priceLow": products.sort((a,b) => a.price - b.price); break;
-      case "priceHigh": products.sort((a,b) => b.price - a.price); break;
-      case "rating": products.sort((a,b) => (b.avgRating||0) - (a.avgRating||0)); break;
-      default: products.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
-    }
-    renderProducts(products);
-  }
-  function renderProducts(products) {
-    productsGrid.innerHTML = "";
-    if (!products || products.length === 0) {
-      productsGrid.innerHTML = `<p class="text-center col-span-4 text-gray-600">لا توجد منتجات متاحة</p>`;
-      return;
-    }
-    products.forEach(product => {
-      const card = document.createElement("div");
-      card.className = "bg-white rounded-lg shadow hover:shadow-lg transition flex flex-col";
-      card.innerHTML = `
-        <img src="${product.image_url || 'https://via.placeholder.com/300'}" class="w-full h-48 object-cover rounded-t">
-        <div class="p-4 flex flex-col flex-1">
-          <h3 class="text-lg font-bold mb-1">
-            <a href="product.html?id=${product.id}" class="hover:underline">${product.name}</a>
-          </h3>
-          <p class="text-sm text-gray-600 mb-2">${product.description || "بدون وصف"}</p>
-          <p class="text-blue-600 font-semibold mb-1">💰 ${product.price} ج.م</p>
-          <p class="text-xs text-gray-500 mb-1">المتوفر: ${product.stock} | المبيعات: ${product.sold || 0}</p>
-          <p class="text-xs text-yellow-600 mb-2">
-            ${product.avgRating ? `⭐ ${product.avgRating} (${product.reviewCount} مراجعة)` : "بدون تقييم"}
-          </p>
-          <div class="mt-auto flex items-center gap-1">
-            <input type="number" value="1" min="1" max="${product.stock}" 
-                  class="w-14 border rounded px-1 py-0.5 text-center" id="qty-${product.id}">
-            <button onclick="addToCart(${product.id})" class="bg-blue-600 text-white px-2 py-1 rounded text-sm">➕ سلة</button>
-            <button onclick="buyNow(${product.id})" class="bg-green-600 text-white px-2 py-1 rounded text-sm">💳 شراء</button>
-          </div>
-        </div>
-      `;
-      productsGrid.appendChild(card);
-    });
+    return;
   }
 
-  function addToCart(productId) {
-    const qty = parseInt(document.getElementById(`qty-${productId}`).value) || 1;
-    const product = allProducts.find(p => p.id === productId);
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
-    cart.push({ id: product.id, name: product.name, price: product.price, quantity: qty });
-    localStorage.setItem("cart", JSON.stringify(cart));
-    showToast("✅ تمت الإضافة للسلة");
+  allProducts = (products || []).map((p) => {
+    const ratings = p.product_reviews?.map((r) => r.rating) || [];
+    const avg = ratings.length
+      ? (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(1)
+      : null;
+
+    const imgs = (p.product_images || []).sort((a, b) => a.ordering - b.ordering);
+    const primary =
+      imgs.find((i) => i.is_primary) || imgs[0] || { image_path: null };
+
+    return {
+      ...p,
+      avgRating: avg,
+      reviewCount: ratings.length,
+      primaryImage: primary.image_path,
+      category: p.metadata?.category || "",
+    };
+  });
+
+  renderCategories();
+  applySorting();
+  loadingEl.classList.add("hidden");
+  productsGrid.classList.remove("hidden");
+}
+
+function renderCategories() {
+  const cats = [
+    ...new Set(allProducts.map((p) => p.category).filter(Boolean)),
+  ];
+  categoriesNav.innerHTML = `<button onclick="fetchProducts()" class="px-3 py-1 rounded bg-blue-100 hover:bg-blue-200">الكل</button>`;
+  cats.forEach((cat) => {
+    categoriesNav.innerHTML += `<button onclick="fetchProducts('', '${cat}')" class="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300">${cat}</button>`;
+  });
+}
+
+function applySorting() {
+  let products = [...allProducts];
+  switch (sortSelect.value) {
+    case "priceLow":
+      products.sort((a, b) => a.price - b.price);
+      break;
+    case "priceHigh":
+      products.sort((a, b) => b.price - a.price);
+      break;
+    case "rating":
+      products.sort((a, b) => (b.avgRating || 0) - (a.avgRating || 0));
+      break;
+    default:
+      products.sort(
+        (a, b) => new Date(b.created_at) - new Date(a.created_at)
+      );
   }
-  function buyNow(productId) {
-    const qty = parseInt(document.getElementById(`qty-${productId}`).value) || 1;
-    const product = allProducts.find(p => p.id === productId);
-    document.getElementById("selectedProductId").value = productId;
-    document.getElementById("selectedQty").value = qty;
-    modalSummary.innerHTML = `
-      <p><b>المنتج:</b> ${product.name}</p>
-      <p><b>الكمية:</b> ${qty}</p>
-      <p><b>الإجمالي:</b> ${product.price * qty} ج.م</p>
+  renderProducts(products);
+}
+
+function renderProducts(products) {
+  productsGrid.innerHTML = "";
+  if (!products || products.length === 0) {
+    productsGrid.innerHTML = `<p class="text-center col-span-4 text-gray-600">لا توجد منتجات متاحة</p>`;
+    return;
+  }
+
+  products.forEach((product) => {
+    const img = product.primaryImage || "https://via.placeholder.com/300";
+    const card = document.createElement("div");
+    card.className =
+      "bg-white rounded-lg shadow hover:shadow-lg transition flex flex-col";
+
+    card.innerHTML = `
+      <img src="${img}" class="w-full h-48 object-cover rounded-t">
+      <div class="p-4 flex flex-col flex-1">
+        <h3 class="text-lg font-bold mb-1">
+          <a href="product.html?id=${product.id}" class="hover:underline">${product.name}</a>
+        </h3>
+        <p class="text-sm text-gray-600 mb-2">${product.description || "بدون وصف"}</p>
+        <p class="text-blue-600 font-semibold mb-1">💰 ${product.price} ج.م</p>
+        <p class="text-xs text-gray-500 mb-1">المتوفر: ${product.stock} | المبيعات: ${product.sold || 0}</p>
+        <p class="text-xs text-yellow-600 mb-2">
+          ${product.avgRating
+            ? `⭐ ${product.avgRating} (${product.reviewCount} مراجعة)`
+            : "بدون تقييم"}
+        </p>
+        <div class="mt-auto flex items-center gap-1">
+          <input type="number" value="1" min="1" max="${product.stock}" 
+                class="w-14 border rounded px-1 py-0.5 text-center" id="qty-${product.id}">
+          <button onclick="addToCart(${product.id})" class="bg-blue-600 text-white px-2 py-1 rounded text-sm">➕ سلة</button>
+          <button onclick="buyNow(${product.id})" class="bg-green-600 text-white px-2 py-1 rounded text-sm">💳 شراء</button>
+        </div>
+      </div>
     `;
-    document.getElementById("buyModal").classList.remove("hidden");
-    document.getElementById("buyModal").classList.add("flex");
+    productsGrid.appendChild(card);
+  });
+}
+
+function addToCart(productId) {
+  const qty = parseInt(document.getElementById(`qty-${productId}`).value) || 1;
+  const product = allProducts.find((p) => p.id === productId);
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+  cart.push({
+    id: product.id,
+    name: product.name,
+    price: product.price,
+    quantity: qty,
+  });
+  localStorage.setItem("cart", JSON.stringify(cart));
+  showToast("✅ تمت الإضافة للسلة");
+}
+
+function buyNow(productId) {
+  const qty = parseInt(document.getElementById(`qty-${productId}`).value) || 1;
+  const product = allProducts.find((p) => p.id === productId);
+  document.getElementById("selectedProductId").value = productId;
+  document.getElementById("selectedQty").value = qty;
+  modalSummary.innerHTML = `
+    <p><b>المنتج:</b> ${product.name}</p>
+    <p><b>الكمية:</b> ${qty}</p>
+    <p><b>الإجمالي:</b> ${product.price * qty} ج.م</p>
+  `;
+  document.getElementById("buyModal").classList.remove("hidden");
+  document.getElementById("buyModal").classList.add("flex");
+}
+
+function closeModal() {
+  document.getElementById("buyModal").classList.add("hidden");
+}
+
+document.getElementById("buyForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const sessionData = await supabase.auth.getSession();
+  if (!sessionData.data.session) {
+    window.location.href = "login.html";
+    return;
   }
-  function closeModal() {
-    document.getElementById("buyModal").classList.add("hidden");
-  }
-  document.getElementById("buyForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const sessionData = await supabase.auth.getSession();
-    if (!sessionData.data.session) {
-      window.location.href = "login.html";
-      return;
-    }
-    const user = sessionData.data.session.user;
-    const name = document.getElementById("custName").value;
-    const address = document.getElementById("custAddress").value;
-    const phone = document.getElementById("custPhone").value;
-    const payment = document.getElementById("custPayment").value;
-    const productId = parseInt(document.getElementById("selectedProductId").value);
-    const qty = parseInt(document.getElementById("selectedQty").value);
-    const date = document.getElementById("deliveryDate").value;
-    const time = document.getElementById("deliveryTime").value;
-    let deliveryDate = null;
-    if (date && time) deliveryDate = new Date(date + "T" + time);
-    const product = allProducts.find(p => p.id === productId);
-    if (!product) return showToast("❌ المنتج غير موجود", false);
-    if (qty > product.stock) return showToast("❌ الكمية أكبر من المخزون", false);
-    const total = product.price * qty;
-    const { error } = await supabase.from("orders").insert([{
+
+  const user = sessionData.data.session.user;
+  const name = document.getElementById("custName").value;
+  const address = document.getElementById("custAddress").value;
+  const phone = document.getElementById("custPhone").value;
+  const payment = document.getElementById("custPayment").value;
+  const productId = parseInt(document.getElementById("selectedProductId").value);
+  const qty = parseInt(document.getElementById("selectedQty").value);
+  const date = document.getElementById("deliveryDate").value;
+  const time = document.getElementById("deliveryTime").value;
+
+  let deliveryDate = null;
+  if (date && time) deliveryDate = new Date(date + "T" + time);
+
+  const product = allProducts.find((p) => p.id === productId);
+  if (!product) return showToast("❌ المنتج غير موجود", false);
+  if (qty > product.stock) return showToast("❌ الكمية أكبر من المخزون", false);
+
+  const total = product.price * qty;
+
+  const { error } = await supabase.from("orders").insert([
+    {
       user_id: user.id,
-      name, address, phone, payment,
+      name,
+      address,
+      phone,
+      payment,
       product_id: productId,
       quantity: qty,
       price: product.price,
       total,
       status: "pending",
-      delivery_date: deliveryDate ? deliveryDate.toISOString() : null
-    }]);
-    if (error) return showToast("❌ خطأ في إنشاء الطلب", false);
-    showToast("✅ تم إرسال طلبك بنجاح");
-    closeModal();
-  });
-  sortSelect.addEventListener("change", applySorting);
-  searchInput.addEventListener("input", (e) => fetchProducts(e.target.value));
-  checkLogin();
-  fetchProducts();
+      delivery_date: deliveryDate ? deliveryDate.toISOString() : null,
+    },
+  ]);
+
+  if (error) return showToast("❌ خطأ في إنشاء الطلب", false);
+
+  showToast("✅ تم إرسال طلبك بنجاح");
+  closeModal();
+});
+
+sortSelect.addEventListener("change", applySorting);
+searchInput.addEventListener("input", (e) => fetchProducts(e.target.value));
+
+checkLogin();
+fetchProducts();
+
 </script>
 </body>
 </html>
+
 
