@@ -926,7 +926,6 @@
     location.reload();
   });
 
-  // --- إدارة التقييمات ---
   (async function () {
     const reviewsEl = document.getElementById("reviews-list");
     const form = document.getElementById("reviewForm");
@@ -939,12 +938,12 @@
 
     let reviewsLimit = 20;
 
+    // جلب التقييمات من قاعدة البيانات بدون شرط moderated
     async function fetchRealReviews(limit = 100) {
       try {
         const { data, error } = await supabase
           .from("reviews")
           .select("id, user_name, comment, rating, created_at")
-          .eq("moderated", true)
           .order("created_at", { ascending: false })
           .limit(limit);
 
@@ -1014,6 +1013,7 @@
         .join("");
     }
 
+    // إرسال التقييم إلى قاعدة البيانات
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       msgEl.textContent = "";
@@ -1032,7 +1032,7 @@
 
       try {
         const { error } = await supabase.from("reviews").insert([
-          { user_name, comment, rating, moderated: true },
+          { user_name, comment, rating }, // ✅ بدون moderated
         ]);
 
         if (error) {
@@ -1114,6 +1114,7 @@
 
 </body>
 </html>
+
 
 
 
