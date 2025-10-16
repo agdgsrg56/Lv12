@@ -1013,46 +1013,51 @@
         .join("");
     }
 
-    // إرسال التقييم إلى قاعدة البيانات
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      msgEl.textContent = "";
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  msgEl.textContent = "";
 
-      const user_name = nameInput.value.trim();
-      const comment = textInput.value.trim();
-      const rating = parseInt(ratingInput.value, 10);
+  const user_name = nameInput.value.trim();
+  const comment = textInput.value.trim();
+  const rating = parseInt(ratingInput.value, 10);
 
-      if (!user_name || !comment || !rating) {
-        msgEl.textContent = "⚠️ املأ كل الحقول";
-        return;
-      }
+  if (!user_name || !comment || !rating) {
+    msgEl.textContent = "⚠️ املأ كل الحقول";
+    return;
+  }
 
-      submitBtn.disabled = true;
-      submitBtn.textContent = "جاري الإرسال...";
+  submitBtn.disabled = true;
+  submitBtn.textContent = "جاري الإرسال...";
 
-      try {
-        const { error } = await supabase.from("reviews").insert([
-          { user_name, comment, rating }, // ✅ بدون moderated
-        ]);
+  const payload = { user_name, comment, rating };
+  console.log("⤴️ إرسال تقييم:", payload);
 
-        if (error) {
-          console.error("❌ Supabase error:", error);
-          msgEl.textContent = "حصل خطأ أثناء الإرسال";
-        } else {
-          msgEl.textContent = "✅ تم إرسال تقييمك بنجاح";
-          nameInput.value = "";
-          textInput.value = "";
-          ratingInput.value = "";
-          await renderMergedReviews();
-        }
-      } catch (err) {
-        console.error("⚠️ مشكلة اتصال:", err);
-        msgEl.textContent = "مشكلة في الاتصال";
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = "أرسل التقييم";
-      }
-    });
+  try {
+    const { data, error, status } = await supabase
+      .from("reviews")
+      .insert([payload])
+      .select();
+
+    console.log("⬇️ استجابة Supabase:", { status, data, error });
+
+    if (error) {
+      msgEl.textContent = `❌ خطأ أثناء الإرسال: ${error.message || JSON.stringify(error)}`;
+      console.error("Supabase insert error:", error);
+    } else {
+      msgEl.textContent = "✅ تم إرسال تقييمك بنجاح";
+      nameInput.value = "";
+      textInput.value = "";
+      ratingInput.value = "";
+      await renderMergedReviews();
+    }
+  } catch (err) {
+    console.error("خطأ استثناء أثناء الإرسال:", err);
+    msgEl.textContent = `مشكلة في الاتصال: ${err.message || err}`;
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = "أرسل التقييم";
+  }
+});
 
     loadMoreBtn.addEventListener("click", async () => {
       reviewsLimit += 20;
@@ -1114,6 +1119,7 @@
 
 </body>
 </html>
+
 
 
 
