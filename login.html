@@ -6,6 +6,8 @@
   <title>تسجيل الدخول</title>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7770714931220768"
      crossorigin="anonymous"></script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7770714931220768"
+     crossorigin="anonymous"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 </head>
@@ -65,22 +67,24 @@
     message.textContent = "✅ تم تسجيل الدخول بنجاح! جاري تحويلك...";
     message.className = "text-center mt-4 text-sm text-green-600";
 
-    let redirectUrl = localStorage.getItem("redirectAfterLogin");
+    let savedPath = localStorage.getItem("redirectAfterLogin");
 
-    if (!redirectUrl || !redirectUrl.startsWith(window.location.origin)) {
-      redirectUrl = window.location.origin + "/index.html";
+    if (!savedPath || savedPath === "/" || savedPath === "/login.html") {
+      savedPath = "/index.html";
     }
 
     localStorage.removeItem("redirectAfterLogin");
 
     setTimeout(() => {
-      window.location.href = redirectUrl;
+      window.location.href = window.location.origin + savedPath;
     }, 1200);
   });
 </script>
 
+
 </body>
 </html>
+
 
 
 
