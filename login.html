@@ -27,7 +27,6 @@
 
     <p id="message" class="text-center mt-4 text-sm"></p>
   </div>
-
 <script>
   const supabase = window.supabase.createClient(
     "https://nszhzfysitppxssplqfb.supabase.co",
@@ -66,7 +65,12 @@
     message.textContent = "✅ تم تسجيل الدخول بنجاح! جاري تحويلك...";
     message.className = "text-center mt-4 text-sm text-green-600";
 
-    const redirectUrl = localStorage.getItem("redirectAfterLogin") || "index.html";
+    let redirectUrl = localStorage.getItem("redirectAfterLogin");
+
+    if (!redirectUrl || !redirectUrl.startsWith(window.location.origin)) {
+      redirectUrl = window.location.origin + "/index.html";
+    }
+
     localStorage.removeItem("redirectAfterLogin");
 
     setTimeout(() => {
@@ -77,6 +81,7 @@
 
 </body>
 </html>
+
 
 
 
