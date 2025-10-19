@@ -133,10 +133,12 @@
   <footer class="bg-gray-900 text-white text-center py-4 text-sm mt-8">© 2025 LV12</footer>
 
 <script>
+/* ========== Supabase setup ========== */
 const SUPABASE_URL = "https://nszhzfysitppxssplqfb.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemh6ZnlzaXRwcHhzcWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMzA4OTcsImV4cCI6MjA3MzgwNjg5N30.5KvK4bhqkZ_GpIfED4qecIMfeubAJYwSFJslULwOp-w";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemh6ZnlzaXRwcHhzc3BscWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMzA4OTcsImV4cCI6MjA3MzgwNjg5N30.5KvK4bhqkZ_GpIfED4qecIMfeubAJYwSFJslULwOp-w";
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+/* ========== DOM ========== */
 const productsGrid = document.getElementById("productsGrid");
 const loadingEl = document.getElementById("loading");
 const noResultsEl = document.getElementById("noResults");
@@ -164,119 +166,138 @@ const qBuy = document.getElementById("qBuy");
 const qSimilar = document.getElementById("qSimilar");
 const qFull = document.getElementById("qFull");
 
-let allProducts = []; // cached loaded products
-let displayedProducts = [];
+/* ========== State ========== */
+let allProducts = [];        // raw from DB (with nested images/reviews)
+let displayedProducts = [];  // after applying price/stock filters
 let categories = [];
 
+/* ========== Helpers ========== */
 function showToast(msg, success = true, timeout = 3000) {
+  if (!toastEl) return;
   toastEl.innerHTML = `<div class="p-3 rounded-lg ${success ? 'bg-green-600 text-white' : 'bg-red-600 text-white'} shadow">${msg}</div>`;
   toastEl.classList.remove("hidden");
   clearTimeout(toastEl._t);
   toastEl._t = setTimeout(() => toastEl.classList.add("hidden"), timeout);
 }
-
-function escapeHtml(s='') { return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
-
-async function fetchProducts({ search = "", category = "", sort = "newest", minPrice = null, maxPrice = null, stock = "" } = {}) {
-  loadingEl.classList.remove("hidden");
-  productsGrid.classList.add("hidden");
-  noResultsEl.classList.add("hidden");
-
-  let query = supabase
-    .from("products")
-    .select(`
-      id, name, description, price, stock, sold, created_at, metadata,
-      product_images(image_url, is_primary, ordering),
-      product_reviews(rating)
-    `);
-
-  if (search) query = query.ilike("name", `%${search}%`);
-  // فلتر السعر (metadata->>category case handled later)
-  // فلتر الفئة: check metadata->>category or category column
-  if (category) {
-    // try metadata->>category first (works if metadata JSON used)
-    query = query.eq("metadata->>category", category).or(`category.eq.${category}`);
-  }
-
-  const { data, error } = await query;
-  if (error) {
-    console.error("fetchProducts error:", error);
-    loadingEl.textContent = "❌ حدث خطأ أثناء تحميل المنتجات";
-    return;
-  }
-
-  allProducts = (data || []).map(p => {
-    const imgs = (p.product_images || []).slice().sort((a,b) => (a.ordering||0) - (b.ordering||0));
-    const primary = imgs.find(x => x.is_primary) || imgs[0] || { image_url: null };
-    const ratings = (p.product_reviews || []).map(r => Number(r.rating)).filter(Boolean);
-    const avg = ratings.length ? (ratings.reduce((a,b)=>a+b,0)/ratings.length) : null;
-    // category fallback (metadata JSON or column)
-    const cat = (p.metadata && p.metadata.category) ? p.metadata.category : (p.category || "");
-    return {
-      ...p,
-      primaryImage: primary.image_url,
-      avgRating: avg ? (Math.round(avg*10)/10) : null,
-      reviewCount: ratings.length,
-      category: cat
-    };
-  });
-
-  displayedProducts = allProducts.filter(prod => {
-    if (minPrice != null && prod.price < minPrice) return false;
-    if (maxPrice != null && prod.price > maxPrice) return false;
-    if (stock === "in" && (!prod.stock || prod.stock <= 0)) return false;
-    if (stock === "out" && prod.stock > 0) return false;
-    return true;
-  });
-
-  categories = [...new Set(allProducts.map(p => p.category).filter(Boolean))].sort();
-
-  renderCategories();
-  applySortAndRender(sort);
-
-  loadingEl.classList.add("hidden");
-  productsGrid.classList.remove("hidden");
+function escapeHtml(s='') {
+  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 }
 
+/* ========== Fetch products from Supabase ==========
+   Note: we fetch product_images and product_reviews in the same query.
+   We do minimal server-side filtering and rely on client-side filtering for category/price/stock.
+*/
+async function fetchProducts({ search = "", category = "", sort = "newest", minPrice = null, maxPrice = null, stock = "" } = {}) {
+  if (loadingEl) loadingEl.classList.remove("hidden");
+  if (productsGrid) productsGrid.classList.add("hidden");
+  if (noResultsEl) noResultsEl.classList.add("hidden");
 
+  try {
+    // Select products with images & reviews (left join style via PostgREST)
+    const { data, error } = await supabase
+      .from("products")
+      .select(`
+        id, name, description, price, stock, sold, created_at, category,
+        product_images ( image_url, is_primary, ordering ),
+        product_reviews ( rating )
+      `);
+
+    if (error) {
+      console.error("fetchProducts error:", error);
+      if (loadingEl) loadingEl.textContent = "❌ حدث خطأ أثناء تحميل المنتجات";
+      return;
+    }
+
+    // Normalize data
+    allProducts = (data || []).map(p => {
+      const imgs = (p.product_images || []).slice().sort((a,b)=> (a.ordering||0)-(b.ordering||0));
+      const primary = imgs.find(i=>i.is_primary) || imgs[0] || { image_url: null };
+      const ratings = (p.product_reviews || []).map(r => Number(r.rating)).filter(Boolean);
+      const avg = ratings.length ? (ratings.reduce((a,b)=>a+b,0)/ratings.length) : null;
+      return {
+        ...p,
+        primaryImage: primary.image_url,
+        avgRating: avg ? Math.round(avg*10)/10 : null,
+        reviewCount: ratings.length,
+        category: p.category || ""
+      };
+    });
+
+    // Apply UI filters (price/stock/search/category)
+    displayedProducts = allProducts.filter(prod => {
+      // search
+      if (search) {
+        const q = search.toLowerCase();
+        const inName = (prod.name || "").toLowerCase().includes(q);
+        const inDesc = (prod.description || "").toLowerCase().includes(q);
+        if (!inName && !inDesc) return false;
+      }
+      // category
+      if (category && prod.category !== category) return false;
+      // price
+      if (minPrice != null && Number(prod.price) < Number(minPrice)) return false;
+      if (maxPrice != null && Number(prod.price) > Number(maxPrice)) return false;
+      // stock
+      if (stock === "in" && (!prod.stock || prod.stock <= 0)) return false;
+      if (stock === "out" && (prod.stock && prod.stock > 0)) return false;
+      return true;
+    });
+
+    categories = [...new Set(allProducts.map(p=>p.category).filter(Boolean))].sort();
+
+    renderCategories();
+    applySortAndRender(sort);
+  } catch (err) {
+    console.error("fetchProducts unexpected error:", err);
+    if (loadingEl) loadingEl.textContent = "❌ حدث خطأ أثناء تحميل المنتجات";
+  } finally {
+    if (loadingEl) loadingEl.classList.add("hidden");
+    if (productsGrid) productsGrid.classList.remove("hidden");
+  }
+}
+
+/* ========== Render categories ========== */
 function renderCategories() {
-  categoriesNav.innerHTML = `<button class="px-3 py-1 rounded bg-blue-100" onclick="onCategoryClick('')">الكل</button>`;
+  if (!categoriesNav || !categoryFilter) return;
+  categoriesNav.innerHTML = `<button class="px-3 py-1 rounded bg-blue-100 mr-2" onclick="onCategoryClick('')">الكل</button>`;
   categoryFilter.innerHTML = `<option value="">كل الفئات</option>`;
   categories.forEach(cat => {
-    categoriesNav.innerHTML += `<button class="px-3 py-1 rounded bg-gray-100" onclick="onCategoryClick('${escapeHtml(cat)}')">${escapeHtml(cat)}</button>`;
-    categoryFilter.innerHTML += `<option value="${escapeHtml(cat)}">${escapeHtml(cat)}</option>`;
+    const safe = escapeHtml(cat);
+    categoriesNav.innerHTML += `<button class="px-3 py-1 rounded bg-gray-100 mr-2" onclick="onCategoryClick('${safe}')">${safe}</button>`;
+    categoryFilter.innerHTML += `<option value="${safe}">${safe}</option>`;
   });
 }
 
-function applySortAndRender(sort = sortSelect.value) {
+/* ========== Sorting + render ========== */
+function applySortAndRender(sort = sortSelect?.value || 'newest') {
   let products = [...displayedProducts];
   switch (sort) {
-    case "priceLow": products.sort((a,b)=>a.price - b.price); break;
-    case "priceHigh": products.sort((a,b)=>b.price - a.price); break;
+    case "priceLow": products.sort((a,b)=>Number(a.price)-Number(b.price)); break;
+    case "priceHigh": products.sort((a,b)=>Number(b.price)-Number(a.price)); break;
     case "rating": products.sort((a,b)=> (b.avgRating||0)-(a.avgRating||0)); break;
-    default: products.sort((a,b)=> new Date(b.created_at) - new Date(a.created_at));
+    default: products.sort((a,b)=> new Date(b.created_at)-new Date(a.created_at)); break;
   }
   renderProducts(products);
 }
 
-
+/* ========== Render product cards ========== */
 function renderProducts(products) {
+  if (!productsGrid) return;
   productsGrid.innerHTML = "";
   if (!products || products.length === 0) {
-    noResultsEl.classList.remove("hidden");
-    productsGrid.innerHTML = "";
+    if (noResultsEl) noResultsEl.classList.remove("hidden");
     return;
   }
   noResultsEl.classList.add("hidden");
 
   products.forEach(prod => {
     const card = document.createElement("div");
-    card.className = "bg-white rounded-lg shadow p-0 overflow-hidden flex flex-col card-hover";
+    card.className = "bg-white rounded-lg shadow p-0 overflow-hidden flex flex-col";
 
     const img = prod.primaryImage || "https://via.placeholder.com/400x300?text=No+Image";
     card.innerHTML = `
       <a href="#" class="block" onclick="openProduct(${prod.id});return false;">
-        <img src="${img}" class="w-full h-44 object-cover" alt="${escapeHtml(prod.name)}" />
+        <img src="${escapeHtml(img)}" class="w-full h-44 object-cover" alt="${escapeHtml(prod.name)}" />
       </a>
       <div class="p-3 flex-1 flex flex-col">
         <a href="#" onclick="openProduct(${prod.id});return false;" class="font-semibold text-gray-800">${escapeHtml(prod.name)}</a>
@@ -300,107 +321,121 @@ function renderProducts(products) {
   });
 }
 
+/* ========== Cart helpers ========== */
 function addToCartFromCard(productId) {
-  const p = allProducts.find(x => x.id === productId);
+  const p = allProducts.find(x => Number(x.id) === Number(productId));
   if (!p) return showToast("❌ المنتج غير موجود", false);
   const qty = 1;
   let cart = JSON.parse(localStorage.getItem("cart") || "[]");
-  const existing = cart.find(i=>i.id===productId);
+  const existing = cart.find(i=>Number(i.id)===Number(p.id));
   if (existing) existing.quantity = Math.min((existing.quantity||0)+qty, p.stock||9999);
   else cart.push({ id: p.id, name: p.name, price: p.price, quantity: qty });
   localStorage.setItem("cart", JSON.stringify(cart));
   showToast("✅ تمت الإضافة إلى السلة");
 }
 
+/* ========== Open product page ========== */
 function openProduct(productId) {
-
   window.location.href = `product.html?id=${productId}`;
 }
 
+/* ========== Quick view (fetch single product + images + reviews) ========== */
 async function quickViewOpen(productId) {
-  const { data, error } = await supabase
-    .from("products")
-   .select(`id, name, description, price, stock, sold, created_at,
-         product_images(image_url, is_primary, ordering)`);
+  try {
+    const { data, error } = await supabase
+      .from("products")
+      .select(`
+        id, name, description, price, stock, sold, created_at, category,
+        product_images ( image_url, is_primary, ordering ),
+        product_reviews ( rating, comment )
+      `)
+      .eq("id", productId)
+      .single();
 
-    .eq("id", productId)
-    .single();
-
-  if (error || !data) {
-    console.error("quickView error:", error);
-    return showToast("❌ فشل جلب بيانات المنتج", false);
-  }
-
-  const prod = data;
-  const imgs = (prod.product_images || []).slice().sort((a,b)=> (a.ordering||0)-(b.ordering||0));
-  const primary = imgs.find(x=>x.is_primary) || imgs[0] || { image_url: null };
-  const ratings = (prod.product_reviews||[]).map(r=>Number(r.rating)).filter(Boolean);
-  const avg = ratings.length ? (Math.round(ratings.reduce((a,b)=>a+b,0)/ratings.length*10)/10) : null;
-
-  qImages.innerHTML = imgs.length ? imgs.map(i=>`<img src="${i.image_url}" class="w-full rounded mb-2">`).join('') : `<img src="https://via.placeholder.com/400x300" class="w-full rounded">`;
-  qName.textContent = prod.name;
-  qDesc.textContent = prod.description || "لا يوجد وصف";
-  qPrice.textContent = prod.price + " ج.م";
-  qStock.textContent = (prod.stock && prod.stock>0) ? `متوفر: ${prod.stock}` : "غير متوفر";
-  qRating.innerHTML = avg ? `⭐ ${avg} (${ratings.length})` : "بدون تقييم";
-  qQty.value = 1;
-  qAdd.onclick = () => {
-    let cart = JSON.parse(localStorage.getItem("cart") || "[]");
-    const existing = cart.find(i=>i.id===prod.id);
-    if (existing) existing.quantity = Math.min((existing.quantity||0)+Number(qQty.value), prod.stock||9999);
-    else cart.push({ id: prod.id, name: prod.name, price: prod.price, quantity: Number(qQty.value) });
-    localStorage.setItem("cart", JSON.stringify(cart));
-    showToast("✅ تمت الإضافة إلى السلة");
-  };
-  qBuy.onclick = () => {
-
-    let cart = JSON.parse(localStorage.getItem("cart") || "[]");
-    const existing = cart.find(i=>i.id===prod.id);
-    if (existing) existing.quantity = Math.min((existing.quantity||0)+Number(qQty.value), prod.stock||9999);
-    else cart.push({ id: prod.id, name: prod.name, price: prod.price, quantity: Number(qQty.value) });
-    localStorage.setItem("cart", JSON.stringify(cart));
-    showToast("تم إضافة المنتج للسلة — انتقل لإتمام الشراء");
-    closeQuickView();
-    setTimeout(()=> window.location.href = "cart.html", 700);
-  };
-
-  qSimilar.innerHTML = "";
-  const cat = (prod.metadata && prod.metadata.category) ? prod.metadata.category : (prod.category||"");
-  if (cat) {
-    const similar = allProducts.filter(x => x.category === cat && x.id !== prod.id).slice(0,6);
-    if (similar.length) {
-      similar.forEach(s => {
-        const el = document.createElement("div");
-        el.className = "w-36 p-2 bg-gray-50 rounded";
-        el.innerHTML = `<img src="${s.primaryImage||'https://via.placeholder.com/200'}" class="w-full h-20 object-cover rounded mb-1"><div class="text-xs font-medium">${escapeHtml(s.name)}</div><div class="text-sm text-blue-700 font-semibold">${s.price} ج.م</div>`;
-        el.onclick = ()=> { closeQuickView(); openProduct(s.id); };
-        qSimilar.appendChild(el);
-      });
-    } else {
-      qSimilar.innerHTML = `<div class="text-sm text-gray-500">لا توجد مشابهات</div>`;
+    if (error || !data) {
+      console.error("quickView error:", error);
+      return showToast("❌ فشل جلب بيانات المنتج", false);
     }
-  } else {
-    qSimilar.innerHTML = `<div class="text-sm text-gray-500">غير متوفر تصنيف للبحث عن مشابه</div>`;
-  }
 
-  quickView.classList.remove("hidden");
-  quickView.classList.add("flex");
-  qFull.onclick = () => { closeQuickView(); openProduct(prod.id); };
+    const prod = data;
+    const imgs = (prod.product_images || []).slice().sort((a,b)=> (a.ordering||0)-(b.ordering||0));
+    const primary = imgs.find(x=>x.is_primary) || imgs[0] || { image_url: null };
+    const ratingsArr = (prod.product_reviews || []).map(r=>Number(r.rating)).filter(Boolean);
+    const avg = ratingsArr.length ? Math.round((ratingsArr.reduce((a,b)=>a+b,0)/ratingsArr.length)*10)/10 : null;
+
+    // Fill quick view UI
+    qImages.innerHTML = imgs.length ? imgs.map(i=>`<img src="${escapeHtml(i.image_url)}" class="w-full rounded mb-2">`).join('') : `<img src="https://via.placeholder.com/400x300" class="w-full rounded">`;
+    qName.textContent = prod.name || "";
+    qDesc.textContent = prod.description || "لا يوجد وصف";
+    qPrice.textContent = (prod.price != null ? prod.price + " ج.م" : "");
+    qStock.textContent = (prod.stock && prod.stock>0) ? `متوفر: ${prod.stock}` : "غير متوفر";
+    qRating.innerHTML = avg ? `⭐ ${avg} (${ratingsArr.length})` : "بدون تقييم";
+    qQty.value = 1;
+
+    // add to cart handler
+    qAdd.onclick = () => {
+      let cart = JSON.parse(localStorage.getItem("cart") || "[]");
+      const existing = cart.find(i=>Number(i.id)===Number(prod.id));
+      const addQty = Math.max(1, Number(qQty.value) || 1);
+      if (existing) existing.quantity = Math.min((existing.quantity||0)+addQty, prod.stock||9999);
+      else cart.push({ id: prod.id, name: prod.name, price: prod.price, quantity: addQty });
+      localStorage.setItem("cart", JSON.stringify(cart));
+      showToast("✅ تمت الإضافة إلى السلة");
+    };
+
+    qBuy.onclick = () => {
+      let cart = JSON.parse(localStorage.getItem("cart") || "[]");
+      const existing = cart.find(i=>Number(i.id)===Number(prod.id));
+      const addQty = Math.max(1, Number(qQty.value) || 1);
+      if (existing) existing.quantity = Math.min((existing.quantity||0)+addQty, prod.stock||9999);
+      else cart.push({ id: prod.id, name: prod.name, price: prod.price, quantity: addQty });
+      localStorage.setItem("cart", JSON.stringify(cart));
+      showToast("✅ تمت الإضافة للسلة — انتقل لإتمام الشراء");
+      closeQuickView();
+      setTimeout(()=> window.location.href = "cart.html", 700);
+    };
+
+    // similar products
+    qSimilar.innerHTML = "";
+    const cat = prod.category || "";
+    if (cat) {
+      const similar = allProducts.filter(x => x.category === cat && Number(x.id) !== Number(prod.id)).slice(0,6);
+      if (similar.length) {
+        similar.forEach(s => {
+          const el = document.createElement("div");
+          el.className = "w-36 p-2 bg-gray-50 rounded cursor-pointer";
+          el.innerHTML = `<img src="${escapeHtml(s.primaryImage||'https://via.placeholder.com/200')}" class="w-full h-20 object-cover rounded mb-1"><div class="text-xs font-medium">${escapeHtml(s.name)}</div><div class="text-sm text-blue-700 font-semibold">${s.price} ج.م</div>`;
+          el.onclick = ()=> { closeQuickView(); openProduct(s.id); };
+          qSimilar.appendChild(el);
+        });
+      } else {
+        qSimilar.innerHTML = `<div class="text-sm text-gray-500">لا توجد مشابهات</div>`;
+      }
+    } else {
+      qSimilar.innerHTML = `<div class="text-sm text-gray-500">غير متوفر تصنيف للبحث عن مشابه</div>`;
+    }
+
+    quickView.classList.remove("hidden");
+    quickView.classList.add("flex");
+    qFull.onclick = () => { closeQuickView(); openProduct(prod.id); };
+
+  } catch (err) {
+    console.error("quickView unexpected:", err);
+    showToast("❌ حدث خطأ أثناء جلب بيانات المنتج", false);
+  }
 }
 
 function closeQuickView() {
+  if (!quickView) return;
   quickView.classList.add("hidden");
   quickView.classList.remove("flex");
 }
 
-searchInput.addEventListener("input", debounce(()=> {
-  fetchWithUi();
-}, 300));
-
-sortSelect.addEventListener("change", ()=> applySortAndRender());
-
-applyFiltersBtn.addEventListener("click", () => fetchWithUi());
-resetFiltersBtn.addEventListener("click", () => {
+/* ========== UI wiring ========== */
+searchInput?.addEventListener("input", debounce(()=> fetchWithUi(), 300));
+sortSelect?.addEventListener("change", ()=> applySortAndRender());
+applyFiltersBtn?.addEventListener("click", () => fetchWithUi());
+resetFiltersBtn?.addEventListener("click", () => {
   categoryFilter.value = "";
   stockFilter.value = "";
   priceMin.value = "";
@@ -408,13 +443,14 @@ resetFiltersBtn.addEventListener("click", () => {
   fetchWithUi();
 });
 
+/* ========== Fetch wrapper that reads UI inputs ========== */
 function fetchWithUi() {
-  const search = searchInput.value.trim();
-  const category = categoryFilter.value;
-  const sort = sortSelect.value;
-  const min = priceMin.value ? Number(priceMin.value) : null;
-  const max = priceMax.value ? Number(priceMax.value) : null;
-  const stock = stockFilter.value;
+  const search = searchInput?.value.trim() || "";
+  const category = categoryFilter?.value || "";
+  const sort = sortSelect?.value || "newest";
+  const min = priceMin?.value ? Number(priceMin.value) : null;
+  const max = priceMax?.value ? Number(priceMax.value) : null;
+  const stock = stockFilter?.value || "";
   fetchProducts({ search, category, sort, minPrice: min, maxPrice: max, stock });
 }
 
@@ -450,4 +486,5 @@ function openProductPage(id) { openProduct(id); }
 </script>
 </body>
 </html>
+
 
