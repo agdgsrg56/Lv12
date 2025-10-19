@@ -189,7 +189,12 @@ async function checkAuth() {
 
 /* =========== تحميل الأقسام =========== */
 async function loadCategories() {
-  const { data: products } = await supabase.from("products").select("category");
+  const { data: products, error } = await supabase.from("products").select("category");
+  if (error) {
+    console.warn("خطأ أثناء تحميل الأقسام:", error.message);
+    return;
+  }
+
   const categories = [...new Set((products || []).map(p => p.category).filter(Boolean))];
   categorySelect.innerHTML = `<option value="">اختر قسماً...</option>`;
   categoryFilter.innerHTML = `<option value="">كل الأقسام</option>`;
@@ -207,7 +212,10 @@ async function uploadImages(productId, files) {
   for (const file of files) {
     const fileName = `${productId}/${Date.now()}-${file.name.replace(/\s+/g, "_")}`;
     const { data, error } = await supabase.storage.from("products").upload(fileName, file, { upsert: true });
-    if (error) { console.warn("خطأ رفع:", error.message); continue; }
+    if (error) {
+      console.warn("⚠️ خطأ أثناء رفع الصورة:", error.message);
+      continue;
+    }
     const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/products/${data.path}`;
     uploaded.push(publicUrl);
   }
@@ -216,10 +224,10 @@ async function uploadImages(productId, files) {
     const rows = uploaded.map((url, i) => ({
       product_id: productId,
       image_url: url,
-      is_primary: i === 0
+      is_primary: i === 0,
     }));
     const { error: imgErr } = await supabase.from("product_images").insert(rows);
-    if (imgErr) console.warn("خطأ حفظ product_images:", imgErr.message);
+    if (imgErr) console.warn("⚠️ خطأ أثناء حفظ الصور:", imgErr.message);
   }
   return uploaded;
 }
@@ -257,7 +265,7 @@ productForm.addEventListener("submit", async (e) => {
         .eq("id", id);
 
       if (error) throw error;
-      showToast("✅ تم تعديل المنتج");
+      showToast("✅ تم تعديل المنتج بنجاح");
     } else {
       const { data, error } = await supabase
         .from("products")
@@ -276,13 +284,26 @@ productForm.addEventListener("submit", async (e) => {
 
       if (error) throw error;
       newId = data.id;
-      showToast("✅ تم إضافة المنتج");
+      showToast("✅ تم إضافة المنتج بنجاح");
     }
 
     if (imagesInput.files?.length > 0 && newId) {
       await uploadImages(newId, imagesInput.files);
     }
 
+    resetForm();
+    await loadProducts();
+    await loadCategories();
+  } catch (err) {
+    console.error("❌ خطأ أثناء الحفظ:", err);
+    showToast("❌ حدث خطأ أثناء حفظ المنتج", false);
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = "💾 حفظ المنتج";
+  }
+});
+
+/* =========== إعادة تعيين النموذج بعد الحفظ =========== */
 function resetForm() {
   productIdInput.value = "";
   productForm.reset();
