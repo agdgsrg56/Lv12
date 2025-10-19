@@ -125,6 +125,28 @@
     <div class="max-w-7xl mx-auto px-4 text-center text-sm">© 2025 LV12 - جميع الحقوق محفوظة</div>
   </footer>
 
+<script>
+const SUPABASE_URL = "https://nszhzfysitppxssplqfb.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemh6ZnlzaXRwcHhzc3BscWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMzA4OTcsImV4cCI6MjA3MzgwNjg5N30.5KvK4bhqkZ_GpIfED4qecIMfeubAJYwSFJslULwOp-w";
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const cartListEl = document.getElementById("cart-list");
+const emptyPlaceholder = document.getElementById("empty-placeholder");
+const subtotalEl = document.getElementById("subtotal");
+const toastEl = document.getElementById("toast");
+const confirmModalEl = document.getElementById("confirmModal");
+const loadingOverlay = document.getElementById("loadingOverlay");
+const signinBtn = document.getElementById("signinBtn");
+
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+/* ========== أدوات مساعدة ========== */
+function escapeHtml(s = "") {
+  return String(s).replace(/[&<>"']/g, m => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+  }[m]));
+}
+
 function showToast(message, success = true, timeout = 3500) {
   toastEl.innerHTML = `
     <div class="flex items-start gap-3 p-3 rounded-lg ${success ? 'bg-green-600' : 'bg-red-600'} text-white shadow-lg">
@@ -143,6 +165,7 @@ function showLoading(show = true) {
   else loadingOverlay.classList.add("hidden"), loadingOverlay.classList.remove("flex");
 }
 
+/* ========== إدارة السلة ========== */
 function normalizeCart() {
   cart = (cart || []).map(it => {
     const qty = Number(it.quantity);
@@ -185,13 +208,13 @@ function renderCart() {
       <div class="text-center">
         <input type="number" min="1" value="${qty}" class="w-20 text-center border rounded px-2 py-1" onchange="updateQuantity(${idx}, this.value)" />
         <div class="mt-2 text-sm text-green-700 font-semibold">${sub} ج.م</div>
-        <button onclick="removeItem(${idx})" class="mt-2 bg-red-500 hover:bg-red-400 text-white px-3 py-1 rounded text-sm">حذف</button>
+        <button onclick="removeItem(${idx})" class="mt-2 bg-red-500 hover:bg-red-400 text-white px-3 py-1 rounded text-sm">🗑️ حذف</button>
       </div>
     `;
     cartListEl.appendChild(card);
   });
 
-  subtotalEl.textContent = `${total} ج.م`;
+  subtotalEl.textContent = `${total.toFixed(2)} ج.م`;
 }
 
 function updateQuantity(index, newVal) {
@@ -219,6 +242,7 @@ function clearCart(confirm = false) {
   showToast("🧹 تم تفريغ السلة بنجاح");
 }
 
+/* ========== إرسال الطلب ========== */
 async function submitOrder() {
   normalizeCart();
 
@@ -278,11 +302,35 @@ async function submitOrder() {
     setTimeout(() => location.href = "my-orders.html", 1200);
 
   } catch (err) {
-    console.error("خطأ أثناء إرسال الطلب:", err);
+    console.error("❌ خطأ أثناء إرسال الطلب:", err);
     showToast("❌ فشل إرسال الطلب: " + (err.message || "راجع الكونسول"), false);
     showLoading(false);
   }
 }
+
+/* ========== تهيئة الصفحة ========== */
+function onInit() {
+  supabase.auth.getSession().then(({ data }) => {
+    const user = data?.session?.user;
+    if (user) {
+      signinBtn.textContent = user.email || "👤 الحساب";
+      signinBtn.href = "shop-login.html";
+    }
+  }).catch(e => console.error("session get error:", e));
+
+  renderCart();
+}
+
+onInit();
+
+/* جعل الدوال عالمية (HTML onclick) */
+window.updateQuantity = updateQuantity;
+window.removeItem = removeItem;
+window.confirmClearCart = confirmClearCart;
+window.hideModal = hideModal;
+window.clearCart = clearCart;
+window.submitOrder = submitOrder;
+</script>
 
 
 </body>
