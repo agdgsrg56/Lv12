@@ -230,7 +230,6 @@ async function uploadImages(productId, files) {
   return uploaded;
 }
 
-/* =========== إضافة / تعديل منتج =========== */
 productForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   saveBtn.disabled = true;
@@ -249,20 +248,17 @@ productForm.addEventListener("submit", async (e) => {
     if (price < 0) { showToast("السعر غير صالح", false); return; }
 
     if (id) {
-      // تعديل
       const { error } = await supabase.from("products").update({
         name, description, price, stock, category, updated_at: new Date().toISOString()
       }).eq("id", Number(id));
       if (error) throw error;
 
-      // صور جديدة إن وُجدت
       if (imagesInput.files && imagesInput.files.length > 0) {
         await uploadImages(Number(id), imagesInput.files);
       }
 
       showToast("✅ تم تعديل المنتج");
     } else {
-      // إضافة جديد
       const { data, error } = await supabase.from("products").insert([{
         name, description, price, stock, category, created_at: new Date().toISOString()
       }]).select().single();
@@ -270,7 +266,6 @@ productForm.addEventListener("submit", async (e) => {
       if (error) throw error;
 
       const newId = data.id;
-      // رفع صور إن وُجدت
       if (imagesInput.files && imagesInput.files.length > 0) {
         await uploadImages(newId, imagesInput.files);
       }
@@ -290,8 +285,7 @@ productForm.addEventListener("submit", async (e) => {
   }
 });
 
-/* =========== معاينة الصور قبل رفعها ===========
-   (تظهر صور المصغّرة عند اختيار ملفات) */
+
 imagesInput.addEventListener("change", () => {
   imagesPreview.innerHTML = "";
   const files = Array.from(imagesInput.files || []);
@@ -304,10 +298,13 @@ imagesInput.addEventListener("change", () => {
   });
 });
 
-/* =========== تحميل المنتجات وعرضها =========== */
 async function loadProducts() {
   productsGrid.innerHTML = `<div class="col-span-3 text-center text-gray-500 py-10">جاري التحميل...</div>`;
-  const { data, error } = await supabase.from("products").select(`id, name, description, price, stock, category, main_image, created_at`).order("id", { ascending: false });
+const { data, error } = await supabase
+  .from("products")
+  .select(`id, name, description, price, stock, category, created_at`)
+  .order("id", { ascending: false });
+
 
   if (error) {
     console.error("خطأ تحميل المنتجات:", error);
@@ -320,7 +317,6 @@ async function loadProducts() {
   productsCountEl.textContent = allProducts.length;
 }
 
-/* =========== ريندر الشبكة والجدول =========== */
 function renderProducts(products) {
   productsGrid.innerHTML = "";
   productsTable.innerHTML = "";
@@ -330,8 +326,8 @@ function renderProducts(products) {
     return;
   }
 
-  products.forEach((p, idx) => {
-    // بطاقة
+products.forEach((p, idx) => {
+
     const card = document.createElement("div");
     card.className = "bg-white rounded-lg shadow p-3 flex flex-col gap-2 fade-in";
     card.innerHTML = `
@@ -354,7 +350,7 @@ function renderProducts(products) {
     `;
     productsGrid.appendChild(card);
 
-    // صف الجدول
+
     const tr = document.createElement("tr");
     tr.className = "border-b";
     tr.innerHTML = `
@@ -372,14 +368,14 @@ function renderProducts(products) {
     productsTable.appendChild(tr);
   });
 
-  // تسجيل مستمعين للأزرار
+
   document.querySelectorAll(".edit-btn").forEach(b => b.addEventListener("click", () => openEditForm(b.dataset.id)));
   document.querySelectorAll(".images-btn").forEach(b => b.addEventListener("click", () => openImagesManager(b.dataset.id)));
   document.querySelectorAll(".del-btn").forEach(b => b.addEventListener("click", () => confirmDelete(Number(b.dataset.id))));
   document.querySelectorAll(".edit-btn-table").forEach(b => b.addEventListener("click", () => openEditForm(b.dataset.id)));
 }
 
-/* =========== وظائف تحرير / فتح الفورم =========== */
+
 async function openEditForm(id) {
   const { data, error } = await supabase.from("products").select("id, name, description, price, stock, category, main_image").eq("id", Number(id)).single();
   if (error || !data) { showToast("❌ فشل جلب بيانات المنتج", false); return; }
@@ -398,12 +394,12 @@ async function openEditForm(id) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-/* =========== إدارة الصور (عرض / حذف) =========== */
+
 async function openImagesManager(productId) {
-  // نجلب الصور من جدول product_images
+
   const { data, error } = await supabase.from("product_images").select("id, image_url, alt_text, created_at").eq("product_id", Number(productId));
   if (error) { showToast("❌ فشل جلب الصور", false); return; }
-  // عرض نافذة مؤقتة بسيطة
+
   const popup = window.open("", "_blank", "width=800,height=600");
   let html = `<html dir="rtl"><head><meta charset="utf-8"><title>صور المنتج ${productId}</title><style>body{font-family: Arial, sans-serif; padding:10px} img{max-width:140px; margin:6px}</style></head><body><h3>صور المنتج ${productId}</h3>`;
   if (!data || data.length === 0) html += `<p>لا توجد صور لهذا المنتج</p>`;
@@ -416,7 +412,7 @@ async function openImagesManager(productId) {
   popup.document.write(html);
 }
 
-/* دالة حذف صورة (تُستدعى من نافذة الصور popup) */
+
 window.deleteImage = async function(imageId) {
   if (!confirm("هل تريد حذف هذه الصورة؟")) return;
   const { error } = await supabase.from("product_images").delete().eq("id", imageId);
@@ -424,7 +420,6 @@ window.deleteImage = async function(imageId) {
   else showToast("✅ تم حذف الصورة");
 };
 
-/* =========== حذف منتج =========== */
 function confirmDelete(id) {
   showConfirm("هل تود حذف المنتج نهائيًا؟", id);
 }
@@ -446,7 +441,7 @@ confirmYes.addEventListener("click", async () => {
 
 confirmNo.addEventListener("click", hideConfirm);
 
-/* =========== إعادة ضبط الفورم =========== */
+
 resetBtn.addEventListener("click", resetForm);
 function resetForm() {
   productIdInput.value = "";
@@ -455,7 +450,7 @@ function resetForm() {
   saveBtn.textContent = "حفظ المنتج";
 }
 
-/* =========== البحث والفلترة ======= */
+
 searchInput.addEventListener("input", () => {
   const q = searchInput.value.trim().toLowerCase();
   const cat = categoryFilter.value;
@@ -471,14 +466,14 @@ categoryFilter.addEventListener("change", () => {
   searchInput.dispatchEvent(new Event('input'));
 });
 
-/* =========== تسجيل خروج =========== */
+
 logoutBtn.addEventListener("click", async () => {
   await supabase.auth.signOut();
   showToast("تم تسجيل الخروج");
   setTimeout(() => window.location.href = "shop-login.html", 900);
 });
 
-/* =========== تهيئة الصفحة عند البداية =========== */
+
 (async function init() {
   const ok = await checkAuth();
   if (!ok) return;
@@ -486,7 +481,6 @@ logoutBtn.addEventListener("click", async () => {
   await loadProducts();
 })();
 
-/* =========== دوال مساعدة ========= */
 function escapeHtml(s='') {
   return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 }
