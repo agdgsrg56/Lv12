@@ -124,220 +124,205 @@
   <footer class="bg-gray-900 text-white py-4 mt-10">
     <div class="max-w-7xl mx-auto px-4 text-center text-sm">© 2025 LV12 - جميع الحقوق محفوظة</div>
   </footer>
+<script>
+const SUPABASE_URL = "https://nszhzfysitppxssplqfb.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemh6ZnlzaXRwcHhzc3BscWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMzA4OTcsImV4cCI6MjA3MzgwNjg5N30.5KvK4bhqkZ_GpIfED4qecIMfeubAJYwSFJslULwOp-w";
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  <script>
-    const SUPABASE_URL = "https://nszhzfysitppxssplqfb.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemh6ZnlzaXRwcHhzc3BscWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMzA4OTcsImV4cCI6MjA3MzgwNjg5N30.5KvK4bhqkZ_GpIfED4qecIMfeubAJYwSFJslULwOp-w";
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const cartListEl = document.getElementById("cart-list");
+const emptyPlaceholder = document.getElementById("empty-placeholder");
+const subtotalEl = document.getElementById("subtotal");
+const toastEl = document.getElementById("toast");
+const confirmModalEl = document.getElementById("confirmModal");
+const loadingOverlay = document.getElementById("loadingOverlay");
+const signinBtn = document.getElementById("signinBtn");
 
-    const cartListEl = document.getElementById("cart-list");
-    const emptyPlaceholder = document.getElementById("empty-placeholder");
-    const subtotalEl = document.getElementById("subtotal");
-    const toastEl = document.getElementById("toast");
-    const confirmModalEl = document.getElementById("confirmModal");
-    const loadingOverlay = document.getElementById("loadingOverlay");
-    const signinBtn = document.getElementById("signinBtn");
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+function escapeHtml(s = "") {
+  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+}
 
-    function escapeHtml(s = "") {
-      return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+function showToast(message, success = true, timeout = 3500) {
+  toastEl.innerHTML = `
+    <div class="flex items-start gap-3 p-3 rounded-lg ${success ? 'bg-green-600' : 'bg-red-600'} text-white shadow-lg">
+      <div class="text-sm">${escapeHtml(message)}</div>
+    </div>`;
+  toastEl.classList.remove("hidden");
+  clearTimeout(toastEl._t);
+  toastEl._t = setTimeout(() => toastEl.classList.add("hidden"), timeout);
+}
+
+function showModal() { confirmModalEl.classList.remove("hidden"); confirmModalEl.classList.add("flex"); }
+function hideModal() { confirmModalEl.classList.add("hidden"); confirmModalEl.classList.remove("flex"); }
+
+function showLoading(show = true) {
+  if (show) loadingOverlay.classList.remove("hidden"), loadingOverlay.classList.add("flex");
+  else loadingOverlay.classList.add("hidden"), loadingOverlay.classList.remove("flex");
+}
+
+function normalizeCart() {
+  cart = (cart || []).map(it => {
+    const qty = Number(it.quantity);
+    return { ...it, quantity: Number.isFinite(qty) && qty > 0 ? Math.trunc(qty) : 1 };
+  });
+  localStorage.setItem("cart", JSON.stringify(cart));
+}
+
+function renderCart() {
+  normalizeCart();
+  cartListEl.innerHTML = "";
+  if (!cart || cart.length === 0) {
+    emptyPlaceholder.classList.remove("hidden");
+    subtotalEl.textContent = "0 ج.م";
+    return;
+  }
+  emptyPlaceholder.classList.add("hidden");
+
+  let total = 0;
+  cart.forEach((item, idx) => {
+    const price = Number(item.price) || 0;
+    const qty = Number(item.quantity) || 1;
+    const sub = price * qty;
+    total += sub;
+
+    const image = item.image || item.image_url || "https://via.placeholder.com/140x100?text=No+Image";
+    const card = document.createElement("div");
+    card.className = "flex gap-4 p-3 border rounded-lg items-center";
+
+    card.innerHTML = `
+      <img src="${escapeHtml(image)}" alt="${escapeHtml(item.name)}" class="w-28 h-20 object-cover rounded" />
+      <div class="flex-1 text-right">
+        <div class="font-semibold text-gray-800">${escapeHtml(item.name || 'منتج')}</div>
+        <div class="text-sm text-gray-500 mt-1">${escapeHtml(item.description || '')}</div>
+        <div class="flex items-center gap-3 mt-2">
+          <div class="text-sm text-gray-700 font-semibold">${price} ج.م</div>
+          <div class="text-xs text-gray-500">/ للواحد</div>
+        </div>
+      </div>
+      <div class="text-center">
+        <input type="number" min="1" value="${qty}" class="w-20 text-center border rounded px-2 py-1" onchange="updateQuantity(${idx}, this.value)" />
+        <div class="mt-2 text-sm text-green-700 font-semibold">${sub} ج.م</div>
+        <button onclick="removeItem(${idx})" class="mt-2 bg-red-500 hover:bg-red-400 text-white px-3 py-1 rounded text-sm">حذف</button>
+      </div>
+    `;
+    cartListEl.appendChild(card);
+  });
+
+  subtotalEl.textContent = `${total} ج.م`;
+}
+
+function updateQuantity(index, newVal) {
+  const v = Math.max(1, parseInt(newVal) || 1);
+  cart[index].quantity = v;
+  localStorage.setItem("cart", JSON.stringify(cart));
+  renderCart();
+  showToast("✅ تم تحديث الكمية");
+}
+
+function removeItem(index) {
+  cart.splice(index, 1);
+  localStorage.setItem("cart", JSON.stringify(cart));
+  renderCart();
+  showToast("🗑️ تم حذف المنتج");
+}
+
+function confirmClearCart() { showModal(); }
+function clearCart(confirm = false) {
+  if (!confirm) return;
+  cart = [];
+  localStorage.removeItem("cart");
+  renderCart();
+  hideModal();
+  showToast("🧹 تم تفريغ السلة بنجاح");
+}
+
+async function submitOrder() {
+  normalizeCart();
+
+  const name = document.getElementById("cust-name").value.trim();
+  const phone = document.getElementById("cust-phone").value.trim();
+  const address = document.getElementById("cust-address").value.trim();
+  const date = document.getElementById("delivery-date").value;
+  const time = document.getElementById("delivery-time").value;
+
+  if (!name || !phone || !address) {
+    showToast("⚠️ يرجى إدخال الاسم، الهاتف، والعنوان", false);
+    return;
+  }
+  if (!/^[0-9]{8,15}$/.test(phone)) {
+    showToast("⚠️ رقم الهاتف غير صالح", false);
+    return;
+  }
+  if (!cart || cart.length === 0) {
+    showToast("🛒 السلة فارغة", false);
+    return;
+  }
+
+  showLoading(true);
+  const { data: sessionData } = await supabase.auth.getSession();
+  const userId = sessionData?.session?.user?.id;
+  if (!userId) {
+    showLoading(false);
+    showToast("⚠️ يجب تسجيل الدخول أولًا", false);
+    setTimeout(() => location.href = "shop-login.html", 900);
+    return;
+  }
+
+  const deliveryDate = date && time ? new Date(date + "T" + time).toISOString() : null;
+
+  const orderRows = cart.map(it => ({
+    user_id: userId,
+    name,
+    phone,
+    address,
+    product_id: Number(it.id),
+    quantity: Math.max(1, Math.trunc(it.quantity || 1)),
+    price: Number(it.price) || 0,
+    status: "pending",
+    delivery_date: deliveryDate,
+    created_at: new Date().toISOString()
+  }));
+
+  try {
+    const { error } = await supabase.from("orders").insert(orderRows);
+    if (error) throw error;
+
+    showToast("✅ تم إرسال الطلب بنجاح!");
+    localStorage.removeItem("cart");
+    cart = [];
+    renderCart();
+    showLoading(false);
+    setTimeout(() => location.href = "my-orders.html", 1200);
+
+  } catch (err) {
+    console.error("خطأ أثناء إرسال الطلب:", err);
+    showToast("❌ فشل إرسال الطلب: " + (err.message || "راجع الكونسول"), false);
+    showLoading(false);
+  }
+}
+
+function onInit() {
+  supabase.auth.getSession().then(({ data }) => {
+    const user = data?.session?.user;
+    if (user) {
+      signinBtn.textContent = user.email || "👤 الحساب";
+      signinBtn.href = "shop-login.html";
     }
+  }).catch(e => console.error("session get error:", e));
+  renderCart();
+}
 
-    function showToast(message, success = true, timeout = 3500) {
-      toastEl.innerHTML = `
-        <div class="flex items-start gap-3 p-3 rounded-lg ${success ? 'bg-green-600' : 'bg-red-600'} text-white shadow-lg">
-          <div class="text-sm">${escapeHtml(message)}</div>
-        </div>`;
-      toastEl.classList.remove("hidden");
-      clearTimeout(toastEl._t);
-      toastEl._t = setTimeout(() => toastEl.classList.add("hidden"), timeout);
-    }
+onInit();
 
-    function showModal() { confirmModalEl.classList.remove("hidden"); confirmModalEl.classList.add("flex"); }
-    function hideModal() { confirmModalEl.classList.add("hidden"); confirmModalEl.classList.remove("flex"); }
-
-    function showLoading(show = true) {
-      if (show) loadingOverlay.classList.remove("hidden"), loadingOverlay.classList.add("flex");
-      else loadingOverlay.classList.add("hidden"), loadingOverlay.classList.remove("flex");
-    }
-
-    function normalizeCart() {
-      cart = (cart || []).map(it => {
-        const qty = Number(it.quantity);
-        return { ...it, quantity: Number.isFinite(qty) && qty > 0 ? Math.trunc(qty) : 1 };
-      });
-      localStorage.setItem("cart", JSON.stringify(cart));
-    }
-
-    function renderCart() {
-      normalizeCart();
-      cartListEl.innerHTML = "";
-      if (!cart || cart.length === 0) {
-        emptyPlaceholder.classList.remove("hidden");
-        subtotalEl.textContent = "0 ج.م";
-        return;
-      }
-      emptyPlaceholder.classList.add("hidden");
-
-      let total = 0;
-      cart.forEach((item, idx) => {
-        const price = Number(item.price) || 0;
-        const qty = Number(item.quantity) || 1;
-        const sub = price * qty;
-        total += sub;
-
-        const image = item.image || item.image_url || "https://via.placeholder.com/140x100?text=No+Image";
-        const card = document.createElement("div");
-        card.className = "flex gap-4 p-3 border rounded-lg items-center";
-
-        card.innerHTML = `
-          <img src="${escapeHtml(image)}" alt="${escapeHtml(item.name)}" class="w-28 h-20 object-cover rounded" />
-          <div class="flex-1 text-right">
-            <div class="font-semibold text-gray-800">${escapeHtml(item.name || 'منتج')}</div>
-            <div class="text-sm text-gray-500 mt-1">${escapeHtml(item.description || '')}</div>
-            <div class="flex items-center gap-3 mt-2">
-              <div class="text-sm text-gray-700 font-semibold">${price} ج.م</div>
-              <div class="text-xs text-gray-500">/ للواحد</div>
-            </div>
-          </div>
-          <div class="text-center">
-            <input type="number" min="1" value="${qty}" class="w-20 text-center border rounded px-2 py-1" onchange="updateQuantity(${idx}, this.value)" />
-            <div class="mt-2 text-sm text-green-700 font-semibold">${sub} ج.م</div>
-            <button onclick="removeItem(${idx})" class="mt-2 bg-red-500 hover:bg-red-400 text-white px-3 py-1 rounded text-sm">حذف</button>
-          </div>
-        `;
-        cartListEl.appendChild(card);
-      });
-
-      subtotalEl.textContent = `${total} ج.م`;
-    }
-
-    function updateQuantity(index, newVal) {
-      const v = Math.max(1, parseInt(newVal) || 1);
-      cart[index].quantity = v;
-      localStorage.setItem("cart", JSON.stringify(cart));
-      renderCart();
-      showToast("✅ تم تحديث الكمية");
-    }
-
-    function removeItem(index) {
-      cart.splice(index, 1);
-      localStorage.setItem("cart", JSON.stringify(cart));
-      renderCart();
-      showToast("🗑️ تم حذف المنتج");
-    }
-
-    function confirmClearCart() { showModal(); }
-    function clearCart(confirm = false) {
-      if (!confirm) return;
-      cart = [];
-      localStorage.removeItem("cart");
-      renderCart();
-      hideModal();
-      showToast("🧹 تم تفريغ السلة بنجاح");
-    }
-
-    async function submitOrder() {
-      normalizeCart();
-
-      const name = document.getElementById("cust-name").value.trim();
-      const phone = document.getElementById("cust-phone").value.trim();
-      const address = document.getElementById("cust-address").value.trim();
-      const date = document.getElementById("delivery-date").value;
-      const time = document.getElementById("delivery-time").value;
-
-      if (!name || !phone || !address) {
-        showToast("⚠️ يرجى إدخال الاسم، الهاتف، والعنوان", false);
-        return;
-      }
-      if (!/^[0-9]{8,15}$/.test(phone)) {
-        showToast("⚠️ رقم الهاتف غير صالح", false);
-        return;
-      }
-      if (!cart || cart.length === 0) {
-        showToast("🛒 السلة فارغة", false);
-        return;
-      }
-
-      showLoading(true);
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-      if (sessionError) {
-        showLoading(false);
-        console.error("خطأ جلسة:", sessionError);
-        showToast("⚠️ خطأ في جلسة المستخدم، حاول تسجيل الدخول مجددًا", false);
-        setTimeout(() => location.href = "shop-login.html", 1200);
-        return;
-      }
-      const userId = sessionData?.session?.user?.id || null;
-      if (!userId) {
-        showLoading(false);
-        showToast("⚠️ يجب تسجيل الدخول أولًا", false);
-        setTimeout(() => location.href = "shop-login.html", 900);
-        return;
-      }
-
-      const deliveryDate = date && time ? new Date(date + "T" + time).toISOString() : null;
-   const orderRows = cart.map(it => ({
-  user_id: userId,
-  name,
-  phone,
-  address,
-  product_id: Number(it.id),
-  quantity: Math.max(1, Math.trunc(it.quantity || 1)),
-  price: Number(it.price) || 0,
-  status: "pending",
-  delivery_date: deliveryDate,
-  created_at: new Date().toISOString()
-}));
+window.updateQuantity = updateQuantity;
+window.removeItem = removeItem;
+window.confirmClearCart = confirmClearCart;
+window.hideModal = hideModal;
+window.clearCart = clearCart;
+window.submitOrder = submitOrder;
+</script>
 
 
-      try {
-        // إرسال دفعة واحدة (bulk insert)
-        const { data, error } = await supabase.from("orders").insert(orderRows).select();
-
-        if (error) {
-          console.error("خطأ من Supabase أثناء الإدخال:", error);
-          showToast("❌ فشل إرسال الطلب: " + (error.message || "راجع الكونسل"), false);
-          showLoading(false);
-          return;
-        }
-
-        showToast("✅ تم إرسال الطلب بنجاح! عدد العناصر: " + (data?.length || orderRows.length));
-        localStorage.removeItem("cart");
-        cart = [];
-        renderCart();
-        showLoading(false);
-        setTimeout(() => location.href = "my-orders.html", 1200);
-
-      } catch (err) {
-        console.error("استثناء غير متوقع أثناء الإرسال:", err);
-        showToast("⚠️ خطأ غير متوقع أثناء إرسال الطلب", false);
-        showLoading(false);
-      }
-    }
-
-    function onInit() {
-      supabase.auth.getSession().then(({ data }) => {
-        const user = data?.session?.user;
-        if (user) {
-          signinBtn.textContent = user.email || "👤 الحساب";
-          signinBtn.href = "shop-login.html"; // يمكن تغييره إلى صفحة الحساب لاحقاً
-        }
-      }).catch(e => console.error("session get error:", e));
-
-      renderCart();
-    }
-
-    onInit();
-
-    window.updateQuantity = updateQuantity;
-    window.removeItem = removeItem;
-    window.confirmClearCart = confirmClearCart;
-    window.hideModal = hideModal;
-    window.clearCart = clearCart;
-    window.submitOrder = submitOrder;
-
-  </script>
 </body>
 </html>
