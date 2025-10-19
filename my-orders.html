@@ -17,7 +17,6 @@
 </head>
 
 <body class="bg-gray-50 min-h-screen flex flex-col">
-  <!-- ✅ Header -->
   <header class="bg-white shadow sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
       <h1 onclick="location.href='shop.html'"
@@ -34,24 +33,20 @@
     </div>
   </header>
 
-  <!-- ✅ Main Content -->
   <main class="max-w-7xl mx-auto p-6 flex-1">
     <h2 class="text-3xl font-bold text-blue-700 mb-6 text-center">📦 طلباتي</h2>
 
     <!-- Toast -->
     <div id="toast" class="fixed bottom-5 right-5 hidden px-4 py-3 rounded-lg text-white shadow-lg z-50"></div>
 
-    <!-- Loader -->
     <div id="loader" class="text-center text-gray-600 hidden">
       <div class="animate-spin border-4 border-gray-300 border-t-blue-600 rounded-full w-10 h-10 mx-auto mb-3"></div>
       <p>جارٍ تحميل الطلبات...</p>
     </div>
 
-    <!-- Orders -->
     <div id="orders-list" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"></div>
   </main>
 
-  <!-- ✅ Footer -->
   <footer class="bg-gray-900 text-white text-center py-5 text-sm mt-auto">
     <p>© 2025 LV12 - جميع الحقوق محفوظة</p>
   </footer>
@@ -90,7 +85,6 @@
 
       const user = sessionData.session.user;
 
-      // ✅ جلب الطلبات
       const { data: orders, error } = await supabase
         .from("orders")
         .select("*")
@@ -105,7 +99,6 @@
         return;
       }
 
-      // ✅ جلب بيانات المنتجات المرتبطة
       const productIds = [...new Set(orders.map(o => o.product_id).filter(Boolean))];
       let productsMap = {};
 
