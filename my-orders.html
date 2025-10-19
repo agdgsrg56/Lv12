@@ -1,29 +1,40 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>📦 طلباتي | LV12</title>
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="icon" href="lv12.ico" type="image/x-icon">
+  <link rel="icon" href="lv12.ico" type="image/x-icon" />
   <style>
-    ::placeholder { color: #999; }
-    .order-card:hover { transform: scale(1.02); transition: 0.2s; }
+    ::placeholder { color: #aaa; }
+    .order-card:hover {
+      transform: translateY(-4px);
+      transition: 0.2s ease;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
   </style>
 </head>
 
 <body class="bg-gray-50 min-h-screen flex flex-col">
-
+  <!-- ✅ Header -->
   <header class="bg-white shadow sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-      <h1 onclick="location.href='shop.html'" class="text-2xl font-bold text-blue-700 cursor-pointer">🛍️ متجر LV12</h1>
+      <h1 onclick="location.href='shop.html'"
+          class="text-2xl font-bold text-blue-700 cursor-pointer hover:text-blue-800">
+        🛍️ متجر LV12
+      </h1>
       <div class="flex items-center gap-3">
-        <input id="searchInput" type="text" placeholder="🔍 ابحث عن منتج أو حالة..." class="border border-gray-300 rounded-lg px-3 py-1.5 w-56 focus:ring-2 focus:ring-blue-400">
-        <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg shadow">🚪 خروج</button>
+        <input id="searchInput" type="text" placeholder="🔍 ابحث عن منتج أو حالة..."
+               class="border border-gray-300 rounded-lg px-3 py-1.5 w-56 focus:ring-2 focus:ring-blue-400 focus:outline-none" />
+        <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg shadow">
+          🚪 خروج
+        </button>
       </div>
     </div>
   </header>
 
+  <!-- ✅ Main Content -->
   <main class="max-w-7xl mx-auto p-6 flex-1">
     <h2 class="text-3xl font-bold text-blue-700 mb-6 text-center">📦 طلباتي</h2>
 
@@ -36,16 +47,19 @@
       <p>جارٍ تحميل الطلبات...</p>
     </div>
 
+    <!-- Orders -->
     <div id="orders-list" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"></div>
   </main>
 
+  <!-- ✅ Footer -->
   <footer class="bg-gray-900 text-white text-center py-5 text-sm mt-auto">
     <p>© 2025 LV12 - جميع الحقوق محفوظة</p>
   </footer>
 
   <script>
     const SUPABASE_URL = "https://nszhzfysitppxssplqfb.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemh6ZnlzaXRwcHhzc3BscWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMzA4OTcsImV4cCI6MjA3MzgwNjg5N30.5KvK4bhqkZ_GpIfED4qecIMfeubAJYwSFJslULwOp-w";
+    const SUPABASE_ANON_KEY =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemh6ZnlzaXRwcHhzc3BscWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMzA4OTcsImV4cCI6MjA3MzgwNjg5N30.5KvK4bhqkZ_GpIfED4qecIMfeubAJYwSFJslULwOp-w";
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const ordersList = document.getElementById("orders-list");
@@ -56,7 +70,9 @@
 
     function showToast(message, success = true) {
       toast.textContent = message;
-      toast.className = `fixed bottom-5 right-5 ${success ? 'bg-green-600' : 'bg-red-600'} text-white px-4 py-3 rounded-lg shadow-lg`;
+      toast.className = `fixed bottom-5 right-5 ${
+        success ? "bg-green-600" : "bg-red-600"
+      } text-white px-4 py-3 rounded-lg shadow-lg`;
       toast.classList.remove("hidden");
       setTimeout(() => toast.classList.add("hidden"), 3000);
     }
@@ -74,25 +90,39 @@
 
       const user = sessionData.session.user;
 
-      // ✅ جلب الطلبات مع بيانات المنتج المرتبطة
+      // ✅ جلب الطلبات
       const { data: orders, error } = await supabase
         .from("orders")
-        .select(`
-          id, quantity, status, created_at, delivery_date,
-          products:product_id ( name, price, image_url )
-        `)
+        .select("*")
         .eq("user_id", user.id)
-        .order("id", { ascending: false });
+        .order("created_at", { ascending: false });
 
       loader.classList.add("hidden");
 
       if (error) {
-        console.error(error);
+        console.error("❌ خطأ:", error);
         showToast("❌ خطأ أثناء تحميل الطلبات", false);
         return;
       }
 
-      allOrders = orders || [];
+      // ✅ جلب بيانات المنتجات المرتبطة
+      const productIds = [...new Set(orders.map(o => o.product_id).filter(Boolean))];
+      let productsMap = {};
+
+      if (productIds.length > 0) {
+        const { data: products } = await supabase
+          .from("products")
+          .select("id, name, price, image_url")
+          .in("id", productIds);
+
+        productsMap = Object.fromEntries(products.map(p => [p.id, p]));
+      }
+
+      allOrders = orders.map(o => ({
+        ...o,
+        product: productsMap[o.product_id] || {},
+      }));
+
       renderOrders(allOrders);
     }
 
@@ -105,7 +135,7 @@
       }
 
       orders.forEach(order => {
-        const p = order.products || {};
+        const p = order.product || {};
         const total = (p.price || 0) * (order.quantity || 1);
 
         let color = "bg-yellow-100 text-yellow-700";
@@ -116,12 +146,13 @@
 
         ordersList.innerHTML += `
           <div class="order-card bg-white rounded-xl shadow p-4 flex flex-col justify-between">
-            <img src="${p.image_url || 'https://via.placeholder.com/300'}" class="rounded-lg h-40 w-full object-cover mb-3">
+            <img src="${p.image_url || 'https://via.placeholder.com/300'}"
+                 class="rounded-lg h-40 w-full object-cover mb-3" alt="${p.name || 'صورة المنتج'}">
             <h3 class="text-lg font-bold mb-1">${p.name || 'منتج غير متوفر'}</h3>
             <p class="text-gray-600 mb-1">📦 الكمية: ${order.quantity}</p>
             <p class="text-gray-600 mb-1">💰 السعر: ${p.price || 0} ج.م</p>
             <p class="font-semibold text-blue-700 mb-2">الإجمالي: ${total.toFixed(2)} ج.م</p>
-            <p class="text-sm text-gray-500 mb-2">🗓️ ${new Date(order.created_at).toLocaleString('ar-EG')}</p>
+            <p class="text-sm text-gray-500 mb-2">🗓️ ${new Date(order.created_at).toLocaleString("ar-EG")}</p>
             <span class="text-center text-sm font-semibold py-1 px-3 rounded ${color}">${statusText}</span>
           </div>
         `;
@@ -131,17 +162,16 @@
     searchInput.addEventListener("input", e => {
       const query = e.target.value.trim().toLowerCase();
       const filtered = allOrders.filter(o => {
-        const p = o.products || {};
+        const p = o.product || {};
         return (
           (p.name || "").toLowerCase().includes(query) ||
           (o.status || "").toLowerCase().includes(query) ||
-          new Date(o.created_at).toLocaleString('ar-EG').includes(query)
+          new Date(o.created_at).toLocaleString("ar-EG").includes(query)
         );
       });
       renderOrders(filtered);
     });
 
-    // ✅ تسجيل الخروج
     async function logout() {
       await supabase.auth.signOut();
       showToast("👋 تم تسجيل الخروج");
