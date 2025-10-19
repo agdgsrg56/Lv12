@@ -238,7 +238,7 @@ async function fetchProducts({ search = "", category = "", sort = "newest", minP
   productsGrid.classList.remove("hidden");
 }
 
-/* ---------- عرض الفئات في القائمة ---------- */
+
 function renderCategories() {
   categoriesNav.innerHTML = `<button class="px-3 py-1 rounded bg-blue-100" onclick="onCategoryClick('')">الكل</button>`;
   categoryFilter.innerHTML = `<option value="">كل الفئات</option>`;
@@ -259,7 +259,7 @@ function applySortAndRender(sort = sortSelect.value) {
   renderProducts(products);
 }
 
-/* ---------- ريندر المنتجات ---------- */
+
 function renderProducts(products) {
   productsGrid.innerHTML = "";
   if (!products || products.length === 0) {
@@ -313,18 +313,16 @@ function addToCartFromCard(productId) {
 }
 
 function openProduct(productId) {
-  // انتقل إلى صفحة المنتج (يمكنك إنشاء product.html لاحقاً)
+
   window.location.href = `product.html?id=${productId}`;
 }
 
 async function quickViewOpen(productId) {
   const { data, error } = await supabase
     .from("products")
-    .select(`
-      id, name, description, price, stock, sold, created_at, metadata,
-      product_images(image_url, is_primary, ordering),
-      product_reviews(rating, comment)
-    `)
+   .select(`id, name, description, price, stock, sold, created_at,
+         product_images(image_url, is_primary, ordering)`);
+
     .eq("id", productId)
     .single();
 
@@ -355,7 +353,7 @@ async function quickViewOpen(productId) {
     showToast("✅ تمت الإضافة إلى السلة");
   };
   qBuy.onclick = () => {
-    // اذهب إلى نافذة الشراء (نستخدم buy modal في cart.html عادة) - هنا سنحفظ للسلة وننتقل للسلة
+
     let cart = JSON.parse(localStorage.getItem("cart") || "[]");
     const existing = cart.find(i=>i.id===prod.id);
     if (existing) existing.quantity = Math.min((existing.quantity||0)+Number(qQty.value), prod.stock||9999);
@@ -452,3 +450,4 @@ function openProductPage(id) { openProduct(id); }
 </script>
 </body>
 </html>
+
