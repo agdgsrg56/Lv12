@@ -8,7 +8,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="icon" href="lv12.ico" type="image/x-icon">
   <style>
-    /* لمسات صغيرة */
     .grid-col-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .fade-in { animation: fadeIn .18s ease; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px);} to { opacity: 1; transform: translateY(0);} }
@@ -16,7 +15,6 @@
 </head>
 <body class="bg-gray-100 min-h-screen font-sans text-gray-800">
 
-  <!-- Header -->
   <header class="bg-white shadow sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
       <div class="flex items-center gap-3 cursor-pointer" onclick="location.href='shop.html'">
@@ -37,9 +35,7 @@
     </div>
   </header>
 
-  <!-- Main -->
   <main class="max-w-7xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <!-- Form: Add / Edit Product -->
     <section class="lg:col-span-1 bg-white rounded-xl shadow p-5">
       <h2 class="text-xl font-bold mb-3">إضافة / تعديل منتج</h2>
 
@@ -76,7 +72,6 @@
       </form>
     </section>
 
-    <!-- Products list -->
     <section class="lg:col-span-2 bg-white rounded-xl shadow p-5">
       <div class="flex items-center justify-between mb-4">
         <h3 class="text-lg font-semibold">المنتجات الحالية</h3>
@@ -104,10 +99,8 @@
     </section>
   </main>
 
-  <!-- Toast -->
   <div id="toast" class="fixed bottom-5 left-5 hidden z-50 max-w-xs"></div>
 
-  <!-- Confirm Modal -->
   <div id="confirmModal" class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center z-40">
     <div class="bg-white rounded-lg p-5 w-full max-w-md text-right">
       <h4 class="text-lg font-semibold mb-2">تأكيد</h4>
@@ -120,12 +113,10 @@
   </div>
 
 <script>
-/* ================== إعداد Supabase ================== */
 const SUPABASE_URL = "https://nszhzfysitppxssplqfb.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemh6ZnlzaXRwcHhzc3BscWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMzA4OTcsImV4cCI6MjA3MzgwNjg5N30.5KvK4bhqkZ_GpIfED4qecIMfeubAJYwSFJslULwOp-w";
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-/* =========== عناصر DOM =========== */
 const ADMIN_EMAIL = "lv12wlv12@gmail.com";
 const productForm = document.getElementById("product-form");
 const productIdInput = document.getElementById("product-id");
@@ -156,7 +147,6 @@ const confirmNo = document.getElementById("confirmNo");
 let allProducts = [];
 let pendingDeleteId = null;
 
-/* =========== الرسائل =========== */
 function showToast(msg, success = true, timeout = 3000) {
   toast.innerHTML = `<div class="p-3 rounded-lg ${success ? 'bg-green-600 text-white' : 'bg-red-600 text-white'} shadow">${msg}</div>`;
   toast.classList.remove("hidden");
@@ -164,7 +154,6 @@ function showToast(msg, success = true, timeout = 3000) {
   toast._t = setTimeout(() => toast.classList.add("hidden"), timeout);
 }
 
-/* =========== تأكيد حذف =========== */
 function showConfirm(text, onYes) {
   confirmText.textContent = text;
   confirmModal.classList.remove("hidden");
@@ -175,7 +164,6 @@ function hideConfirm() {
   pendingDeleteId = null;
 }
 
-/* =========== حماية الدخول =========== */
 async function checkAuth() {
   const { data } = await supabase.auth.getSession();
   const user = data?.session?.user;
@@ -187,7 +175,6 @@ async function checkAuth() {
   return true;
 }
 
-/* =========== تحميل الأقسام =========== */
 async function loadCategories() {
   const { data: products, error } = await supabase.from("products").select("category");
   if (error) {
@@ -204,7 +191,6 @@ async function loadCategories() {
   });
 }
 
-/* =========== رفع صور =========== */
 async function uploadImages(productId, files) {
   if (!files || files.length === 0) return [];
 
@@ -232,7 +218,6 @@ async function uploadImages(productId, files) {
   return uploaded;
 }
 
-/* =========== حفظ منتج =========== */
 productForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   saveBtn.disabled = true;
@@ -303,7 +288,6 @@ productForm.addEventListener("submit", async (e) => {
   }
 });
 
-/* =========== إعادة تعيين النموذج بعد الحفظ =========== */
 function resetForm() {
   productIdInput.value = "";
   productForm.reset();
@@ -312,7 +296,6 @@ function resetForm() {
   showToast("📦 تم حفظ التغييرات بنجاح", true);
 }
 
-/* =========== معاينة الصور قبل الرفع =========== */
 imagesInput.addEventListener("change", () => {
   imagesPreview.innerHTML = "";
   const files = Array.from(imagesInput.files || []);
@@ -322,7 +305,6 @@ imagesInput.addEventListener("change", () => {
   });
 });
 
-/* =========== تحميل المنتجات =========== */
 async function loadProducts() {
   productsGrid.innerHTML = `<div class="col-span-3 text-center text-gray-500 py-10">⏳ جاري التحميل...</div>`;
 
@@ -343,7 +325,6 @@ async function loadProducts() {
   productsCountEl.textContent = allProducts.length;
 }
 
-/* =========== عرض المنتجات =========== */
 function renderProducts(products) {
   productsGrid.innerHTML = "";
   productsTable.innerHTML = "";
@@ -400,8 +381,6 @@ function renderProducts(products) {
   document.querySelectorAll(".del-btn").forEach(b => b.addEventListener("click", () => confirmDelete(Number(b.dataset.id))));
   document.querySelectorAll(".edit-btn-table").forEach(b => b.addEventListener("click", () => openEditForm(b.dataset.id)));
 }
-
-/* =========== تحرير منتج =========== */
 async function openEditForm(id) {
   const { data, error } = await supabase.from("products").select("id, name, description, price, stock, category").eq("id", Number(id)).single();
   if (error || !data) return showToast("❌ فشل جلب بيانات المنتج", false);
@@ -415,7 +394,6 @@ async function openEditForm(id) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-/* =========== حذف منتج =========== */
 function confirmDelete(id) {
   showConfirm("هل تود حذف المنتج نهائيًا؟", id);
 }
@@ -433,7 +411,6 @@ confirmYes.addEventListener("click", async () => {
 });
 confirmNo.addEventListener("click", hideConfirm);
 
-/* =========== بحث وفلترة =========== */
 searchInput.addEventListener("input", () => {
   const q = searchInput.value.trim().toLowerCase();
   const cat = categoryFilter.value;
@@ -446,14 +423,12 @@ searchInput.addEventListener("input", () => {
 });
 categoryFilter.addEventListener("change", () => searchInput.dispatchEvent(new Event('input')));
 
-/* =========== خروج =========== */
 logoutBtn.addEventListener("click", async () => {
   await supabase.auth.signOut();
   showToast("👋 تم تسجيل الخروج");
   setTimeout(() => window.location.href = "shop-login.html", 900);
 });
 
-/* =========== بدء التشغيل =========== */
 (async function init() {
   const ok = await checkAuth();
   if (!ok) return;
@@ -461,7 +436,6 @@ logoutBtn.addEventListener("click", async () => {
   await loadProducts();
 })();
 
-/* =========== أدوات صغيرة =========== */
 function escapeHtml(s='') {
   return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 }

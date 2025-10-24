@@ -204,7 +204,6 @@ const applyFiltersBtn = document.getElementById("applyFilters");
 const resetFiltersBtn = document.getElementById("resetFilters");
 const toastEl = document.getElementById("toast");
 const categoriesNav = document.getElementById("categoriesNav");
-
 const quickView = document.getElementById("quickView");
 const qImages = document.getElementById("qImages");
 const qName = document.getElementById("qName");
@@ -256,19 +255,26 @@ async function fetchProducts(options = {}) {
       .order("created_at", { ascending: false });
 
     if (error) throw error;
+allProducts = (data || []).map(p => {
+  const imgs = (p.product_images || []).sort((a, b) => (a.ordering || 0) - (b.ordering || 0));
+  const primary = imgs.find(i => i.is_primary) || imgs[0] || {};
+  const ratings = (p.product_reviews || [])
+    .map(r => Number(r.rating))
+    .filter(Boolean);
+  const avg = ratings.length
+    ? Math.round((ratings.reduce((a, b) => a + b, 0) / ratings.length) * 10) / 10
+    : null;
 
-    allProducts = (data || []).map(p => {
-      const imgs = (p.product_images || []).sort((a,b)=>(a.ordering||0)-(b.ordering||0));
-      const primary = imgs.find(i=>i.is_primary) || imgs[0] || {};
-      const ratings = (p.product_reviews || []).map(r => Number(r.rating)).filter(Boolean);
-      const avg = ratings.length ? Math.round((ratings.reduce((a,b)=>a+b,0)/ratings.length)*10)/10 : null;
-      return {
-        ...p,
-        primaryImage: primary.image_url || "https://via.placeholder.com/400x300?text=No+Image",
-        avgRating: avg,
-        reviewCount: ratings.length,
-      };
-    });
+  return {
+    ...p,
+    primaryImage:
+      primary.image_url ||
+      "https://placehold.co/400x300/EEE/AAA?text=No+Image",
+    avgRating: avg,
+    reviewCount: ratings.length,
+  };
+});
+
 
     filterAndRender({ search, category, sort, minPrice, maxPrice, stock });
     renderCategories();
@@ -369,10 +375,9 @@ async function quickViewOpen(id) {
       .select(`id,name,description,price,stock,category,product_images(image_url,is_primary,ordering),product_reviews(rating,comment)`)
       .eq("id", id).single();
     if (error) throw error;
-    const imgs = (data.product_images||[]).sort((a,b)=>(a.ordering||0)-(b.ordering||0));
-    qImages.innerHTML = imgs.length
-      ? imgs.map(i=>`<img src="${i.image_url}" class="w-full h-44 object-cover rounded mb-2">`).join("")
-      : `<img src="https://via.placeholder.com/400x300" class="w-full h-44 object-cover rounded">`;
+  const mainImage = p.product_images?.find(img => img.is_primary)?.image_url 
+  || p.product_images?.[0]?.image_url 
+  || "https://nszhzfysitppxssplqfb.supabase.co/storage/v1/object/public/products/no-image.png";
 
     const ratings = (data.product_reviews||[]).map(r=>r.rating);
     const avg = ratings.length? (ratings.reduce((a,b)=>a+b,0)/ratings.length).toFixed(1):null;
