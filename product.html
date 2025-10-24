@@ -118,6 +118,7 @@ const SUPABASE_KEY =
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const productDetailsEl = document.getElementById("productDetails");
+const reviewCommentEl = document.getElementById("reviewComment");
 const reviewsListEl = document.getElementById("reviewsList");
 const averageRatingEl = document.getElementById("averageRating");
 const reviewForm = document.getElementById("reviewForm");
@@ -244,49 +245,40 @@ async function loadProduct() {
       "<p class='text-red-600 text-center'>⚠️ حدث خطأ غير متوقع أثناء تحميل المنتج</p>";
   }
 }
-
 async function loadReviews() {
-  try {
-    const { data, error } = await supabase
-      .from("product_reviews")
-      .select("*")
-      .eq("product_id", productId)
-      .order("created_at", { ascending: false });
+  const { data, error } = await supabase
+    .from("product_reviews")
+    .select("*")
+    .eq("product_id", productId)
+    .order("created_at", { ascending: false });
 
-    if (error || !data || data.length === 0) {
-      reviewsListEl.innerHTML = `<p class="text-gray-500">لا توجد تقييمات بعد</p>`;
-      averageRatingEl.textContent = "";
-      return;
-    }
-
-    const ratings = data.map((r) => Number(r.rating) || 0).filter((n) => n > 0);
-    const avg = ratings.length
-      ? (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(1)
-      : null;
-
-    averageRatingEl.textContent = avg
-      ? `متوسط التقييم: ⭐ ${avg} (${data.length} تقييم)`
-      : "لا توجد تقييمات بعد";
-
-    reviewsListEl.innerHTML = data
-      .map(
-        (r) => `
-      <div class="border p-3 rounded bg-gray-50">
-        <div class="flex justify-between items-center mb-1">
-          <span class="font-semibold">${escapeHtml(r.user_name || "مستخدم")}</span>
-          <span class="text-yellow-500">${"⭐".repeat(r.rating)}</span>
-        </div>
-        <p class="text-gray-700">${escapeHtml(r.comment || "")}</p>
-        <p class="text-xs text-gray-400 mt-1">${new Date(
-          r.created_at
-        ).toLocaleString()}</p>
-      </div>`
-      )
-      .join("");
-  } catch (err) {
-    console.error("loadReviews error:", err);
-    reviewsListEl.innerHTML = `<p class="text-gray-500">حدث خطأ أثناء تحميل التقييمات</p>`;
+  if (error) {
+    console.error("loadReviews error:", error);
+    reviewsListEl.innerHTML = `<p class="text-gray-500">لا توجد تقييمات بعد</p>`;
+    return;
   }
+
+  if (!data || !data.length) {
+    reviewsListEl.innerHTML = `<p class="text-gray-500">لا توجد تقييمات بعد</p>`;
+    averageRatingEl.textContent = "";
+    avgBadge.textContent = "";
+    return;
+  }
+
+  const avg = (data.reduce((s, r) => s + (r.rating || 0), 0) / data.length).toFixed(1);
+  averageRatingEl.textContent = `متوسط التقييم: ⭐ ${avg} (${data.length} تقييم)`;
+  avgBadge.textContent = `${avg} / 5`;
+
+  reviewsListEl.innerHTML = data.map(r => `
+    <div class="border p-3 rounded bg-gray-50">
+      <div class="flex justify-between mb-1">
+        <span class="font-semibold">${escapeHtml(r.user_name || "مستخدم")}</span>
+        <span class="text-yellow-500">${"⭐".repeat(r.rating || 0)}</span>
+      </div>
+      <p class="text-gray-700">${escapeHtml(r.comment || "")}</p>
+      <p class="text-xs text-gray-400 mt-1">${new Date(r.created_at).toLocaleString()}</p>
+    </div>
+  `).join("");
 }
 
 reviewForm.addEventListener("submit", async (ev) => {
@@ -331,32 +323,73 @@ function buildStarInput() {
   for (let i = 1; i <= 5; i++) {
     const span = document.createElement("span");
     span.textContent = "☆";
+    span.className = "text-2xl text-gray-400";
     span.dataset.value = i;
-    span.className = "text-2xl text-gray-400 cursor-pointer";
     span.addEventListener("mouseenter", () => renderStarUI(i));
     span.addEventListener("mouseleave", () => renderStarUI(selectedRating));
     span.addEventListener("click", () => {
       selectedRating = i;
       reviewRatingHidden.value = i;
-      renderStarUI(selectedRating);
+      renderStarUI(i);
     });
     starInput.appendChild(span);
   }
-  renderStarUI(selectedRating);
 }
-
 function renderStarUI(rating) {
-  Array.from(starInput.children).forEach((el) => {
-    const val = Number(el.dataset.value);
-    if (val <= rating) {
-      el.textContent = "★";
-      el.classList.replace("text-gray-400", "text-yellow-400");
-    } else {
-      el.textContent = "☆";
-      el.classList.replace("text-yellow-400", "text-gray-400");
-    }
+  [...starInput.children].forEach((star, idx) => {
+    star.textContent = idx < rating ? "★" : "☆";
+    star.className = idx < rating ? "text-2xl rating-star" : "text-2xl text-gray-400";
   });
 }
+async function safeAddReview(payload) {
+  try {
+    let { error } = await supabase.from("product_reviews").insert([payload]);
+    if (error && error.message.includes("user_id")) {
+      delete payload.user_id;
+      delete payload.user_name;
+      ({ error } = await supabase.from("product_reviews").insert([payload]));
+    }
+    return error ? { ok: false, error } : { ok: true };
+  } catch (e) {
+    return { ok: false, error: e };
+  }
+}
+
+reviewForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  if (!currentUser) return showToast("❌ يجب تسجيل الدخول لإضافة تقييم", false);
+
+  const rating = Number(reviewRatingHidden.value || selectedRating);
+  const comment = reviewCommentEl.value.trim();
+  if (!rating || !comment) return showToast("⚠️ يرجى تعبئة التقييم والتعليق", false);
+
+  const payload = {
+    product_id: productId,
+    user_id: currentUser?.id,
+    user_name: currentUser?.email,
+    rating,
+    comment
+  };
+
+  const res = await safeAddReview(payload);
+  if (res.ok) {
+    showToast("✅ تم إرسال تقييمك بنجاح");
+    reviewForm.reset();
+    selectedRating = 0;
+    renderStarUI(0);
+    await loadReviews();
+  } else {
+    console.error("submit review error", res.error);
+    showToast("❌ حدث خطأ أثناء إرسال التقييم", false);
+  }
+});
+
+cancelReviewBtn.addEventListener("click", () => {
+  reviewForm.reset();
+  selectedRating = 0;
+  renderStarUI(0);
+});
+
 
 async function loadRelated(category, excludeId) {
   try {
@@ -415,6 +448,34 @@ function escapeHtml(str = "") {
   await checkLogin();
   await loadProduct();
 })();
+function addToCart(id, name, price) {
+  let cart = JSON.parse(localStorage.getItem("cart") || "[]");
+  
+  const existing = cart.find(item => item.id === id);
+  
+  if (existing) {
+    existing.quantity += 1; 
+  } else {
+    cart.push({
+      id,
+      name,
+      price,
+      quantity: 1
+    });
+  }
+
+  localStorage.setItem("cart", JSON.stringify(cart));
+
+  const cartBadge = document.getElementById("cartBadge");
+  if (cartBadge) {
+    const count = cart.reduce((a, b) => a + (b.quantity || 1), 0);
+    cartBadge.textContent = count;
+    cartBadge.classList.remove("hidden");
+  }
+
+  showToast("✅ تمت إضافة المنتج إلى السلة بنجاح");
+}
+
 </script>
 
 </body>
