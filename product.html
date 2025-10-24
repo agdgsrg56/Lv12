@@ -172,7 +172,6 @@
 
   <!-- Script -->
   <script>
-  /* ================= إعداد Supabase ================= */
   const SUPABASE_URL = "https://nszhzfysitppxssplqfb.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemh6ZnlzaXRwcHhzc3BscWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMzA4OTcsImV4cCI6MjA3MzgwNjg5N30.5KvK4bhqkZ_GpIfED4qecIMfeubAJYwSFJslULwOp-w";
   const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -242,34 +241,58 @@
   }
 
   /* ======= جلب بيانات المنتج ======= */
-  async function loadProduct() {
-    if (!productId) {
-      document.getElementById('productWrap').innerHTML = `<p class="text-red-600">❌ لم يتم تحديد المنتج</p>`;
-      return;
-    }
+async function loadProduct() {
+  const { data, error } = await supabase
+    .from("products")
+    .select(`
+      id, name, description, price, stock, sold, category, created_at,
+      product_images(image_url, is_primary, ordering),
+      product_reviews(rating, comment, user_name, created_at)
+    `)
+    .eq("id", productId)
+    .single();
 
-    // fetch product + images + reviews
-    const { data, error } = await supabase.from('products')
-      .select(`
-        id, name, description, price, stock, sold, category, created_at,
-        product_images(image_url, is_primary, ordering),
-        product_reviews(id, rating, comment, created_at, user_name)
-      `)
-      .eq('id', productId)
-      .single();
-
-    if (error || !data) {
-      console.error('fetch product error', error);
-      document.getElementById('productWrap').innerHTML = `<p class="text-red-600">❌ المنتج غير موجود أو حدث خطأ</p>`;
-      return;
-    }
-
-    allProductData = data;
-    renderProduct(data);
-    renderReviews(data.product_reviews || []);
-    loadRelated(data.category);
-    updateCartUI();
+  if (error || !data) {
+    console.error('fetch product error', error);
+    document.getElementById('productDetails').innerHTML =
+      "<p class='text-red-600'>❌ المنتج غير موجود أو حدث خطأ</p>";
+    return;
   }
+
+  const images = (data.product_images || []).sort((a, b) => a.ordering - b.ordering);
+  const primary = images.find((i) => i.is_primary) || images[0];
+  const primaryUrl = primary ? primary.image_url : "https://via.placeholder.com/500";
+
+  productDetailsEl.innerHTML = `
+    <div class="grid md:grid-cols-2 gap-6">
+      <div>
+        <img id="mainImage" src="${primaryUrl}" class="w-full h-96 object-cover rounded-lg shadow mb-2">
+        <div class="flex gap-2 overflow-x-auto pb-1">
+          ${images
+            .map(
+              (img) => `
+              <img src="${img.image_url}" 
+                   class="w-20 h-20 object-cover rounded cursor-pointer border hover:border-blue-500"
+                   onclick="document.getElementById('mainImage').src='${img.image_url}'">
+            `
+            )
+            .join("")}
+        </div>
+      </div>
+      <div>
+        <h1 class="text-2xl font-bold mb-2">${data.name}</h1>
+        <p class="text-gray-600 mb-4">${data.description || "لا يوجد وصف"}</p>
+        <p class="text-blue-600 text-xl font-bold mb-4">💰 ${data.price} ج.م</p>
+        <p class="text-sm text-gray-500 mb-4">المتوفر: ${data.stock} | المبيعات: ${data.sold || 0}</p>
+        <button onclick="addToCart(${data.id}, '${data.name}', ${data.price})" 
+                class="bg-blue-600 text-white px-4 py-2 rounded">➕ أضف للسلة</button>
+      </div>
+    </div>
+  `;
+
+  await loadReviews(data.id);
+  await loadRelated(data.category, data.id);
+}
 
   function renderProduct(p) {
     // main fields
